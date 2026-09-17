@@ -18,8 +18,15 @@ function safeEqualHex(a,b){
 
 function verifySignature({signature,requestId,dataId,secret}){
   const {ts,v1}=parseSignature(signature);
-  if(!ts||!v1||!requestId||!dataId||!secret) return false;
-  const manifest=`id:${dataId};request-id:${requestId};ts:${ts};`;
+  if(!ts||!v1||!secret) return false;
+
+  // Mercado Pago firma únicamente los pares presentes. Para IDs alfanuméricos
+  // recomienda usar data.id en minúsculas durante la validación.
+  let manifest='';
+  if(dataId) manifest+=`id:${String(dataId).toLowerCase()};`;
+  if(requestId) manifest+=`request-id:${requestId};`;
+  manifest+=`ts:${ts};`;
+
   const expected=crypto.createHmac('sha256',secret).update(manifest).digest('hex');
   return safeEqualHex(expected,v1);
 }
@@ -53,24 +60,38 @@ export default async function handler(req,res){
   }
 
   const body=req.body||{};
-  const dataId=String(req.query?.['data.id']||req.query?.data_id||body?.data?.id||'');
+  const queryDataId=String(req.query?.['data.id']||req.query?.data_id||'');
+  const bodyDataId=String(body?.data?.id||'');
+  const orderId=queryDataId||bodyDataId;
   const type=String(req.query?.type||body?.type||'');
   const signature=String(req.headers['x-signature']||'');
   const requestId=String(req.headers['x-request-id']||'');
 
-  if(!verifySignature({signature,requestId,dataId,secret})){
-    console.warn('Webhook Mercado Pago rechazado por firma inválida',{type,dataId,requestId});
+  // La firma se valida con data.id del query string, tal como lo documenta Mercado Pago.
+  if(!verifySignature({signature,requestId,dataId:queryDataId,secret})){
+    console.warn('Webhook Mercado Pago rechazado por firma inválida',{
+      type,
+      hasQueryDataId:Boolean(queryDataId),
+      hasBodyDataId:Boolean(bodyDataId),
+      hasRequestId:Boolean(requestId)
+    });
     return res.status(401).json({error:'Firma inválida'});
   }
 
-  // Checkout Pro vía Orders API notifica eventos de order.
   if(type && type!=='order' && type!=='orders_v2'){
-    console.log('Webhook Mercado Pago ignorado por tipo no manejado',{type,dataId});
+    console.log('Webhook Mercado Pago ignorado por tipo no manejado',{type,orderId});
     return res.status(200).json({ok:true,ignored:true});
   }
 
+  // El simulador puede enviar un ID de ejemplo solamente en el body. Una vez
+  // validada la firma, lo reconocemos sin intentar consultar una orden inexistente.
+  if(!queryDataId){
+    console.log('AQUACORE_WEBHOOK_SIMULATION',{action:body?.action||null,type,bodyDataId:bodyDataId||null});
+    return res.status(200).json({ok:true,received:true,simulation:true});
+  }
+
   try{
-    const order=await fetchOrder(dataId,accessToken);
+    const order=await fetchOrder(orderId,accessToken);
     const summary={
       eventId:body?.id||null,
       action:body?.action||null,
@@ -84,7 +105,6 @@ export default async function handler(req,res){
       currency:order.currency||null
     };
 
-    // Vercel conserva este registro en Runtime Logs. La fuente de verdad sigue siendo Mercado Pago.
     if(order.status==='processed' && order.status_detail==='accredited'){
       console.log('AQUACORE_PAYMENT_APPROVED',summary);
     }else if(order.status==='failed'||order.status==='canceled'||order.status==='refunded'){
@@ -95,7 +115,6 @@ export default async function handler(req,res){
 
     return res.status(200).json({ok:true,received:true,status:order.status,statusDetail:order.status_detail});
   }catch(err){
-    // Un error de consulta debe provocar reintento de Mercado Pago.
     console.error('Webhook Mercado Pago: no se pudo consultar la order',err);
     return res.status(500).json({error:'No se pudo validar el estado de la order'});
   }
