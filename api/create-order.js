@@ -9,12 +9,6 @@ function loadProducts(){
   return JSON.parse(fs.readFileSync(file,'utf8'));
 }
 
-function getBaseUrl(req){
-  const proto=req.headers['x-forwarded-proto']||'https';
-  const host=req.headers['x-forwarded-host']||req.headers.host;
-  return `${proto}://${host}`;
-}
-
 export default async function handler(req,res){
   const accessToken=process.env.MERCADOPAGO_ACCESS_TOKEN;
 
@@ -36,7 +30,9 @@ export default async function handler(req,res){
   if(req.method!=='POST')return res.status(405).json({error:'Método no permitido'});
 
   try{
-    if(!accessToken)return res.status(503).json({error:'Pago en línea aún no activado',code:'PAYMENTS_NOT_CONFIGURED'});
+    if(!accessToken){
+      return res.status(503).json({error:'Pago en línea aún no activado',code:'PAYMENTS_NOT_CONFIGURED'});
+    }
 
     const {orderId,customer,lines}=req.body||{};
     if(!orderId||!customer?.email||!Array.isArray(lines)||!lines.length){
@@ -55,7 +51,6 @@ export default async function handler(req,res){
     }
 
     const subtotal=Number(clean.reduce((s,x)=>s+Number(x.p.price)*x.qty,0).toFixed(2));
-
     if(subtotal<FREE_SHIPPING){
       return res.status(409).json({
         error:'El pedido requiere cálculo de envío antes de cobrar.',
@@ -65,32 +60,24 @@ export default async function handler(req,res){
       });
     }
 
-    const baseUrl=getBaseUrl(req);
     const items=clean.map(({p,qty})=>({
       title:String(p.name).slice(0,120),
-      ...(p.code?{description:`Código: ${p.code}`}:{ }),
       unit_price:Number(p.price).toFixed(2),
       quantity:qty,
       unit_measure:'unit',
       total_amount:Number(Number(p.price)*qty).toFixed(2)
     }));
 
+    // Para la prueba usamos el payload mínimo recomendado por Checkout Pro Orders API.
+    // Las URLs de retorno se vuelven a agregar después de validar el checkout.
     const body={
       type:'online',
       processing_mode:'manual',
+      capture_mode:'automatic_async',
       total_amount:subtotal.toFixed(2),
       external_reference:String(orderId).slice(0,64),
-      description:`Pedido ${orderId} - AquaCore MX`,
-      payer:{email:customer.email},
-      items,
-      config:{
-        online:{
-          success_url:`${baseUrl}/success.html?folio=${encodeURIComponent(orderId)}`,
-          failure_url:`${baseUrl}/failure.html?folio=${encodeURIComponent(orderId)}`,
-          pending_url:`${baseUrl}/pending.html?folio=${encodeURIComponent(orderId)}`,
-          auto_return:'all'
-        }
-      }
+      payer:{email:String(customer.email).trim()},
+      items
     };
 
     const mpResponse=await fetch('https://api.mercadopago.com/v1/orders',{
@@ -111,12 +98,14 @@ export default async function handler(req,res){
         status:mpResponse.status,
         message:data?.message,
         error:data?.error,
-        details:data?.details
+        details:data?.details,
+        cause:data?.cause
       });
       return res.status(502).json({
         error:'No fue posible iniciar el pago con Mercado Pago.',
         providerStatus:mpResponse.status,
-        details:data?.message||data?.error||'Respuesta inválida del proveedor de pago'
+        providerMessage:data?.message||data?.error||'Respuesta inválida del proveedor de pago',
+        providerDetails:data?.details||data?.cause||null
       });
     }
 
