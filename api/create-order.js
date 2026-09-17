@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
+import { dbConfigured, upsertOrder, updateOrderByFolio } from './_db.js';
 
 const FREE_SHIPPING = 5000;
 
@@ -39,7 +40,8 @@ export default async function handler(req,res){
         ok:true,
         paymentsConfigured:Boolean(accessToken),
         catalogLoaded:Array.isArray(products)&&products.length>0,
-        productCount:Array.isArray(products)?products.length:0
+        productCount:Array.isArray(products)?products.length:0,
+        ordersDatabaseConfigured:dbConfigured()
       });
     }catch(err){
       console.error('Healthcheck catalog error:',err);
@@ -119,12 +121,50 @@ export default async function handler(req,res){
     if(!mpResponse.ok||!data.checkout_url){
       const details=providerDetail(data);
       console.error('Mercado Pago create-order error',{status:mpResponse.status,details});
+      if(dbConfigured()){
+        updateOrderByFolio(orderId,{payment_status:'failed',payment_status_detail:details}).catch(()=>{});
+      }
       return res.status(502).json({
         error:'No fue posible iniciar el pago con Mercado Pago.',
         providerStatus:mpResponse.status,
         providerCode:data?.error||data?.code||null,
         details
       });
+    }
+
+    if(dbConfigured()){
+      const orderRecord={
+        folio:String(orderId),
+        mp_order_id:String(data.id||'')||null,
+        customer_name:String(customer.name||'').trim()||null,
+        customer_email:String(customer.email||'').trim()||null,
+        customer_phone:String(customer.phone||'').trim()||null,
+        address:String(customer.address||'').trim()||null,
+        city:String(customer.city||'').trim()||null,
+        state:String(customer.state||'').trim()||null,
+        zip:String(customer.zip||'').trim()||null,
+        reference:String(customer.reference||'').trim()||null,
+        items:clean.map(({p,qty})=>({
+          id:Number(p.id),
+          name:p.name,
+          code:p.code||null,
+          qty,
+          unit_price:Number(p.price),
+          total:Number((Number(p.price)*qty).toFixed(2))
+        })),
+        subtotal,
+        shipping_amount:0,
+        shipping_status:'free',
+        payment_status:'pending',
+        payment_status_detail:'checkout_created',
+        currency:'MXN',
+        updated_at:new Date().toISOString()
+      };
+      try{
+        await upsertOrder(orderRecord);
+      }catch(dbErr){
+        console.error('No se pudo guardar el pedido en Supabase',dbErr);
+      }
     }
 
     return res.status(200).json({
