@@ -9,6 +9,26 @@ function loadProducts(){
   return JSON.parse(fs.readFileSync(file,'utf8'));
 }
 
+function getBaseUrl(req){
+  const proto=req.headers['x-forwarded-proto']||'https';
+  const host=req.headers['x-forwarded-host']||req.headers.host;
+  return `${proto}://${host}`;
+}
+
+function providerDetail(data){
+  const parts=[];
+  if(data?.error) parts.push(String(data.error));
+  if(data?.message) parts.push(String(data.message));
+  if(Array.isArray(data?.details)){
+    for(const d of data.details.slice(0,3)){
+      const code=d?.code||d?.error||d?.type;
+      const desc=d?.description||d?.message||d?.detail;
+      if(code||desc) parts.push([code,desc].filter(Boolean).join(': '));
+    }
+  }
+  return parts.join(' | ')||'Respuesta inválida del proveedor de pago';
+}
+
 export default async function handler(req,res){
   const accessToken=process.env.MERCADOPAGO_ACCESS_TOKEN;
 
@@ -30,9 +50,7 @@ export default async function handler(req,res){
   if(req.method!=='POST')return res.status(405).json({error:'Método no permitido'});
 
   try{
-    if(!accessToken){
-      return res.status(503).json({error:'Pago en línea aún no activado',code:'PAYMENTS_NOT_CONFIGURED'});
-    }
+    if(!accessToken)return res.status(503).json({error:'Pago en línea aún no activado',code:'PAYMENTS_NOT_CONFIGURED'});
 
     const {orderId,customer,lines}=req.body||{};
     if(!orderId||!customer?.email||!Array.isArray(lines)||!lines.length){
@@ -51,6 +69,7 @@ export default async function handler(req,res){
     }
 
     const subtotal=Number(clean.reduce((s,x)=>s+Number(x.p.price)*x.qty,0).toFixed(2));
+
     if(subtotal<FREE_SHIPPING){
       return res.status(409).json({
         error:'El pedido requiere cálculo de envío antes de cobrar.',
@@ -60,24 +79,28 @@ export default async function handler(req,res){
       });
     }
 
+    const baseUrl=getBaseUrl(req);
     const items=clean.map(({p,qty})=>({
       title:String(p.name).slice(0,120),
-      unit_price:Number(p.price).toFixed(2),
       quantity:qty,
-      unit_measure:'unit',
-      total_amount:Number(Number(p.price)*qty).toFixed(2)
+      unit_price:Number(p.price).toFixed(2)
     }));
 
-    // Para la prueba usamos el payload mínimo recomendado por Checkout Pro Orders API.
-    // Las URLs de retorno se vuelven a agregar después de validar el checkout.
     const body={
       type:'online',
       processing_mode:'manual',
-      capture_mode:'automatic_async',
       total_amount:subtotal.toFixed(2),
       external_reference:String(orderId).slice(0,64),
       payer:{email:String(customer.email).trim()},
-      items
+      items,
+      config:{
+        online:{
+          success_url:`${baseUrl}/success.html?folio=${encodeURIComponent(orderId)}`,
+          failure_url:`${baseUrl}/failure.html?folio=${encodeURIComponent(orderId)}`,
+          pending_url:`${baseUrl}/pending.html?folio=${encodeURIComponent(orderId)}`,
+          auto_return:'approved'
+        }
+      }
     };
 
     const mpResponse=await fetch('https://api.mercadopago.com/v1/orders',{
@@ -94,18 +117,13 @@ export default async function handler(req,res){
     const data=await mpResponse.json().catch(()=>({}));
 
     if(!mpResponse.ok||!data.checkout_url){
-      console.error('Mercado Pago create-order error',{
-        status:mpResponse.status,
-        message:data?.message,
-        error:data?.error,
-        details:data?.details,
-        cause:data?.cause
-      });
+      const details=providerDetail(data);
+      console.error('Mercado Pago create-order error',{status:mpResponse.status,details});
       return res.status(502).json({
         error:'No fue posible iniciar el pago con Mercado Pago.',
         providerStatus:mpResponse.status,
-        providerMessage:data?.message||data?.error||'Respuesta inválida del proveedor de pago',
-        providerDetails:data?.details||data?.cause||null
+        providerCode:data?.error||data?.code||null,
+        details
       });
     }
 
@@ -117,6 +135,6 @@ export default async function handler(req,res){
     });
   }catch(err){
     console.error('Checkout error:',err);
-    return res.status(500).json({error:'Error interno al generar el pago'});
+    return res.status(500).json({error:'Error interno al generar el pago',details:err?.message||'Error desconocido'});
   }
 }
