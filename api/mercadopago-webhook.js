@@ -1,4 +1,5 @@
 import { WebhookSignatureValidator, InvalidWebhookSignatureError } from 'mercadopago';
+import { dbConfigured, updateOrderByFolio, updateOrderByMpOrderId } from './_db.js';
 
 function validateWithSdk({signature,requestId,dataId,secret}){
   if(!signature||!secret) return false;
@@ -26,6 +27,33 @@ async function fetchOrder(orderId,accessToken){
   return data;
 }
 
+function localStatus(order){
+  const status=String(order?.status||'').toLowerCase();
+  const detail=String(order?.status_detail||'').toLowerCase();
+  if(status==='processed'&&detail==='accredited') return 'approved';
+  if(['failed','canceled','cancelled'].includes(status)) return 'failed';
+  if(status==='refunded') return 'refunded';
+  return 'pending';
+}
+
+function paymentInfo(order){
+  const pools=[
+    order?.transactions?.payments,
+    order?.payments,
+    order?.transactions?.payment
+  ];
+  let p=null;
+  for(const x of pools){
+    if(Array.isArray(x)&&x.length){p=x[0];break}
+    if(x&&typeof x==='object'&&!Array.isArray(x)){p=x;break}
+  }
+  if(!p) return {payment_id:null,payment_method:null};
+  return {
+    payment_id:p.id!=null?String(p.id):null,
+    payment_method:p?.payment_method?.id||p?.payment_method_id||p?.method||null
+  };
+}
+
 export default async function handler(req,res){
   if(req.method==='GET'){
     return res.status(200).json({
@@ -33,6 +61,7 @@ export default async function handler(req,res){
       endpoint:'mercadopago-webhook',
       accessTokenConfigured:Boolean(process.env.MERCADOPAGO_ACCESS_TOKEN),
       webhookSecretConfigured:Boolean(process.env.MERCADOPAGO_WEBHOOK_SECRET),
+      ordersDatabaseConfigured:dbConfigured(),
       validator:'mercadopago-sdk'
     });
   }
@@ -54,9 +83,6 @@ export default async function handler(req,res){
   const signature=String(req.headers['x-signature']||'');
   const requestId=String(req.headers['x-request-id']||'');
 
-  // Mercado Pago documenta validar con data.id del query string.
-  // El simulador puede entregar el Data ID dentro del body; si no hay query,
-  // validamos contra ese mismo ID usando el SDK oficial.
   const signatureOk =
     validateWithSdk({signature,requestId,dataId:queryDataId,secret}) ||
     (!queryDataId && bodyDataId
@@ -79,8 +105,6 @@ export default async function handler(req,res){
     return res.status(200).json({ok:true,ignored:true});
   }
 
-  // La simulación de Mercado Pago envía una order completa de ejemplo en data.
-  // No intentamos consultar ese ID ficticio en /v1/orders.
   const looksLikeSimulation = Boolean(
     body?.data &&
     typeof body.data==='object' &&
@@ -123,6 +147,32 @@ export default async function handler(req,res){
       totalPaidAmount:order.total_paid_amount||null,
       currency:order.currency||null
     };
+
+    if(dbConfigured()){
+      const mapped=localStatus(order);
+      const p=paymentInfo(order);
+      const patch={
+        mp_order_id:String(order.id||orderId),
+        payment_status:mapped,
+        payment_status_detail:order.status_detail||order.status||null,
+        payment_id:p.payment_id,
+        payment_method:p.payment_method,
+        currency:order.currency||'MXN'
+      };
+      if(mapped==='approved') patch.paid_at=new Date().toISOString();
+
+      try{
+        const byFolio=order.external_reference
+          ? await updateOrderByFolio(String(order.external_reference),patch)
+          : null;
+        if((!byFolio||!byFolio.length) && order.id){
+          await updateOrderByMpOrderId(String(order.id),patch);
+        }
+      }catch(dbErr){
+        console.error('No se pudo actualizar el pedido en Supabase',dbErr);
+        return res.status(500).json({error:'No se pudo registrar el estado del pago'});
+      }
+    }
 
     if(order.status==='processed' && order.status_detail==='accredited'){
       console.log('AQUACORE_PAYMENT_APPROVED',summary);
