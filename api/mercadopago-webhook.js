@@ -1,34 +1,20 @@
-import crypto from 'node:crypto';
+import { WebhookSignatureValidator, InvalidWebhookSignatureError } from 'mercadopago';
 
-function parseSignature(header=''){
-  const out={};
-  for(const part of String(header).split(',')){
-    const i=part.indexOf('=');
-    if(i>0) out[part.slice(0,i).trim()]=part.slice(i+1).trim();
+function validateWithSdk({signature,requestId,dataId,secret}){
+  if(!signature||!secret) return false;
+  try{
+    WebhookSignatureValidator.validate({
+      xSignature: signature,
+      xRequestId: requestId || undefined,
+      dataId: dataId || undefined,
+      secret: String(secret).trim()
+    });
+    return true;
+  }catch(err){
+    if(err instanceof InvalidWebhookSignatureError) return false;
+    console.error('Mercado Pago webhook validator error',err);
+    return false;
   }
-  return out;
-}
-
-function safeEqualHex(a,b){
-  if(!/^[a-f0-9]+$/i.test(a||'')||!/^[a-f0-9]+$/i.test(b||'')) return false;
-  const aa=Buffer.from(a,'hex'),bb=Buffer.from(b,'hex');
-  if(aa.length!==bb.length) return false;
-  return crypto.timingSafeEqual(aa,bb);
-}
-
-function verifySignature({signature,requestId,dataId,secret}){
-  const {ts,v1}=parseSignature(signature);
-  if(!ts||!v1||!secret) return false;
-
-  // Mercado Pago firma únicamente los pares presentes. Para IDs alfanuméricos
-  // recomienda usar data.id en minúsculas durante la validación.
-  let manifest='';
-  if(dataId) manifest+=`id:${String(dataId).toLowerCase()};`;
-  if(requestId) manifest+=`request-id:${requestId};`;
-  manifest+=`ts:${ts};`;
-
-  const expected=crypto.createHmac('sha256',secret).update(manifest).digest('hex');
-  return safeEqualHex(expected,v1);
 }
 
 async function fetchOrder(orderId,accessToken){
@@ -46,7 +32,8 @@ export default async function handler(req,res){
       ok:true,
       endpoint:'mercadopago-webhook',
       accessTokenConfigured:Boolean(process.env.MERCADOPAGO_ACCESS_TOKEN),
-      webhookSecretConfigured:Boolean(process.env.MERCADOPAGO_WEBHOOK_SECRET)
+      webhookSecretConfigured:Boolean(process.env.MERCADOPAGO_WEBHOOK_SECRET),
+      validator:'mercadopago-sdk'
     });
   }
 
@@ -67,13 +54,22 @@ export default async function handler(req,res){
   const signature=String(req.headers['x-signature']||'');
   const requestId=String(req.headers['x-request-id']||'');
 
-  // La firma se valida con data.id del query string, tal como lo documenta Mercado Pago.
-  if(!verifySignature({signature,requestId,dataId:queryDataId,secret})){
+  // Mercado Pago documenta validar con data.id del query string.
+  // El simulador puede entregar el Data ID dentro del body; si no hay query,
+  // validamos contra ese mismo ID usando el SDK oficial.
+  const signatureOk =
+    validateWithSdk({signature,requestId,dataId:queryDataId,secret}) ||
+    (!queryDataId && bodyDataId
+      ? validateWithSdk({signature,requestId,dataId:bodyDataId,secret})
+      : false);
+
+  if(!signatureOk){
     console.warn('Webhook Mercado Pago rechazado por firma inválida',{
       type,
       hasQueryDataId:Boolean(queryDataId),
       hasBodyDataId:Boolean(bodyDataId),
-      hasRequestId:Boolean(requestId)
+      hasRequestId:Boolean(requestId),
+      hasSignature:Boolean(signature)
     });
     return res.status(401).json({error:'Firma inválida'});
   }
@@ -83,11 +79,34 @@ export default async function handler(req,res){
     return res.status(200).json({ok:true,ignored:true});
   }
 
-  // El simulador puede enviar un ID de ejemplo solamente en el body. Una vez
-  // validada la firma, lo reconocemos sin intentar consultar una orden inexistente.
-  if(!queryDataId){
-    console.log('AQUACORE_WEBHOOK_SIMULATION',{action:body?.action||null,type,bodyDataId:bodyDataId||null});
+  // La simulación de Mercado Pago envía una order completa de ejemplo en data.
+  // No intentamos consultar ese ID ficticio en /v1/orders.
+  const looksLikeSimulation = Boolean(
+    body?.data &&
+    typeof body.data==='object' &&
+    (
+      body.data.status ||
+      body.data.status_detail ||
+      body.data.total_amount ||
+      body.data.transactions ||
+      body.data.payments ||
+      body.data.external_reference
+    )
+  );
+
+  if(looksLikeSimulation){
+    console.log('AQUACORE_WEBHOOK_SIMULATION',{
+      action:body?.action||null,
+      type,
+      dataId:bodyDataId||queryDataId||null,
+      status:body?.data?.status||null,
+      statusDetail:body?.data?.status_detail||null
+    });
     return res.status(200).json({ok:true,received:true,simulation:true});
+  }
+
+  if(!orderId){
+    return res.status(400).json({error:'Notificación sin order id'});
   }
 
   try{
@@ -113,7 +132,12 @@ export default async function handler(req,res){
       console.log('AQUACORE_PAYMENT_UPDATE',summary);
     }
 
-    return res.status(200).json({ok:true,received:true,status:order.status,statusDetail:order.status_detail});
+    return res.status(200).json({
+      ok:true,
+      received:true,
+      status:order.status,
+      statusDetail:order.status_detail
+    });
   }catch(err){
     console.error('Webhook Mercado Pago: no se pudo consultar la order',err);
     return res.status(500).json({error:'No se pudo validar el estado de la order'});
