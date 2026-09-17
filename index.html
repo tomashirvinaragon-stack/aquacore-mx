@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#062b4d">
+  <meta name="description" content="AquaCore MX: equipos para acuacultura, aireación, calidad de agua, redes y equipo de pesca. Envíos a todo México y envío gratis desde $5,000 MXN.">
+  <meta property="og:title" content="AquaCore MX | Tecnología que impulsa tu cultivo">
+  <meta property="og:description" content="Blowers, aireadores, oxímetros, difusores, redes y equipo especializado con cobertura nacional.">
+  <meta property="og:type" content="website">
+  <title>AquaCore MX | Equipos para acuacultura y pesca</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"OnlineStore","name":"AquaCore MX","description":"Equipos y soluciones para acuacultura y pesca comercial","telephone":"+52 644 212 7571","areaServed":"MX","priceRange":"$$"}
+  </script>
+</head>
+<body>
+  <div class="topbar"><span>🚚 <strong>Envío GRATIS</strong> en compras desde $5,000 MXN</span><span>·</span><span>Envíos a todo México</span></div>
+
+  <header class="site-header">
+    <a href="#inicio" class="brand" aria-label="AquaCore MX - Inicio"><img src="assets/logo.svg" alt="AquaCore MX"></a>
+    <button class="mobile-menu" id="mobileMenu" aria-label="Abrir menú" aria-expanded="false">☰</button>
+    <nav id="mainNav">
+      <a href="#productos">Productos</a>
+      <a href="#calculadora">Calcula tu sistema</a>
+      <a href="#cobertura">Cobertura</a>
+      <a href="#faq">Preguntas</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+    <button class="cart-button" id="cartButton" aria-label="Abrir carrito"><span>Carrito</span><b id="cartCount">0</b></button>
+  </header>
+
+  <main>
+    <section class="hero" id="inicio">
+      <div class="hero-copy">
+        <span class="eyebrow">ACUACULTURA · PESCA · PRODUCCIÓN</span>
+        <h1>Tecnología que impulsa tu cultivo.</h1>
+        <p>Equipos para aireación, monitoreo de agua, redes, procesamiento y protección. Compra en línea con precios netos y atención directa.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#productos">Ver catálogo</a>
+          <a class="btn secondary" href="https://wa.me/526442127571?text=Hola%20AquaCore%20MX,%20necesito%20asesor%C3%ADa" target="_blank" rel="noopener">WhatsApp 644 212 7571</a>
+        </div>
+        <div class="hero-benefits">
+          <span>✓ Precios netos</span><span>✓ 91 productos</span><span>✓ 9 puntos de distribución</span><span>✓ Envío gratis desde $5,000</span>
+        </div>
+      </div>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="hero-orb orb-1"></div><div class="hero-orb orb-2"></div><div class="hero-orb orb-3"></div>
+        <div class="hero-machine"><span class="rotor">✦</span><small>AIREACIÓN</small></div>
+        <div class="hero-wave wave-a"></div><div class="hero-wave wave-b"></div>
+      </div>
+    </section>
+
+    <section class="trust-strip">
+      <div><strong>91</strong><span>Productos cargados</span></div>
+      <div><strong>$5,000</strong><span>Envío gratis desde</span></div>
+      <div><strong>9</strong><span>Puntos de distribución</span></div>
+      <div><strong>Nacional</strong><span>Cobertura de envío</span></div>
+    </section>
+
+    <section class="section" id="soluciones">
+      <div class="section-heading"><div><span class="eyebrow">CATEGORÍAS</span><h2>Encuentra tu equipo más rápido</h2></div><p>Explora por tipo de producto o usa el buscador del catálogo.</p></div>
+      <div class="category-grid" id="categoryGrid"></div>
+    </section>
+
+    <section class="section products-section" id="productos">
+      <div class="section-heading products-heading">
+        <div><span class="eyebrow">CATÁLOGO</span><h2>Productos AquaCore MX</h2></div>
+        <div class="catalog-tools">
+          <label class="search-box"><span>⌕</span><input id="searchInput" type="search" placeholder="Buscar producto, modelo o marca…" autocomplete="off"></label>
+          <select id="sortSelect" aria-label="Ordenar productos">
+            <option value="featured">Destacados</option><option value="price-asc">Precio: menor a mayor</option><option value="price-desc">Precio: mayor a menor</option><option value="name">Nombre A-Z</option>
+          </select>
+        </div>
+      </div>
+      <div class="filters" id="filters"></div>
+      <div class="catalog-status"><span id="resultCount"></span><span>Todos los precios mostrados son <strong>netos</strong>.</span></div>
+      <div class="product-grid" id="productGrid"></div>
+      <div class="empty-state" id="emptyState" hidden>No encontramos productos con esos filtros.</div>
+    </section>
+
+    <section class="section calculator-section" id="calculadora">
+      <div class="calculator-copy">
+        <span class="eyebrow">PRE-DIMENSIONAMIENTO</span>
+        <h2>Calcula los datos de tu estanque y solicita el sistema correcto</h2>
+        <p>La herramienta calcula el volumen aproximado del estanque y prepara una solicitud técnica con los datos necesarios para recomendar blower, difusores o aireadores.</p>
+        <div class="note-card"><strong>Importante</strong><span>La recomendación final se confirma con un asesor, porque la demanda de oxígeno cambia según especie, biomasa, temperatura, salinidad y manejo.</span></div>
+      </div>
+      <form class="calculator-card" id="airForm">
+        <div class="form-grid compact">
+          <label>Tipo de estanque<select name="shape" id="shapeSelect"><option value="round">Circular</option><option value="rect">Rectangular</option></select></label>
+          <label>Especie<select name="species"><option>Camarón</option><option>Tilapia</option><option>Trucha</option><option>Bagre</option><option>Ornamental</option><option>Otra</option></select></label>
+          <label class="round-field">Diámetro (m)<input name="diameter" type="number" min="0.1" step="0.1" value="4"></label>
+          <label class="rect-field" hidden>Largo (m)<input name="length" type="number" min="0.1" step="0.1"></label>
+          <label class="rect-field" hidden>Ancho (m)<input name="width" type="number" min="0.1" step="0.1"></label>
+          <label>Profundidad (m)<input name="depth" type="number" min="0.1" step="0.1" value="1"></label>
+          <label>Número de estanques<input name="ponds" type="number" min="1" step="1" value="1"></label>
+          <label>Densidad / biomasa (opcional)<input name="density" placeholder="Ej. 8,000 camarones"></label>
+        </div>
+        <div class="calculator-result" id="calcResult"><span>Volumen aproximado total</span><strong>—</strong></div>
+        <button class="btn primary full" type="submit">Solicitar recomendación por WhatsApp</button>
+      </form>
+    </section>
+
+    <section class="section coverage-section" id="cobertura">
+      <div class="section-heading"><div><span class="eyebrow">COBERTURA NACIONAL</span><h2>Distribución desde puntos estratégicos</h2></div><p>El punto de surtido depende de existencia, destino y logística del pedido.</p></div>
+      <div class="warehouse-grid">
+        <article class="warehouse main"><span>MATRIZ</span><strong>Ciudad Obregón</strong><small>Sonora</small></article>
+        <article class="warehouse"><strong>Guadalajara</strong><small>Jalisco</small></article><article class="warehouse"><strong>Mazatlán</strong><small>Sinaloa</small></article><article class="warehouse"><strong>Los Mochis</strong><small>Sinaloa</small></article>
+        <article class="warehouse"><strong>Hermosillo</strong><small>Sonora</small></article><article class="warehouse"><strong>Tuxtla Gutiérrez</strong><small>Chiapas</small></article><article class="warehouse"><strong>Champotón</strong><small>Campeche</small></article>
+        <article class="warehouse"><strong>Ensenada</strong><small>Baja California</small></article><article class="warehouse"><strong>La Paz</strong><small>Baja California Sur</small></article>
+      </div>
+    </section>
+
+    <section class="section process-section">
+      <div class="section-heading"><div><span class="eyebrow">COMPRA SIMPLE</span><h2>Así funciona tu pedido</h2></div></div>
+      <div class="process-grid"><article><b>1</b><h3>Elige productos</h3><p>Agrega equipos y accesorios al carrito con precio neto visible.</p></article><article><b>2</b><h3>Completa tus datos</h3><p>Ingresa dirección de entrega y datos de contacto.</p></article><article><b>3</b><h3>Confirma disponibilidad</h3><p>El pedido genera un folio y se envía por WhatsApp para confirmar existencia y pago.</p></article><article><b>4</b><h3>Recibe tu pedido</h3><p>En compras desde $5,000 MXN, el envío es gratis bajo la política comercial indicada.</p></article></div>
+    </section>
+
+    <section class="section faq-section" id="faq">
+      <div class="section-heading"><div><span class="eyebrow">PREGUNTAS FRECUENTES</span><h2>Antes de comprar</h2></div></div>
+      <div class="faq-list">
+        <details><summary>¿Los precios ya incluyen impuestos?</summary><p>Los precios publicados se muestran como precios netos de venta. Antes de procesar el pago se confirma disponibilidad y datos fiscales cuando aplique.</p></details>
+        <details><summary>¿Cuándo aplica el envío gratis?</summary><p>En compras de $5,000 MXN o más. En pedidos menores, el costo de envío se confirma según destino, volumen y peso.</p></details>
+        <details><summary>¿Puedo pedir asesoría antes de comprar un blower o aireador?</summary><p>Sí. Puedes usar la calculadora de pre-dimensionamiento o escribir al WhatsApp 644 212 7571.</p></details>
+        <details><summary>¿Desde dónde se envían los productos?</summary><p>El surtido puede salir de Ciudad Obregón, Guadalajara, Mazatlán, Los Mochis, Hermosillo, Tuxtla Gutiérrez, Champotón, Ensenada o La Paz, según existencia y destino.</p></details>
+      </div>
+    </section>
+  </main>
+
+  <footer id="contacto">
+    <div class="footer-brand"><img src="assets/logo.svg" alt="AquaCore MX"><p>Equipos y soluciones para acuacultura, pesca comercial y producción.</p></div>
+    <div><b>Contacto</b><a href="tel:+526442127571">644 212 7571</a><a target="_blank" rel="noopener" href="https://wa.me/526442127571">WhatsApp</a></div>
+    <div><b>Compra</b><a href="#productos">Catálogo</a><a href="#calculadora">Calcula tu sistema</a><a href="#cobertura">Cobertura</a></div>
+    <div><b>Políticas</b><button class="footer-link" data-policy="shipping">Envíos</button><button class="footer-link" data-policy="privacy">Privacidad</button><button class="footer-link" data-policy="terms">Términos</button></div>
+  </footer>
+
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="cart-drawer" id="cartDrawer" aria-hidden="true">
+    <div class="cart-head"><div><span class="eyebrow">TU PEDIDO</span><h3>Carrito</h3></div><button id="closeCart" aria-label="Cerrar">×</button></div>
+    <div class="shipping-progress"><div class="progress-text" id="progressText"></div><div class="progress-track"><div class="progress-bar" id="progressBar"></div></div></div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-summary"><div><span>Subtotal</span><strong id="subtotal">$0.00</strong></div><div><span>Envío</span><strong id="shipping">Por calcular</strong></div><div class="total"><span>Total productos</span><strong id="total">$0.00</strong></div><button class="btn primary full" id="checkoutBtn">Continuar pedido</button><small>Pago seguro con Mercado Pago para pedidos con envío gratis. En compras menores a $5,000, primero se calcula el flete.</small></div>
+  </aside>
+
+  <dialog id="productDialog" class="product-dialog"><button class="dialog-close" data-close="productDialog" aria-label="Cerrar">×</button><div id="productDialogBody"></div></dialog>
+
+  <dialog id="checkoutDialog" class="checkout-dialog">
+    <form id="checkoutForm">
+      <button type="button" class="dialog-close" data-close="checkoutDialog" aria-label="Cerrar">×</button>
+      <span class="eyebrow">FINALIZAR PEDIDO</span><h2>Datos de entrega</h2>
+      <div class="order-mini" id="orderMini"></div>
+      <div class="form-grid">
+        <label>Nombre completo<input required name="name" autocomplete="name"></label><label>Teléfono<input required name="phone" inputmode="tel" autocomplete="tel"></label>
+        <label class="wide">Correo<input required name="email" type="email" autocomplete="email"></label><label class="wide">Dirección<input required name="address" autocomplete="street-address"></label>
+        <label>Ciudad<input required name="city"></label><label>Estado<input required name="state"></label><label>C.P.<input required name="zip" inputmode="numeric" autocomplete="postal-code"></label><label>Referencia<input name="reference"></label>
+      </div>
+      <label class="checkbox"><input required type="checkbox"> <span>Confirmo que mis datos son correctos y deseo generar el pedido.</span></label>
+      <div class="payment-notice" id="paymentNotice">En compras de $5,000 MXN o más podrás continuar directamente a Mercado Pago. En compras menores, te ayudamos a calcular el envío antes de cobrar.</div><button class="btn primary full" id="submitOrderBtn" type="submit">Continuar al pago</button>
+    </form>
+  </dialog>
+
+  <dialog id="policyDialog" class="policy-dialog"><button class="dialog-close" data-close="policyDialog" aria-label="Cerrar">×</button><div id="policyBody"></div></dialog>
+
+  <dialog id="successDialog" class="success-dialog"><button class="dialog-close" data-close="successDialog" aria-label="Cerrar">×</button><div class="success-icon">✓</div><h2 id="successTitle">Pedido generado</h2><p id="successCopy"></p><button class="btn primary full" id="successWa">Continuar por WhatsApp</button></dialog>
+
+  <a class="whatsapp-float" href="https://wa.me/526442127571?text=Hola%20AquaCore%20MX" target="_blank" rel="noopener" aria-label="WhatsApp">WA</a>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
