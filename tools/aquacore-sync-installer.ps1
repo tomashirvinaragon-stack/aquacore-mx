@@ -58,6 +58,7 @@ $SecurePassword = Read-Host 'Contrasena de administrador' -AsSecureString
 $EncryptedPassword = ConvertFrom-SecureString -SecureString $SecurePassword
 
 $Worker = @'
+param([switch]$Interactive)
 $ErrorActionPreference = 'Stop'
 $Root = Join-Path $env:LOCALAPPDATA 'AquaCoreSync'
 $ConfigPath = Join-Path $Root 'config.json'
@@ -93,21 +94,30 @@ try {
     $credential = New-Object System.Management.Automation.PSCredential('aquacore', $secure)
     $adminPassword = $credential.GetNetworkCredential().Password
 
-    Log 'Iniciando actualizacion de Power Query.'
+    Log 'Iniciando Excel.'
     $excel = New-Object -ComObject Excel.Application
-    $excel.Visible = $false
-    $excel.DisplayAlerts = $false
+    $excel.Visible = [bool]$Interactive
+    $excel.DisplayAlerts = [bool]$Interactive
     $excel.AskToUpdateLinks = $false
 
+    Log ('Abriendo herramienta: ' + $config.WorkbookPath)
     $sourceBook = $excel.Workbooks.Open($config.WorkbookPath, 0, $true)
-    $sourceBook.RefreshAll()
 
-    try { $excel.CalculateUntilAsyncQueriesDone() } catch {}
+    try {
+        $sourceSheet = $sourceBook.Worksheets.Item('Productos')
+    } catch {
+        throw 'No encontre la hoja Productos dentro de la herramienta.'
+    }
+
+    Log 'Solicitando RefreshAll de Power Query.'
+    $sourceBook.RefreshAll()
+    Start-Sleep -Seconds 3
 
     $deadline = (Get-Date).AddMinutes(4)
+    $refreshing = $true
     do {
-        Start-Sleep -Seconds 2
         $refreshing = $false
+
         try {
             foreach ($connection in @($sourceBook.Connections)) {
                 try {
@@ -119,18 +129,28 @@ try {
                 Release-Com $connection
             }
         } catch {}
+
+        try {
+            foreach ($lo in @($sourceSheet.ListObjects)) {
+                try {
+                    if ($lo.QueryTable.Refreshing) { $refreshing = $true }
+                } catch {}
+                Release-Com $lo
+            }
+        } catch {}
+
         try {
             if ($excel.CalculationState -ne 0) { $refreshing = $true }
         } catch {}
+
+        if ($refreshing) { Start-Sleep -Seconds 2 }
     } while ($refreshing -and (Get-Date) -lt $deadline)
 
-    if ($refreshing) { throw 'Power Query no termino de actualizar dentro de 4 minutos.' }
-
-    try {
-        $sourceSheet = $sourceBook.Worksheets.Item('Productos')
-    } catch {
-        throw 'No encontre la hoja Productos dentro de la herramienta.'
+    if ($refreshing) {
+        throw 'Power Query no termino de actualizar dentro de 4 minutos. Si Excel mostro una ventana, completa el acceso y vuelve a ejecutar el instalador.'
     }
+
+    Log 'Power Query termino de actualizar.'
 
     $used = $sourceSheet.UsedRange
     $lastRow = $used.Rows.Count
@@ -252,12 +272,36 @@ $config = @{
 }
 $config | ConvertTo-Json | Set-Content -Path $ConfigPath -Encoding UTF8
 
+Write-Step 'Preparando la primera sincronizacion'
+$runningExcel = @(Get-Process EXCEL -ErrorAction SilentlyContinue)
+if ($runningExcel.Count -gt 0) {
+    Write-Host ""
+    Write-Host "Hay Excel abierto. Guarda tu trabajo y CIERRA todas las ventanas de Excel." -ForegroundColor Yellow
+    Write-Host "Cuando ya no tengas Excel abierto, presiona ENTER." -ForegroundColor Yellow
+    Read-Host | Out-Null
+    if (@(Get-Process EXCEL -ErrorAction SilentlyContinue).Count -gt 0) {
+        Stop-WithMessage 'Excel sigue abierto. Cierra Excel por completo y vuelve a ejecutar este instalador.'
+    }
+}
+
 Write-Step 'Probando la primera sincronizacion'
 try {
-    & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $WorkerPath
-    if ($LASTEXITCODE -ne 0) { throw 'La prueba de sincronizacion fallo.' }
+    $arguments = '-NoProfile -ExecutionPolicy Bypass -File "' + $WorkerPath + '" -Interactive'
+    $process = Start-Process -FilePath 'powershell.exe' -ArgumentList $arguments -PassThru
+    $finished = $process.WaitForExit(330000)
+    if (-not $finished) {
+        try { Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue } catch {}
+        throw 'La prueba excedio 5 minutos y 30 segundos. Se cancelo para evitar que quede congelada.'
+    }
+    if ($process.ExitCode -ne 0) {
+        $tail = ''
+        if (Test-Path $LogPath) {
+            $tail = (Get-Content $LogPath -Tail 5 -ErrorAction SilentlyContinue) -join ' | '
+        }
+        throw ('La prueba de sincronizacion fallo. ' + $tail)
+    }
 } catch {
-    Stop-WithMessage ("No pude completar la primera sincronizacion. Revisa que Excel pueda actualizar la consulta y que la URL/contrasena de AquaCore sean correctas. Detalle: " + $_.Exception.Message)
+    Stop-WithMessage ("No pude completar la primera sincronizacion. Detalle: " + $_.Exception.Message)
 }
 
 Write-Step 'Programando Windows para actualizar cada 15 minutos'
