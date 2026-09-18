@@ -1822,5 +1822,868 @@
       "Trabajo en ambientes húmedos",
       "Protección contra salpicaduras"
     ]
+  },
+  {
+    "id": 92,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 3.3hp 2 tiempos (3MH) 2-S 1003201EK",
+    "code": "1003201EK",
+    "price": 17423.79,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 3.3 HP, 2 tiempos, configuración 3MH.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 3.3 HP",
+      "Ciclo: 2 tiempos",
+      "Configuración: 3MH",
+      "Modelo Mercury: 1003201EK"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "49751"
+  },
+  {
+    "id": 93,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 15hp 2 tiempos (15 MH) 1015203EL (flecha corta) internacional",
+    "code": "1015203EL",
+    "price": 42051.79,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 15 HP, 2 tiempos, configuración 15 MH. Versión de flecha corta.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 15 HP",
+      "Ciclo: 2 tiempos",
+      "Configuración: 15 MH",
+      "Modelo Mercury: 1015203EL",
+      "Longitud indicada: corta"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "46136"
+  },
+  {
+    "id": 94,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 5hp 2 tiempos (5MH 2S) 1005201EK (flecha corta)",
+    "code": "1005201EK",
+    "price": 25058.79,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 5 HP, 2 tiempos, configuración 5MH 2S. Versión de flecha corta.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 5 HP",
+      "Ciclo: 2 tiempos",
+      "Configuración: 5MH 2S",
+      "Modelo Mercury: 1005201EK",
+      "Longitud indicada: corta"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "50659"
+  },
+  {
+    "id": 95,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 30hp 2 tiempos (30 MH) pata corta 1030201EL",
+    "code": "1030201EL",
+    "price": 53963.99,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 30 HP, 2 tiempos, configuración 30 MH. Versión de flecha corta.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 30 HP",
+      "Ciclo: 2 tiempos",
+      "Configuración: 30 MH",
+      "Modelo Mercury: 1030201EL",
+      "Longitud indicada: corta"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "56041"
+  },
+  {
+    "id": 96,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 25hp 2 tiempos SeaPro (25 MH SeaPro) 1025207FL",
+    "code": "1025207FL",
+    "price": 54222.79,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 25 HP, 2 tiempos, línea SeaPro, configuración 25 MH SeaPro.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 25 HP",
+      "Ciclo: 2 tiempos",
+      "Línea: SeaPro",
+      "Configuración: 25 MH SeaPro",
+      "Modelo Mercury: 1025207FL"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "49195"
+  },
+  {
+    "id": 97,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 8hp 2 tiempos (8MH 2S) 1008201EK",
+    "code": "1008201EK",
+    "price": 34244.79,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 8 HP, 2 tiempos, configuración 8MH 2S.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 8 HP",
+      "Ciclo: 2 tiempos",
+      "Configuración: 8MH 2S",
+      "Modelo Mercury: 1008201EK"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "45147"
+  },
+  {
+    "id": 98,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 30hp 2 tiempos (30 MLH) pata larga 1030211EL",
+    "code": "1030211EL",
+    "price": 55112.99,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 30 HP, 2 tiempos, configuración 30 MLH. Versión de flecha larga.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 30 HP",
+      "Ciclo: 2 tiempos",
+      "Configuración: 30 MLH",
+      "Modelo Mercury: 1030211EL",
+      "Longitud indicada: larga"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "54415"
+  },
+  {
+    "id": 99,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 40hp 2 tiempos (40 MLH) 1040213EL",
+    "code": "1040213EL",
+    "price": 71968.79,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 40 HP, 2 tiempos, configuración 40 MLH.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 40 HP",
+      "Ciclo: 2 tiempos",
+      "Configuración: 40 MLH",
+      "Modelo Mercury: 1040213EL"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "52686"
+  },
+  {
+    "id": 100,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 15hp 4 tiempos SeaPro (15 MLH SP) 1A15217BK (flecha larga)",
+    "code": "1A15217BK",
+    "price": 71847.79,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 15 HP, 4 tiempos, línea SeaPro, configuración 15 MLH SP. Versión de flecha larga.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 15 HP",
+      "Ciclo: 4 tiempos",
+      "Línea: SeaPro",
+      "Configuración: 15 MLH SP",
+      "Modelo Mercury: 1A15217BK",
+      "Longitud indicada: larga"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "54703"
+  },
+  {
+    "id": 101,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 15hp 4 tiempos SeaPro (15 MH SP) 1A15207BK (flecha corta)",
+    "code": "1A15207BK",
+    "price": 70699.79,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 15 HP, 4 tiempos, línea SeaPro, configuración 15 MH SP. Versión de flecha corta.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 15 HP",
+      "Ciclo: 4 tiempos",
+      "Línea: SeaPro",
+      "Configuración: 15 MH SP",
+      "Modelo Mercury: 1A15207BK",
+      "Longitud indicada: corta"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "53422"
+  },
+  {
+    "id": 102,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 15hp 2 tiempos (15 MLH) 1015213EL (flecha larga) internacional",
+    "code": "1015213EL",
+    "price": 42166.79,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 15 HP, 2 tiempos, configuración 15 MLH. Versión de flecha larga.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 15 HP",
+      "Ciclo: 2 tiempos",
+      "Configuración: 15 MLH",
+      "Modelo Mercury: 1015213EL",
+      "Longitud indicada: larga"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "13065"
+  },
+  {
+    "id": 103,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 5hp 2 tiempos (5MLH 2S) 1005211EK (flecha larga)",
+    "code": "1005211EK",
+    "price": 25374.79,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 5 HP, 2 tiempos, configuración 5MLH 2S. Versión de flecha larga.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 5 HP",
+      "Ciclo: 2 tiempos",
+      "Configuración: 5MLH 2S",
+      "Modelo Mercury: 1005211EK",
+      "Longitud indicada: larga"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "49098"
+  },
+  {
+    "id": 104,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 25hp 2 tiempos SeaPro (25 MLH SeaPro) 1025217FL",
+    "code": "1025217FL",
+    "price": 54825.79,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 25 HP, 2 tiempos, línea SeaPro, configuración 25 MLH SeaPro.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 25 HP",
+      "Ciclo: 2 tiempos",
+      "Línea: SeaPro",
+      "Configuración: 25 MLH SeaPro",
+      "Modelo Mercury: 1025217FL"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "13067"
+  },
+  {
+    "id": 105,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 8hp 2 tiempos (8MLH 2S) 1008211EK",
+    "code": "1008211EK",
+    "price": 34416.99,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 8 HP, 2 tiempos, configuración 8MLH 2S.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 8 HP",
+      "Ciclo: 2 tiempos",
+      "Configuración: 8MLH 2S",
+      "Modelo Mercury: 1008211EK"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "54595"
+  },
+  {
+    "id": 106,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 6hp 4 tiempos (6MLH 4S) 1FX6211KK",
+    "code": "1FX6211KK",
+    "price": 33497.99,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 6 HP, 4 tiempos, configuración 6MLH 4S.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 6 HP",
+      "Ciclo: 4 tiempos",
+      "Configuración: 6MLH 4S",
+      "Modelo Mercury: 1FX6211KK"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "27628"
+  },
+  {
+    "id": 107,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 6hp 4 tiempos (6MH 4S) 1FX6201KK",
+    "code": "1FX6201KK",
+    "price": 32694.99,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 6 HP, 4 tiempos, configuración 6MH 4S.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 6 HP",
+      "Ciclo: 4 tiempos",
+      "Configuración: 6MH 4S",
+      "Modelo Mercury: 1FX6201KK"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "46639"
+  },
+  {
+    "id": 108,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 9.9hp 2 tiempos (9MH 2S) (peso ligero) 1010201EL",
+    "code": "1010201EL",
+    "price": 41879.79,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 9.9 HP, 2 tiempos, configuración 9MH 2S.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 9.9 HP",
+      "Ciclo: 2 tiempos",
+      "Configuración: 9MH 2S",
+      "Modelo Mercury: 1010201EL",
+      "Versión: peso ligero"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "54155"
+  },
+  {
+    "id": 109,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 25hp 4 tiempos SeaPro (25 MLH SP) 1A25217BK (flecha larga)",
+    "code": "1A25217BK",
+    "price": 93796.99,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 25 HP, 4 tiempos, línea SeaPro, configuración 25 MLH SP. Versión de flecha larga.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 25 HP",
+      "Ciclo: 4 tiempos",
+      "Línea: SeaPro",
+      "Configuración: 25 MLH SP",
+      "Modelo Mercury: 1A25217BK",
+      "Longitud indicada: larga"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "54759"
+  },
+  {
+    "id": 110,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 25hp 4 tiempos FourStroke (25 MH EFI 4S) 1A25203BK",
+    "code": "1A25203BK",
+    "price": 92599.99,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 25 HP, 4 tiempos, línea FourStroke, configuración 25 MH EFI 4S.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 25 HP",
+      "Ciclo: 4 tiempos",
+      "Línea: FourStroke",
+      "Configuración: 25 MH EFI 4S",
+      "Modelo Mercury: 1A25203BK"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "27624"
+  },
+  {
+    "id": 111,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 20hp 4 tiempos (20MLH 4S) 1A20211LK",
+    "code": "1A20211LK",
+    "price": 69981.99,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 20 HP, 4 tiempos, configuración 20MLH 4S.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 20 HP",
+      "Ciclo: 4 tiempos",
+      "Configuración: 20MLH 4S",
+      "Modelo Mercury: 1A20211LK"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "48970"
+  },
+  {
+    "id": 112,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 9.9hp 4 tiempos (9.9MLH 4S) 1F10211BK",
+    "code": "1F10211BK",
+    "price": 65475.99,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 9.9 HP, 4 tiempos, configuración 9.9MLH 4S.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 9.9 HP",
+      "Ciclo: 4 tiempos",
+      "Configuración: 9.9MLH 4S",
+      "Modelo Mercury: 1F10211BK"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "44730"
+  },
+  {
+    "id": 113,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 9.9hp 4 tiempos (9.9 MH 4S) 1A10201LK (transmisión estándar)",
+    "code": "1A10201LK",
+    "price": 65303.79,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 9.9 HP, 4 tiempos, configuración 9.9 MH 4S.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 9.9 HP",
+      "Ciclo: 4 tiempos",
+      "Configuración: 9.9 MH 4S",
+      "Modelo Mercury: 1A10201LK",
+      "Transmisión: estándar"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "47398"
+  },
+  {
+    "id": 114,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 9.9hp 2 tiempos (9MH 2S) 1010203EL",
+    "code": "1010203EL",
+    "price": 44893.79,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 9.9 HP, 2 tiempos, configuración 9MH 2S.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 9.9 HP",
+      "Ciclo: 2 tiempos",
+      "Configuración: 9MH 2S",
+      "Modelo Mercury: 1010203EL"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "53692"
+  },
+  {
+    "id": 115,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 90hp SeaPro (90EXLPT 4S SP) 1F914671D sin maneral/sin accesorios",
+    "code": "1F914671D",
+    "price": 233225.79,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 90 HP, 4 tiempos, línea SeaPro, configuración 90EXLPT 4S SP. Versión sin maneral y sin accesorios.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 90 HP",
+      "Ciclo: 4 tiempos",
+      "Línea: SeaPro",
+      "Configuración: 90EXLPT 4S SP",
+      "Modelo Mercury: 1F914671D",
+      "Suministro: sin maneral / sin accesorios"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "50511"
+  },
+  {
+    "id": 116,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 90hp 4 tiempos SeaPro (90EXLHPT 4S SP) 1F9146TED (maneral Advanced Tiller) c/accs propela acero",
+    "code": "1F9146TED",
+    "price": 276997.99,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 90 HP, 4 tiempos, línea SeaPro, configuración 90EXLHPT 4S SP. Configuración con maneral Advanced Tiller y propela de acero.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 90 HP",
+      "Ciclo: 4 tiempos",
+      "Línea: SeaPro",
+      "Configuración: 90EXLHPT 4S SP",
+      "Modelo Mercury: 1F9146TED",
+      "Dirección: maneral Advanced Tiller",
+      "Accesorios indicados: propela de acero"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "53431"
+  },
+  {
+    "id": 117,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 75hp 4 tiempos SeaPro (75 ELHPT 4S) 1F7645TED (maneral Advanced Tiller) c/accs propela acero",
+    "code": "1F7645TED",
+    "price": 237289.99,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 75 HP, 4 tiempos, línea SeaPro, configuración 75 ELHPT 4S. Configuración con maneral Advanced Tiller y propela de acero.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 75 HP",
+      "Ciclo: 4 tiempos",
+      "Línea: SeaPro",
+      "Configuración: 75 ELHPT 4S",
+      "Modelo Mercury: 1F7645TED",
+      "Dirección: maneral Advanced Tiller",
+      "Accesorios indicados: propela de acero"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "53032"
+  },
+  {
+    "id": 118,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 60hp 4 tiempos SeaPro (60ELPT 4S SP) 1F604571Z sin maneral/sin accesorios",
+    "code": "1F604571Z",
+    "price": 141966.79,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 60 HP, 4 tiempos, línea SeaPro, configuración 60ELPT 4S SP. Versión sin maneral y sin accesorios.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 60 HP",
+      "Ciclo: 4 tiempos",
+      "Línea: SeaPro",
+      "Configuración: 60ELPT 4S SP",
+      "Modelo Mercury: 1F604571Z",
+      "Suministro: sin maneral / sin accesorios"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "27417"
+  },
+  {
+    "id": 119,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 60hp 4 tiempos SeaPro (60ELHGA 4S SP) 1F6035TEZ (maneral Advanced Tiller) c/accs propela",
+    "code": "1F6035TEZ",
+    "price": 182696.99,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 60 HP, 4 tiempos, línea SeaPro, configuración 60ELHGA 4S SP. Configuración con maneral Advanced Tiller y accesorios con propela.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 60 HP",
+      "Ciclo: 4 tiempos",
+      "Línea: SeaPro",
+      "Configuración: 60ELHGA 4S SP",
+      "Modelo Mercury: 1F6035TEZ",
+      "Dirección: maneral Advanced Tiller",
+      "Accesorios indicados: con propela"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "53047"
+  },
+  {
+    "id": 120,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 300hp 4 tiempos SeaPro (300XL SeaPro 5.44 1.75-NO DTS) 13000028A sin maneral/sin accesorios",
+    "code": "13000028A",
+    "price": 495314.99,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 300 HP, 4 tiempos, línea SeaPro, configuración 300XL SeaPro 5.44 1.75-NO DTS. Versión sin maneral y sin accesorios.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 300 HP",
+      "Ciclo: 4 tiempos",
+      "Línea: SeaPro",
+      "Configuración: 300XL SeaPro 5.44 1.75-NO DTS",
+      "Modelo Mercury: 13000028A",
+      "Suministro: sin maneral / sin accesorios",
+      "Control indicado: No DTS"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "55618"
+  },
+  {
+    "id": 121,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 25hp 4 tiempos FourStroke (25 MLH EFI 4S) 1A25213BK",
+    "code": "1A25213BK",
+    "price": 93346.99,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 25 HP, 4 tiempos, línea FourStroke, configuración 25 MLH EFI 4S.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 25 HP",
+      "Ciclo: 4 tiempos",
+      "Línea: FourStroke",
+      "Configuración: 25 MLH EFI 4S",
+      "Modelo Mercury: 1A25213BK"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "44734"
+  },
+  {
+    "id": 122,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 2.5hp 4 tiempos (2.5MH 4S) 1F02201KK",
+    "code": "1F02201KK",
+    "price": 26981.99,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 2.5 HP, 4 tiempos, configuración 2.5MH 4S.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 2.5 HP",
+      "Ciclo: 4 tiempos",
+      "Configuración: 2.5MH 4S",
+      "Modelo Mercury: 1F02201KK"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "44728"
+  },
+  {
+    "id": 123,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 200hp SeaPro (200XL SP 5.44 1.85 4S-NO DTS) 12000023A sin maneral/sin accesorios",
+    "code": "12000023A",
+    "price": 420012.99,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 200 HP, 4 tiempos, línea SeaPro, configuración 200XL SP 5.44 1.85 4S-NO DTS. Versión sin maneral y sin accesorios.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 200 HP",
+      "Ciclo: 4 tiempos",
+      "Línea: SeaPro",
+      "Configuración: 200XL SP 5.44 1.85 4S-NO DTS",
+      "Modelo Mercury: 12000023A",
+      "Suministro: sin maneral / sin accesorios",
+      "Control indicado: No DTS"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "51779"
+  },
+  {
+    "id": 124,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 200hp SeaPro (200CXL SP 5.44 1.85 4S-NO DTS) 12000025A sin maneral/sin accesorios",
+    "code": "12000025A",
+    "price": 424733.79,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 200 HP, 4 tiempos, línea SeaPro, configuración 200CXL SP 5.44 1.85 4S-NO DTS. Versión sin maneral y sin accesorios.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 200 HP",
+      "Ciclo: 4 tiempos",
+      "Línea: SeaPro",
+      "Configuración: 200CXL SP 5.44 1.85 4S-NO DTS",
+      "Modelo Mercury: 12000025A",
+      "Suministro: sin maneral / sin accesorios",
+      "Control indicado: No DTS"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "54405"
+  },
+  {
+    "id": 125,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 150hp 4 tiempos SeaPro (150XL 4S SP) 1151F27ED sin maneral/sin accesorios",
+    "code": "1151F27ED",
+    "price": 295364.99,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 150 HP, 4 tiempos, línea SeaPro, configuración 150XL 4S SP. Versión sin maneral y sin accesorios.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 150 HP",
+      "Ciclo: 4 tiempos",
+      "Línea: SeaPro",
+      "Configuración: 150XL 4S SP",
+      "Modelo Mercury: 1151F27ED",
+      "Suministro: sin maneral / sin accesorios"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "13074"
+  },
+  {
+    "id": 126,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 150hp 4 tiempos SeaPro (150 CXL 4S SP) 1151F28ED sin maneral/sin accesorios",
+    "code": "1151F28ED",
+    "price": 302661.99,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 150 HP, 4 tiempos, línea SeaPro, configuración 150 CXL 4S SP. Versión sin maneral y sin accesorios.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 150 HP",
+      "Ciclo: 4 tiempos",
+      "Línea: SeaPro",
+      "Configuración: 150 CXL 4S SP",
+      "Modelo Mercury: 1151F28ED",
+      "Suministro: sin maneral / sin accesorios"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "32521"
+  },
+  {
+    "id": 127,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 115hp SeaPro (115EXLPT 4S SP) 1116F671D sin maneral/sin accesorios",
+    "code": "1116F671D",
+    "price": 265383.99,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 115 HP, 4 tiempos, línea SeaPro, configuración 115EXLPT 4S SP. Versión sin maneral y sin accesorios.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 115 HP",
+      "Ciclo: 4 tiempos",
+      "Línea: SeaPro",
+      "Configuración: 115EXLPT 4S SP",
+      "Modelo Mercury: 1116F671D",
+      "Suministro: sin maneral / sin accesorios"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "47041"
+  },
+  {
+    "id": 128,
+    "cat": "Motores Mercury",
+    "name": "Motor MERCURY 115hp 4 tiempos SeaPro (115EXLHPT 4S SP) 1116F6TED (maneral Advanced Tiller) c/accs propela acero",
+    "code": "1116F6TED",
+    "price": 307462.99,
+    "icon": "🚤",
+    "description": "Motor fuera de borda Mercury de 115 HP, 4 tiempos, línea SeaPro, configuración 115EXLHPT 4S SP. Configuración con maneral Advanced Tiller y propela de acero.",
+    "specs": [
+      "Marca: Mercury",
+      "Potencia: 115 HP",
+      "Ciclo: 4 tiempos",
+      "Línea: SeaPro",
+      "Configuración: 115EXLHPT 4S SP",
+      "Modelo Mercury: 1116F6TED",
+      "Dirección: maneral Advanced Tiller",
+      "Accesorios indicados: propela de acero"
+    ],
+    "uses": [
+      "Motores fuera de borda",
+      "Pesca y embarcaciones de trabajo",
+      "Navegación según la configuración del modelo"
+    ],
+    "equipesca_code": "53432"
   }
 ]
