@@ -1,11 +1,24 @@
 -- AquaCore MX - control de inventario
 create table if not exists public.inventory (
   product_id integer primary key,
-  stock integer not null default 0 check (stock >= 0),
+  stock numeric(14,3) not null default 0 check (stock >= 0),
   low_stock_threshold integer not null default 2 check (low_stock_threshold >= 0),
   managed boolean not null default false,
+  source_code text,
+  source_description text,
+  source_file text,
+  source_updated_at timestamptz,
   updated_at timestamptz not null default now()
 );
+
+alter table public.inventory
+  alter column stock type numeric(14,3) using stock::numeric;
+
+alter table public.inventory
+  add column if not exists source_code text,
+  add column if not exists source_description text,
+  add column if not exists source_file text,
+  add column if not exists source_updated_at timestamptz;
 
 create index if not exists inventory_managed_idx
   on public.inventory (managed);
