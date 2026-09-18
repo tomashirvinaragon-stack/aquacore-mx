@@ -1,5 +1,5 @@
 const SUPABASE_URL=process.env.SUPABASE_URL;
-const SUPABASE_KEY=process.env.SUPABASE_SERVICE_ROLE_KEY;
+const SUPABASE_KEY=process.env.SUPABASE_SECRET_KEY||process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 export function dbConfigured(){
   return Boolean(SUPABASE_URL&&SUPABASE_KEY);
@@ -10,7 +10,6 @@ async function request(path,{method='GET',body,prefer}={}){
   const url=`${SUPABASE_URL.replace(/\/$/,'')}/rest/v1/${path}`;
   const headers={
     apikey:SUPABASE_KEY,
-    authorization:`Bearer ${SUPABASE_KEY}`,
     accept:'application/json'
   };
   if(body!==undefined) headers['content-type']='application/json';
