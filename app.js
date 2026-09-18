@@ -45,7 +45,7 @@ function renderProducts(){
   $('#emptyState').hidden=!!a.length;
   $$('[data-add]').forEach(b=>b.onclick=()=>add(+b.dataset.add));
   $$('[data-wa]').forEach(b=>b.onclick=()=>ask(+b.dataset.wa));
-  $('[data-detail]').forEach(b=>b.onclick=()=>{const p=PRODUCTS.find(x=>x.id===+b.dataset.detail);if(p)location.href=productUrl(p)});
+  $$('[data-detail]').forEach(b=>b.onclick=()=>{const p=PRODUCTS.find(x=>x.id===+b.dataset.detail);if(p)location.href=productUrl(p)});
 }
 function ask(id){
   const p=PRODUCTS.find(x=>x.id===id);
