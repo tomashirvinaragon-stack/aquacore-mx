@@ -58,8 +58,12 @@
         <button id="syncNow" class="btn primary">Sincronizar ahora</button>
       </div>
       <div id="syncResult" class="import-result">Comprobando conexión automática…</div>
+      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <a class="btn primary" href="/tools/instalar-inventario-automatico.cmd" download style="text-decoration:none">Instalar inventario automático en esta PC</a>
+        <span class="muted" style="font-size:13px">Se configura una sola vez. Windows actualizará AquaCore cada 15 minutos usando tu Power Query de Equipesca.</span>
+      </div>
       <div style="height:1px;background:var(--line);margin:16px 0"></div>
-      <div class="muted"><b>Respaldo manual:</b> si alguna vez falla la conexión directa, puedes seguir subiendo “Existencias actuales por sucursal”; se usará únicamente la columna <b>Total</b>.</div>
+      <div class="muted"><b>Respaldo manual:</b> si alguna vez falla la automatización, puedes seguir subiendo “Existencias actuales por sucursal”; se usará únicamente la columna <b>Total</b>.</div>
       <div class="import-grid">
         <input id="inventoryFile" type="file" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
         <button id="importFile" class="btn ghost">Importar archivo</button>
@@ -204,12 +208,17 @@ async function syncStatus(){
     const out=await r.json().catch(()=>({}));
     if(r.status===401)throw new Error('AUTH');
     if(!r.ok)throw new Error([out.error,out.details].filter(Boolean).join(' — ')||'No se pudo consultar la sincronización');
-    if(out.configured){
+    const localRows=products.filter(p=>String(p.source_file||'').startsWith('AquaCore_AutoSync_')&&p.source_updated_at);
+    const localLast=localRows.length?Math.max(...localRows.map(p=>Date.parse(p.source_updated_at)||0)):0;
+    if(localLast){
       box.className='import-result good';
-      box.innerHTML='<b>Conexión automática lista.</b> '+(out.lastSync?'Última sincronización: '+esc(new Date(out.lastSync).toLocaleString('es-MX'))+'.':'La primera actualización se hará al abrir la tienda o al pulsar “Sincronizar ahora”.');
+      box.innerHTML='<b>Inventario automático activo desde esta PC.</b> Última sincronización: '+esc(new Date(localLast).toLocaleString('es-MX'))+'. Los precios permanecen manuales.';
+    }else if(out.configured){
+      box.className='import-result good';
+      box.innerHTML='<b>Conexión automática directa lista.</b> '+(out.lastSync?'Última sincronización: '+esc(new Date(out.lastSync).toLocaleString('es-MX'))+'.':'La primera actualización se hará al abrir la tienda o al pulsar “Sincronizar ahora”.');
     }else{
       box.className='import-result warn';
-      box.innerHTML='<b>Conexión directa pendiente.</b> Falta registrar en Vercel un acceso de solo lectura a Equipesca. Mientras tanto, el respaldo por archivo sigue funcionando.';
+      box.innerHTML='<b>Automatización lista para instalar.</b> Pulsa “Instalar inventario automático en esta PC”. Solo se hace una vez; después Windows enviará las existencias cada 15 minutos.';
     }
   }catch(e){
     if(e.message==='AUTH'){password='';sessionStorage.removeItem('aquacore-admin-password');$('#login').classList.remove('hidden')}
