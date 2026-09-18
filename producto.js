@@ -13,10 +13,20 @@ const imagePath=p=>{
 const productUrl=p=>`${location.origin}/productos/${slugify(p.name)}-${p.id}`;
 const toast=t=>{const x=document.querySelector('#productToast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1800)};
 function stockInfo(p){
-  if(!p.stockManaged)return{className:'stock-unknown',label:'Disponibilidad por confirmar'};
-  if(Number(p.stock)<=0)return{className:'stock-out',label:'Agotado'};
-  if(Number(p.stock)<=Number(p.lowStockThreshold||0))return{className:'stock-low',label:'Pocas piezas'};
-  return{className:'stock-ok',label:'Disponible'};
+  if(p.stockManaged){
+    if(Number(p.stock)<=0)return{className:'stock-out',label:'Agotado'};
+    if(Number(p.stock)<=Number(p.lowStockThreshold||0))return{className:'stock-low',label:'Pocas piezas'};
+    return{className:'stock-ok',label:'Disponible'};
+  }
+  if(p.availabilityKnown)return p.shopAvailable
+    ?{className:'stock-ok',label:'Disponible'}
+    :{className:'stock-out',label:'Agotado'};
+  return{className:'stock-unknown',label:'Disponibilidad por confirmar'};
+}
+function isSoldOut(p){
+  return p.stockManaged
+    ? Number(p.stock)<=0
+    : Boolean(p.availabilityKnown&&!p.shopAvailable);
 }
 
 function getRequestedId(){
@@ -34,6 +44,7 @@ function productImage(p){
 function addToCart(p){
   const cart=JSON.parse(localStorage.getItem('aquacore-cart-v2')||'{}');
   const current=Number(cart[p.id]||0);
+  if(isSoldOut(p)){toast('Producto agotado');return}
   if(p.stockManaged&&current>=Number(p.stock||0)){toast('No hay más piezas disponibles');return}
   cart[p.id]=current+1;
   localStorage.setItem('aquacore-cart-v2',JSON.stringify(cart));
@@ -47,14 +58,25 @@ function whatsapp(p){
 async function init(){
   const root=document.querySelector('#singleProduct');
   try{
-    const [products,inventoryOut]=await Promise.all([
+    const [products,inventoryOut,mercuryOut]=await Promise.all([
       fetch('/data/products.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('catalog');return r.json()}),
-      fetch('/api/inventory',{cache:'no-store'}).then(r=>r.ok?r.json():({inventory:[]})).catch(()=>({inventory:[]}))
+      fetch('/api/inventory',{cache:'no-store'}).then(r=>r.ok?r.json():({inventory:[]})).catch(()=>({inventory:[]})),
+      fetch('/api/equipesca-mercury',{cache:'no-store'}).then(r=>r.ok?r.json():({availability:[]})).catch(()=>({availability:[]}))
     ]);
     const id=getRequestedId();
     const base=products.find(x=>Number(x.id)===id);
     const inv=(Array.isArray(inventoryOut?.inventory)?inventoryOut.inventory:[]).find(x=>Number(x.product_id)===id);
-    const p=base?{...base,stockManaged:Boolean(inv?.managed),stock:Number(inv?.stock||0),lowStockThreshold:Number(inv?.low_stock_threshold||0)}:null;
+    const mercury=(Array.isArray(mercuryOut?.availability)?mercuryOut.availability:[]).find(x=>Number(x.product_id)===id);
+    const stockManaged=Boolean(inv?.managed);
+    const availabilityKnown=!stockManaged&&typeof mercury?.available==='boolean';
+    const p=base?{
+      ...base,
+      stockManaged,
+      stock:Number(inv?.stock||0),
+      lowStockThreshold:Number(inv?.low_stock_threshold||0),
+      availabilityKnown,
+      shopAvailable:availabilityKnown?Boolean(mercury.available):null
+    }:null;
     if(!p){
       document.title='Producto no encontrado | AquaCore MX';
       root.innerHTML='<div class="single-product-error"><h1>Producto no encontrado</h1><p>Este enlace no corresponde a un producto disponible.</p><a class="btn primary" href="/#productos">Volver al catálogo</a></div>';
@@ -69,7 +91,7 @@ async function init(){
 
     const specs=Array.isArray(p.specs)?p.specs:[];
     const uses=Array.isArray(p.uses)?p.uses:[];
-    const st=stockInfo(p),soldOut=p.stockManaged&&Number(p.stock)<=0;
+    const st=stockInfo(p),soldOut=isSoldOut(p);
     root.innerHTML=`
       <div class="single-product-visual">${productImage(p)}</div>
       <div class="single-product-info">
