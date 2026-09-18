@@ -20,7 +20,7 @@ function scoreProduct(p,name,code){
 
 function isBrandPlaceholder(url=''){
   const s=decodeURIComponent(String(url||'')).toLowerCase();
-  return /(equipesca|logo|placeholder|sin[-_ ]?imagen|no[-_ ]?image)/i.test(s);
+  return /(logo|placeholder|sin[-_ ]?imagen|no[-_ ]?image)/i.test(s);
 }
 
 function imageFromProduct(p){
