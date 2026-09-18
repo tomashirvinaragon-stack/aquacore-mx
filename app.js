@@ -4,6 +4,8 @@ let PRODUCTS=[],activeCat='Todos',search='',sort='featured',pendingWhatsApp='';
 let cart=JSON.parse(localStorage.getItem('aquacore-cart-v2')||'{}');
 const fmt=n=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'}).format(n);
 const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+const slugify=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+const productUrl=p=>`${location.origin}/productos/${slugify(p.name)}-${p.id}`;
 const catIcon={Blowers:'🌀',Aireadores:'🌊',Difusores:'⚫','Calidad de agua':'🧪','Redes y mallas':'🕸️',Procesamiento:'🔪',Protección:'🦺',Refacciones:'⚙️'};
 const NO_PRODUCT_IMAGE=new Set([78,80,85]);
 const imagePath=p=>p.image||(p.cat==='Blowers'?'/assets/products/blower-pulsar.webp':`/api/equipesca-image?name=${encodeURIComponent(p.name)}&code=${encodeURIComponent(p.code||'')}&v=20260917b`);
@@ -43,11 +45,11 @@ function renderProducts(){
   $('#emptyState').hidden=!!a.length;
   $$('[data-add]').forEach(b=>b.onclick=()=>add(+b.dataset.add));
   $$('[data-wa]').forEach(b=>b.onclick=()=>ask(+b.dataset.wa));
-  $$('[data-detail]').forEach(b=>b.onclick=()=>detail(+b.dataset.detail));
+  $('[data-detail]').forEach(b=>b.onclick=()=>{const p=PRODUCTS.find(x=>x.id===+b.dataset.detail);if(p)location.href=productUrl(p)});
 }
 function ask(id){
   const p=PRODUCTS.find(x=>x.id===id);
-  window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(`Hola AquaCore MX. Me interesa: ${p.name} (${p.code||'sin código'}) - ${fmt(p.price)}.`)}`,'_blank');
+  window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(`Hola AquaCore MX. Me interesa: ${p.name} (${p.code||'sin código'}) - ${fmt(p.price)}.\n${productUrl(p)}`)}`,'_blank');
 }
 function detail(id){
   const p=PRODUCTS.find(x=>x.id===id);
