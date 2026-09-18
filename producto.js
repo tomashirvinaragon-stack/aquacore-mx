@@ -37,6 +37,7 @@ function addToCart(p){
   if(p.stockManaged&&current>=Number(p.stock||0)){toast('No hay más piezas disponibles');return}
   cart[p.id]=current+1;
   localStorage.setItem('aquacore-cart-v2',JSON.stringify(cart));
+  window.aquaMeta?.('AddToCart',{content_ids:[String(p.id)],content_name:p.name,content_type:'product',value:Number(p.price),currency:'MXN'});
   toast('Producto agregado al carrito');
 }
 function whatsapp(p){
@@ -64,6 +65,7 @@ async function init(){
     document.querySelector('meta[property="og:title"]').setAttribute('content',p.name+' | AquaCore MX');
     document.querySelector('meta[property="og:description"]').setAttribute('content',p.description||'Consulta precio, ficha técnica y disponibilidad.');
     document.querySelector('#breadcrumbName').textContent=p.name;
+    window.aquaMeta?.('ViewContent',{content_ids:[String(p.id)],content_name:p.name,content_category:p.cat,content_type:'product',value:Number(p.price),currency:'MXN'});
 
     const specs=Array.isArray(p.specs)?p.specs:[];
     const uses=Array.isArray(p.uses)?p.uses:[];
