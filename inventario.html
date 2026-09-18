@@ -51,13 +51,20 @@
     </section>
 
     <section class="importer">
-      <h2>Actualizar desde Equipesca</h2>
-      <div class="muted">Sube el archivo diario de “Existencias actuales por sucursal”. AquaCore usará la columna <b>Total</b> y cruzará los productos por el código de Equipesca.</div>
+      <h2>Inventario de Equipesca</h2>
+      <div class="muted">AquaCore puede actualizar las existencias directamente desde Equipesca. <b>Los precios nunca se modifican con esta sincronización.</b></div>
+      <div class="import-grid">
+        <div><b>Sincronización automática</b><br><span class="muted">Al abrir la tienda, AquaCore refresca el stock si la última sincronización tiene más de 15 minutos.</span></div>
+        <button id="syncNow" class="btn primary">Sincronizar ahora</button>
+      </div>
+      <div id="syncResult" class="import-result">Comprobando conexión automática…</div>
+      <div style="height:1px;background:var(--line);margin:16px 0"></div>
+      <div class="muted"><b>Respaldo manual:</b> si alguna vez falla la conexión directa, puedes seguir subiendo “Existencias actuales por sucursal”; se usará únicamente la columna <b>Total</b>.</div>
       <div class="import-grid">
         <input id="inventoryFile" type="file" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
-        <button id="importFile" class="btn primary">Actualizar inventario</button>
+        <button id="importFile" class="btn ghost">Importar archivo</button>
       </div>
-      <div id="importResult" class="import-result">Aún no se ha cargado un archivo en esta sesión.</div>
+      <div id="importResult" class="import-result">No se ha usado el respaldo manual en esta sesión.</div>
     </section>
 
     <section class="toolbar">
@@ -173,6 +180,7 @@ async function load(){
     products=out.products||[];
     $('#login').classList.add('hidden');
     render();
+    await syncStatus();
   }catch(e){
     if(e.message==='AUTH'){password='';sessionStorage.removeItem('aquacore-admin-password');$('#login').classList.remove('hidden')}
     else alert(e.message);
@@ -185,6 +193,59 @@ $('#apply').onclick=render;
 $('#search').oninput=render;
 $('#filter').onchange=render;
 $('#logout').onclick=()=>{password='';sessionStorage.removeItem('aquacore-admin-password');$('#password').value='';$('#login').classList.remove('hidden')};
+async function syncStatus(){
+  const box=$('#syncResult');
+  if(!box)return;
+  try{
+    const r=await fetch('/api/admin-inventory-sync',{
+      headers:{'x-admin-password':password},
+      cache:'no-store'
+    });
+    const out=await r.json().catch(()=>({}));
+    if(r.status===401)throw new Error('AUTH');
+    if(!r.ok)throw new Error([out.error,out.details].filter(Boolean).join(' — ')||'No se pudo consultar la sincronización');
+    if(out.configured){
+      box.className='import-result good';
+      box.innerHTML='<b>Conexión automática lista.</b> '+(out.lastSync?'Última sincronización: '+esc(new Date(out.lastSync).toLocaleString('es-MX'))+'.':'La primera actualización se hará al abrir la tienda o al pulsar “Sincronizar ahora”.');
+    }else{
+      box.className='import-result warn';
+      box.innerHTML='<b>Conexión directa pendiente.</b> Falta registrar en Vercel un acceso de solo lectura a Equipesca. Mientras tanto, el respaldo por archivo sigue funcionando.';
+    }
+  }catch(e){
+    if(e.message==='AUTH'){password='';sessionStorage.removeItem('aquacore-admin-password');$('#login').classList.remove('hidden')}
+    else{box.className='import-result warn';box.textContent=e.message}
+  }
+}
+
+async function syncNow(){
+  const btn=$('#syncNow'),box=$('#syncResult');
+  btn.disabled=true;
+  btn.textContent='Sincronizando…';
+  box.className='import-result';
+  box.textContent='Consultando existencias de Equipesca…';
+  try{
+    const r=await fetch('/api/admin-inventory-sync',{
+      method:'POST',
+      headers:{'content-type':'application/json','x-admin-password':password},
+      body:'{}'
+    });
+    const out=await r.json().catch(()=>({}));
+    if(r.status===401)throw new Error('AUTH');
+    if(!r.ok)throw new Error([out.error,out.details].filter(Boolean).join(' — ')||'No se pudo sincronizar');
+    box.className='import-result '+(out.unmatched?'warn':'good');
+    box.innerHTML='<b>'+out.updated+' productos actualizados automáticamente.</b> Fuente consultada: '+out.sourceRows+' productos.'+(out.unmatched?' '+out.unmatched+' producto(s) quedaron sin coincidencia y conservaron su stock anterior.':'');
+    await load();
+  }catch(e){
+    if(e.message==='AUTH'){password='';sessionStorage.removeItem('aquacore-admin-password');$('#login').classList.remove('hidden')}
+    else{box.className='import-result warn';box.textContent=e.message}
+  }finally{
+    btn.disabled=false;
+    btn.textContent='Sincronizar ahora';
+  }
+}
+
+$('#syncNow').onclick=syncNow;
+
 async function fileToBase64(file){
   return new Promise((resolve,reject)=>{
     const reader=new FileReader();
@@ -221,7 +282,7 @@ async function importInventory(){
     else{box.className='import-result warn';box.textContent=e.message}
   }finally{
     btn.disabled=false;
-    btn.textContent='Actualizar inventario';
+    btn.textContent='Importar archivo';
   }
 }
 
