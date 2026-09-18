@@ -69,6 +69,15 @@ export async function upsertInventoryItem(item){
   });
 }
 
+export async function upsertInventoryItems(items){
+  if(!Array.isArray(items)||!items.length) return [];
+  return request('inventory?on_conflict=product_id',{
+    method:'POST',
+    body:items,
+    prefer:'resolution=merge-duplicates,return=representation'
+  });
+}
+
 export async function getInventoryByIds(ids){
   const clean=[...new Set((Array.isArray(ids)?ids:[]).map(Number).filter(Number.isInteger))];
   if(!clean.length) return [];
