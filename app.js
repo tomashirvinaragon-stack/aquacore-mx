@@ -5,6 +5,12 @@ let cart=JSON.parse(localStorage.getItem('aquacore-cart-v2')||'{}');
 const fmt=n=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'}).format(n);
 const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 const catIcon={Blowers:'🌀',Aireadores:'🌊',Difusores:'⚫','Calidad de agua':'🧪','Redes y mallas':'🕸️',Procesamiento:'🔪',Protección:'🦺',Refacciones:'⚙️'};
+const imagePath=p=>p.image||`assets/products/${String(p.id).padStart(3,'0')}.webp`;
+function productImage(p,detail=false){
+  const cls=detail?'product-detail-photo':'product-photo';
+  const fallback=detail?'product-detail-fallback':'symbol';
+  return `<img class="${cls}" src="${esc(imagePath(p))}" alt="${esc(p.name)}" loading="lazy" decoding="async" onerror="this.style.display='none'"><span class="${fallback}">${p.icon||catIcon[p.cat]||'•'}</span>`;
+}
 
 function toast(t){const x=$('#toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1800)}
 function cats(){return [...new Set(PRODUCTS.map(p=>p.cat))]}
@@ -26,7 +32,7 @@ function filtered(){
   return a;
 }
 function card(p){
-  return `<article class="product-card"><div class="product-visual" data-cat="${esc(p.cat)}">${p.featured?'<span class="badge">DESTACADO</span>':''}<span class="symbol">${p.icon||catIcon[p.cat]||'•'}</span></div><div class="product-body"><span class="product-category">${esc(p.cat)}</span><div class="product-title">${esc(p.name)}</div><div class="product-code">${esc(p.code||'')}</div><div class="price">${fmt(p.price)}</div><div class="net-price">Precio neto</div><div class="product-actions"><button class="add-btn" data-add="${p.id}">Agregar al carrito</button><button class="wa-btn" data-wa="${p.id}" aria-label="WhatsApp">WA</button><button class="detail-btn" data-detail="${p.id}">Ver detalles</button></div></div></article>`;
+  return `<article class="product-card"><div class="product-visual" data-cat="${esc(p.cat)}">${p.featured?'<span class="badge">DESTACADO</span>':''}${productImage(p)}</div><div class="product-body"><span class="product-category">${esc(p.cat)}</span><div class="product-title">${esc(p.name)}</div><div class="product-code">${esc(p.code||'')}</div><div class="price">${fmt(p.price)}</div><div class="net-price">Precio neto</div><div class="product-actions"><button class="add-btn" data-add="${p.id}">Agregar al carrito</button><button class="wa-btn" data-wa="${p.id}" aria-label="WhatsApp">WA</button><button class="detail-btn" data-detail="${p.id}">Ver detalles</button></div></div></article>`;
 }
 function renderProducts(){
   const a=filtered();
@@ -43,7 +49,7 @@ function ask(id){
 }
 function detail(id){
   const p=PRODUCTS.find(x=>x.id===id);
-  $('#productDialogBody').innerHTML=`<div class="product-detail"><div class="product-detail-visual"><span>${p.icon||'•'}</span></div><div><span class="detail-kicker">${esc(p.cat)}</span><h2>${esc(p.name)}</h2><div class="detail-code">${esc(p.code||'')}</div><div class="detail-price">${fmt(p.price)}</div><ul class="detail-list"><li>Precio neto</li><li>Envíos a todo México</li><li>Envío gratis desde $5,000 MXN</li><li>Disponibilidad sujeta a confirmación</li></ul><div class="product-detail-actions"><button class="btn primary" data-modal-add="${p.id}">Agregar al carrito</button><button class="btn secondary" data-modal-wa="${p.id}">Consultar por WhatsApp</button></div></div></div>`;
+  $('#productDialogBody').innerHTML=`<div class="product-detail"><div class="product-detail-visual">${productImage(p,true)}</div><div><span class="detail-kicker">${esc(p.cat)}</span><h2>${esc(p.name)}</h2><div class="detail-code">${esc(p.code||'')}</div><div class="detail-price">${fmt(p.price)}</div><ul class="detail-list"><li>Precio neto</li><li>Envíos a todo México</li><li>Envío gratis desde $5,000 MXN</li><li>Disponibilidad sujeta a confirmación</li></ul><div class="product-detail-actions"><button class="btn primary" data-modal-add="${p.id}">Agregar al carrito</button><button class="btn secondary" data-modal-wa="${p.id}">Consultar por WhatsApp</button></div></div></div>`;
   $('#productDialog').showModal();
   $('[data-modal-add]').onclick=()=>{add(id,false);$('#productDialog').close()};
   $('[data-modal-wa]').onclick=()=>ask(id);
