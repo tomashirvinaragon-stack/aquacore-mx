@@ -273,6 +273,12 @@ async function init(){
           stockErr.code='STOCK_VALIDATION_UNAVAILABLE';
           throw stockErr;
         }
+        if(out.code==='CONFIRM_AVAILABILITY'){
+          const stockErr=new Error(out.error||'La existencia del motor debe confirmarse antes del pago.');
+          stockErr.code='CONFIRM_AVAILABILITY';
+          stockErr.productId=Number(out.productId||0)||null;
+          throw stockErr;
+        }
         const detail=[out.providerStatus?`HTTP ${out.providerStatus}`:'',out.providerCode||'',out.details||out.error||'Pago no disponible'].filter(Boolean).join(' · ');
         throw new Error(detail);
       }
@@ -288,6 +294,12 @@ async function init(){
         $('#successTitle').textContent='No pudimos confirmar existencia';
         $('#successCopy').textContent=`${err.message} No se realizó ningún cobro.`;
         $('#successWa').textContent='Consultar por WhatsApp';
+      }else if(err.code==='CONFIRM_AVAILABILITY'){
+        const motor=PRODUCTS.find(p=>Number(p.id)===Number(err.productId))||lines().find(x=>x.p.cat==='Motores Mercury')?.p;
+        if(motor) pendingWhatsApp=`https://wa.me/${PHONE}?text=${encodeURIComponent(`Hola AquaCore MX. Quiero confirmar existencia antes de pagar: ${motor.name} (${motor.code||'sin código'}) - ${fmt(motor.price)}.\n${productUrl(motor)}`)}`;
+        $('#successTitle').textContent='Confirma disponibilidad';
+        $('#successCopy').textContent=`${err.message} No se realizó ningún cobro.`;
+        $('#successWa').textContent='Confirmar por WhatsApp';
       }else{
         $('#successTitle').textContent='Error de Mercado Pago';
         $('#successCopy').textContent=`No se pudo abrir el checkout. Detalle: ${err.message}`;
