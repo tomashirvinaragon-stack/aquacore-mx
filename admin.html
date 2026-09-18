@@ -11,13 +11,13 @@
     .top{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}.topin{max-width:1450px;margin:auto;padding:15px 22px;display:flex;align-items:center;justify-content:space-between;gap:18px}
     .logo{height:42px}.top-actions{display:flex;gap:10px;align-items:center}.btn{border:0;border-radius:12px;padding:11px 15px;font-weight:800;cursor:pointer}.primary{background:linear-gradient(90deg,var(--blue),#0fa7b0);color:#fff}.ghost{background:#eef4f8;color:var(--navy)}
     .wrap{max-width:1450px;margin:0 auto;padding:28px 22px 60px}.head{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:20px}.head h1{margin:0;color:var(--navy);font-size:34px}.head p{margin:7px 0 0;color:var(--muted)}
-    .stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-bottom:20px}.stat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px}.stat small{display:block;color:var(--muted);font-weight:700}.stat strong{display:block;margin-top:7px;font-size:27px;color:var(--navy)}
+    .stats{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:14px;margin-bottom:20px}.stat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px}.stat small{display:block;color:var(--muted);font-weight:700}.stat strong{display:block;margin-top:7px;font-size:27px;color:var(--navy)}
     .toolbar{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;display:grid;grid-template-columns:minmax(240px,1fr) 220px auto;gap:10px;margin-bottom:16px}.toolbar input,.toolbar select{width:100%;border:1px solid #cfdde7;border-radius:12px;padding:12px 13px;font:inherit;background:#fff}
     .table-card{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden}.scroll{overflow:auto}.table{width:100%;border-collapse:collapse;min-width:1080px}.table th{background:#f8fbfd;text-align:left;padding:13px 14px;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#688093;border-bottom:1px solid var(--line)}.table td{padding:14px;border-bottom:1px solid #edf2f5;vertical-align:top}.table tr:hover td{background:#fbfdfe}.folio{font-weight:900;color:var(--navy)}.muted{color:var(--muted);font-size:13px}.money{font-weight:900}.status{display:inline-flex;padding:6px 9px;border-radius:999px;font-size:12px;font-weight:900}.approved{background:#e7f7ef;color:#08784a}.pending{background:#fff4d8;color:#915f00}.failed{background:#fdebed;color:#a62c3a}.refunded{background:#f0eafd;color:#6940a4}
-    .empty{padding:50px;text-align:center;color:var(--muted)}.linkbtn{border:0;background:none;color:var(--blue);font-weight:900;cursor:pointer;padding:0}
+    .empty{padding:50px;text-align:center;color:var(--muted)}.linkbtn{border:0;background:none;color:var(--blue);font-weight:900;cursor:pointer;padding:0}.rowactions{display:flex;gap:10px;align-items:center;white-space:nowrap}.wa{color:#0b8f55}.danger{background:#fdebed;color:#a62c3a}.warnbtn{background:#fff4d8;color:#915f00}.actionbar{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}.smallbtn{border:0;border-radius:11px;padding:10px 13px;font-weight:850;cursor:pointer}
     dialog{border:0;border-radius:20px;box-shadow:0 25px 80px #16334d30;max-width:760px;width:calc(100% - 30px);padding:0}dialog::backdrop{background:#0d2436a6}.dlg{padding:25px}.dlghead{display:flex;justify-content:space-between;gap:12px;align-items:start}.dlg h2{margin:0;color:var(--navy)}.x{border:0;background:#edf3f7;border-radius:50%;width:38px;height:38px;font-size:20px;cursor:pointer}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}.box{background:#f7fafc;border:1px solid var(--line);border-radius:14px;padding:13px}.box small{color:var(--muted);display:block;margin-bottom:5px}.items{margin-top:16px;border:1px solid var(--line);border-radius:14px;overflow:hidden}.item{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px;border-bottom:1px solid var(--line)}.item:last-child{border-bottom:0}
     .login{position:fixed;inset:0;background:linear-gradient(135deg,#062b4d,#0a809c);display:grid;place-items:center;z-index:100}.login-card{background:#fff;border-radius:22px;padding:30px;width:min(430px,calc(100% - 30px));box-shadow:0 30px 90px #001d2e55;text-align:center}.login-card img{height:55px}.login-card h2{color:var(--navy)}.login-card input{width:100%;border:1px solid #ccdbe5;border-radius:12px;padding:13px;margin:9px 0 11px;font:inherit}.err{color:var(--bad);min-height:20px;font-size:13px}.hidden{display:none!important}
-    @media(max-width:950px){.stats{grid-template-columns:1fr 1fr}.toolbar{grid-template-columns:1fr}.head{align-items:start;flex-direction:column}.grid{grid-template-columns:1fr}.topin{padding:12px 15px}.wrap{padding:20px 14px 45px}}
+    @media(max-width:1200px){.stats{grid-template-columns:repeat(3,1fr)}}@media(max-width:950px){.stats{grid-template-columns:1fr 1fr}.toolbar{grid-template-columns:1fr}.head{align-items:start;flex-direction:column}.grid{grid-template-columns:1fr}.topin{padding:12px 15px}.wrap{padding:20px 14px 45px}}
   </style>
 </head>
 <body>
@@ -45,6 +45,8 @@
       <div class="stat"><small>Pedidos pagados</small><strong id="approved">0</strong></div>
       <div class="stat"><small>Pendientes</small><strong id="pending">0</strong></div>
       <div class="stat"><small>Fallidos</small><strong id="failed">0</strong></div>
+      <div class="stat"><small>Cancelados</small><strong id="canceled">0</strong></div>
+      <div class="stat"><small>Archivados</small><strong id="archived">0</strong></div>
       <div class="stat"><small>Total pedidos</small><strong id="total">0</strong></div>
     </section>
 
@@ -56,6 +58,8 @@
         <option value="pending">Pendientes</option>
         <option value="failed">Fallidos</option>
         <option value="refunded">Reembolsados</option>
+        <option value="canceled">Cancelados</option>
+        <option value="archived">Archivados</option>
       </select>
       <button id="filter" class="btn primary">Filtrar</button>
     </section>
@@ -79,12 +83,36 @@
     const money=n=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'}).format(Number(n||0));
     const date=s=>s?new Intl.DateTimeFormat('es-MX',{dateStyle:'medium',timeStyle:'short'}).format(new Date(s)):'—';
     const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-    function statusInfo(s){
+    function statusInfo(s,admin){
+      admin=String(admin||'active').toLowerCase();
+      if(admin==='canceled')return['failed','Cancelado'];
+      if(admin==='archived')return['refunded','Archivado'];
       s=String(s||'').toLowerCase();
       if(['approved','paid','processed'].includes(s))return['approved','Pagado'];
       if(['failed','canceled','cancelled','rejected'].includes(s))return['failed','Fallido'];
       if(s==='refunded')return['refunded','Reembolsado'];
       return['pending','Pendiente'];
+    }
+    function whatsappUrl(o){
+      let digits=String(o.customer_phone||'').replace(/\D/g,'');
+      if(digits.length===10)digits='52'+digits;
+      if(!digits)return '';
+      const total=money(Number(o.subtotal||0)+Number(o.shipping_amount||0));
+      const msg='Hola '+(o.customer_name||'')+', te contacto de AquaCore MX sobre tu pedido '+o.folio+' por '+total+'.';
+      return 'https://wa.me/'+digits+'?text='+encodeURIComponent(msg);
+    }
+    async function orderAction(folio,action){
+      const labels={cancel:'cancelar',archive:'archivar',restore:'restaurar'};
+      if(!confirm('¿Seguro que deseas '+(labels[action]||action)+' este pedido?'))return;
+      const r=await fetch('/api/admin-orders',{
+        method:'POST',
+        headers:{'content-type':'application/json','x-admin-password':password},
+        body:JSON.stringify({folio,action})
+      });
+      const out=await r.json().catch(()=>({}));
+      if(!r.ok){alert([out.error,out.details].filter(Boolean).join(' — ')||'No se pudo actualizar el pedido');return}
+      detail.close();
+      await load();
     }
     async function api(){
       const q=new URLSearchParams({status:$('#status').value,q:$('#search').value.trim()});
@@ -100,9 +128,11 @@
       $('#approved').textContent=out.stats?.approvedOrders||0;
       $('#pending').textContent=out.stats?.pendingOrders||0;
       $('#failed').textContent=out.stats?.failedOrders||0;
+      $('#canceled').textContent=out.stats?.canceledOrders||0;
+      $('#archived').textContent=out.stats?.archivedOrders||0;
       $('#total').textContent=out.stats?.totalOrders||0;
       $('#tbody').innerHTML=orders.map((o,i)=>{
-        const [cl,tx]=statusInfo(o.payment_status);
+        const [cl,tx]=statusInfo(o.payment_status,o.admin_status);
         return '<tr>'+
           '<td><div class="folio">'+esc(o.folio)+'</div><div class="muted">'+esc(o.mp_order_id||'')+'</div></td>'+
           '<td>'+esc(date(o.created_at))+(o.paid_at?'<div class="muted">Pagado '+esc(date(o.paid_at))+'</div>':'')+'</td>'+
@@ -111,7 +141,9 @@
           '<td><span class="status '+cl+'">'+tx+'</span><div class="muted">'+esc(o.payment_status_detail||'')+'</div></td>'+
           '<td>'+esc(o.payment_method||'—')+'<div class="muted">'+esc(o.payment_id||'')+'</div></td>'+
           '<td>'+esc([o.city,o.state].filter(Boolean).join(', ')||'—')+'<div class="muted">'+esc(o.zip||'')+'</div></td>'+
-          '<td><button class="linkbtn" data-i="'+i+'">Ver</button></td>'+
+          '<td><div class="rowactions">'+
+            (whatsappUrl(o)?'<a class="linkbtn wa" target="_blank" rel="noopener" href="'+whatsappUrl(o)+'">WhatsApp</a>':'')+
+            '<button class="linkbtn" data-i="'+i+'">Ver</button></div></td>'+
         '</tr>';
       }).join('');
       $('#empty').classList.toggle('hidden',orders.length>0);
@@ -120,8 +152,11 @@
     function show(i){
       const o=orders[i]; if(!o)return;
       $('#dFolio').textContent=o.folio;
-      const [cl,tx]=statusInfo(o.payment_status);
+      const [cl,tx]=statusInfo(o.payment_status,o.admin_status);
       const items=Array.isArray(o.items)?o.items:[];
+      const admin=String(o.admin_status||'active').toLowerCase();
+      const wa=whatsappUrl(o);
+      const paid=['approved','paid','processed'].includes(String(o.payment_status||'').toLowerCase());
       $('#dBody').innerHTML=
         '<div class="grid">'+
           '<div class="box"><small>Cliente</small><b>'+esc(o.customer_name||'—')+'</b><br>'+esc(o.customer_email||'')+'<br>'+esc(o.customer_phone||'')+'</div>'+
@@ -130,7 +165,18 @@
           '<div class="box"><small>Mercado Pago</small>Order: '+esc(o.mp_order_id||'—')+'<br>Pago: '+esc(o.payment_id||'—')+'<br>Método: '+esc(o.payment_method||'—')+'</div>'+
         '</div>'+
         '<div class="items">'+items.map(x=>'<div class="item"><div><b>'+esc(x.name||'Producto')+'</b><div class="muted">'+esc(x.code||'')+' · '+esc(x.qty)+' x '+money(x.unit_price)+'</div></div><b>'+money(x.total)+'</b></div>').join('')+'</div>'+
-        '<div style="display:flex;justify-content:space-between;margin-top:16px;font-size:20px"><b>Total</b><b>'+money(Number(o.subtotal||0)+Number(o.shipping_amount||0))+'</b></div>';
+        '<div style="display:flex;justify-content:space-between;margin-top:16px;font-size:20px"><b>Total</b><b>'+money(Number(o.subtotal||0)+Number(o.shipping_amount||0))+'</b></div>'+
+        '<div class="actionbar">'+
+          (wa?'<a class="smallbtn primary" style="text-decoration:none" target="_blank" rel="noopener" href="'+wa+'">WhatsApp al cliente</a>':'')+
+          (admin==='active'&&!paid?'<button class="smallbtn warnbtn" id="cancelOrder">Cancelar pedido</button>':'')+
+          (admin!=='archived'?'<button class="smallbtn ghost" id="archiveOrder">Archivar</button>':'')+
+          (admin==='canceled'||admin==='archived'?'<button class="smallbtn ghost" id="restoreOrder">Restaurar</button>':'')+
+        '</div>';
+      detail.showModal();
+      const cancel=$('#cancelOrder'),archive=$('#archiveOrder'),restore=$('#restoreOrder');
+      if(cancel)cancel.onclick=()=>orderAction(o.folio,'cancel');
+      if(archive)archive.onclick=()=>orderAction(o.folio,'archive');
+      if(restore)restore.onclick=()=>orderAction(o.folio,'restore');
       detail.showModal();
     }
     async function load(){
