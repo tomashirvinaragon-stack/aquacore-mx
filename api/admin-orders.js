@@ -73,6 +73,9 @@ export default async function handler(req,res){
     });
   }catch(err){
     console.error('Admin orders error',err);
-    return res.status(500).json({error:'No se pudieron cargar los pedidos'});
+    return res.status(500).json({
+      error:'No se pudieron cargar los pedidos',
+      details:String(err?.message||'Error de base de datos desconocido').slice(0,500)
+    });
   }
 }
