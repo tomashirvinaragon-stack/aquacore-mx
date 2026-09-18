@@ -18,7 +18,7 @@ function codeKeys(value){
   const raw=String(value??'').trim();
   if(!raw) return [];
   const keys=[raw.toUpperCase()];
-  if(/^\\d+$/.test(raw)) keys.push(String(Number(raw)));
+  if(/^\d+$/.test(raw)) keys.push(String(Number(raw)));
   return [...new Set(keys)];
 }
 
@@ -51,10 +51,10 @@ function connectionConfig(){
   const rawServer=env('EQUIPESCA_SQL_SERVER');
   let server=rawServer;
   let instanceName=env('EQUIPESCA_SQL_INSTANCE');
-  if(rawServer.includes('\\\\')){
-    const parts=rawServer.split('\\\\');
+  if(rawServer.includes('\\')){
+    const parts=rawServer.split('\\');
     server=parts.shift()||rawServer;
-    if(!instanceName) instanceName=parts.join('\\\\');
+    if(!instanceName) instanceName=parts.join('\\');
   }
 
   const port=Number(env('EQUIPESCA_SQL_PORT'));
