@@ -21,11 +21,5 @@
         }
       ]
     }
-  ],
-  "rewrites": [
-    {
-      "source": "/productos/:slug",
-      "destination": "/producto.html?slug=:slug"
-    }
   ]
 }

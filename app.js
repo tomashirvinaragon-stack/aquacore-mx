@@ -5,7 +5,7 @@ let cart=JSON.parse(localStorage.getItem('aquacore-cart-v2')||'{}');
 const fmt=n=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'}).format(n);
 const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 const slugify=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
-const productUrl=p=>`${location.origin}/productos/${slugify(p.name)}-${p.id}`;
+const productUrl=p=>`${location.origin}/producto?id=${p.id}`;
 const catIcon={Blowers:'🌀',Aireadores:'🌊',Difusores:'⚫','Calidad de agua':'🧪','Redes y mallas':'🕸️',Procesamiento:'🔪',Protección:'🦺',Refacciones:'⚙️'};
 const NO_PRODUCT_IMAGE=new Set([78,80,85]);
 const imagePath=p=>p.image||(p.cat==='Blowers'?'/assets/products/blower-pulsar.webp':`/api/equipesca-image?name=${encodeURIComponent(p.name)}&code=${encodeURIComponent(p.code||'')}&v=20260917b`);
