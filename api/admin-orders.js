@@ -94,7 +94,7 @@ export default async function handler(req,res){
     const all=await listOrders(500);
     const status=String(req.query?.status||'all').toLowerCase();
     const q=String(req.query?.q||'').trim().toLowerCase();
-    const rows=Array.isArray(all)?all:[];
+    const rows=(Array.isArray(all)?all:[]).filter(o=>String(o.payment_status||'').toLowerCase()!=='inventory'&&!String(o.folio||'').startsWith('INV-'));
     const active=rows.filter(o=>adminState(o)!=='archived');
     const activeNotCanceled=active.filter(o=>adminState(o)!=='canceled');
     let orders;

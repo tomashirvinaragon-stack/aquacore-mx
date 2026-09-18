@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Inventario | AquaCore MX</title>
+  <style>
+    :root{--navy:#062b4d;--blue:#0876b7;--teal:#10b8b0;--bg:#f3f7fa;--card:#fff;--line:#dce6ee;--text:#17354f;--muted:#6b8090;--ok:#159c62;--warn:#b97900;--bad:#c23d4a}
+    *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    .top{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}.topin{max-width:1450px;margin:auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:15px}.logo{height:42px}.top-actions{display:flex;gap:9px;align-items:center}
+    .btn{border:0;border-radius:11px;padding:10px 14px;font-weight:800;cursor:pointer}.primary{background:linear-gradient(90deg,var(--blue),#0fa7b0);color:white}.ghost{background:#eef4f8;color:var(--navy)}
+    .wrap{max-width:1450px;margin:auto;padding:26px 20px 60px}.head{display:flex;justify-content:space-between;gap:16px;align-items:end;margin-bottom:18px}.head h1{margin:0;color:var(--navy)}.muted{color:var(--muted)}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px}.stat small{display:block;color:var(--muted);font-weight:700}.stat strong{display:block;margin-top:6px;font-size:25px;color:var(--navy)}
+    .importer{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px}.importer h2{margin:0 0 6px;color:var(--navy);font-size:20px}.import-grid{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin-top:12px}.import-grid input{width:100%;border:1px dashed #aebfcb;border-radius:12px;padding:11px;background:#f8fbfd}.import-result{margin-top:10px;padding:11px 12px;border-radius:11px;background:#f7fafc;color:var(--muted);font-size:13px}.import-result.good{background:#e7f7ef;color:#08784a}.import-result.warn{background:#fff4d8;color:#915f00}
+    .toolbar{display:grid;grid-template-columns:1fr 220px auto;gap:10px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:13px;margin-bottom:14px}.toolbar input,.toolbar select{width:100%;border:1px solid #ccdbe5;border-radius:10px;padding:11px;font:inherit}
+    .table-card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}.scroll{overflow:auto}.table{width:100%;border-collapse:collapse;min-width:980px}.table th{background:#f8fbfd;text-align:left;padding:12px;font-size:12px;text-transform:uppercase;color:#688093;border-bottom:1px solid var(--line)}.table td{padding:12px;border-bottom:1px solid #edf2f5;vertical-align:middle}.table tr:hover td{background:#fbfdfe}
+    .name{font-weight:850;color:var(--navy)}.code{font-size:12px;color:var(--muted)}.num{width:90px;border:1px solid #cfdde7;border-radius:9px;padding:9px}.sku{width:105px;border:1px solid #cfdde7;border-radius:9px;padding:9px}.check{width:20px;height:20px}.rowbtn{border:0;border-radius:9px;padding:8px 10px;font-weight:850;cursor:pointer}.minus{background:#fdebed;color:#a62c3a}.plus{background:#e7f7ef;color:#08784a}.save{background:#e8f2ff;color:#1762a5}.pill{display:inline-flex;padding:5px 8px;border-radius:999px;font-size:12px;font-weight:900}.ok{background:#e7f7ef;color:#08784a}.low{background:#fff4d8;color:#915f00}.out{background:#fdebed;color:#a62c3a}.off{background:#eef4f8;color:#557086}
+    .login{position:fixed;inset:0;background:linear-gradient(135deg,#062b4d,#0a809c);display:grid;place-items:center;z-index:100}.login-card{background:#fff;border-radius:22px;padding:30px;width:min(430px,calc(100% - 30px));box-shadow:0 30px 90px #001d2e55;text-align:center}.login-card img{height:55px}.login-card input{width:100%;border:1px solid #ccdbe5;border-radius:12px;padding:13px;margin:9px 0 11px;font:inherit}.hidden{display:none!important}.err{color:var(--bad);min-height:20px;font-size:13px}
+    @media(max-width:900px){.stats{grid-template-columns:1fr 1fr}.toolbar{grid-template-columns:1fr}.head{align-items:start;flex-direction:column}.wrap{padding:18px 12px 45px}.topin{padding:11px 12px}}
+  </style>
+</head>
+<body>
+  <div id="login" class="login">
+    <form id="loginForm" class="login-card">
+      <img src="assets/logo.svg" alt="AquaCore MX">
+      <h2>Inventario AquaCore MX</h2>
+      <p class="muted">Usa la misma contraseña del panel administrativo.</p>
+      <input id="password" type="password" autocomplete="current-password" placeholder="Contraseña" required>
+      <button class="btn primary" style="width:100%">Entrar</button>
+      <div id="loginError" class="err"></div>
+    </form>
+  </div>
+
+  <header class="top"><div class="topin">
+    <img class="logo" src="assets/logo.svg" alt="AquaCore MX">
+    <div class="top-actions">
+      <a class="btn ghost" href="/admin.html" style="text-decoration:none">Pedidos</a>
+      <button id="refresh" class="btn ghost">Actualizar</button>
+      <button id="logout" class="btn ghost">Cerrar sesión</button>
+    </div>
+  </div></header>
+
+  <main class="wrap">
+    <div class="head"><div><h1>Control de stock</h1><p class="muted">El stock exacto solo se publica cuando activas “Controlar stock”.</p></div></div>
+    <section class="stats">
+      <div class="stat"><small>Productos</small><strong id="total">0</strong></div>
+      <div class="stat"><small>Con stock controlado</small><strong id="managed">0</strong></div>
+      <div class="stat"><small>Pocas piezas</small><strong id="low">0</strong></div>
+      <div class="stat"><small>Agotados</small><strong id="out">0</strong></div>
+    </section>
+
+    <section class="importer">
+      <h2>Actualizar desde Equipesca</h2>
+      <div class="muted">Sube el archivo diario de “Existencias actuales por sucursal”. AquaCore usará la columna <b>Total</b> y cruzará los productos por el código de Equipesca.</div>
+      <div class="import-grid">
+        <input id="inventoryFile" type="file" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
+        <button id="importFile" class="btn primary">Actualizar inventario</button>
+      </div>
+      <div id="importResult" class="import-result">Aún no se ha cargado un archivo en esta sesión.</div>
+    </section>
+
+    <section class="toolbar">
+      <input id="search" type="search" placeholder="Buscar producto, código o categoría...">
+      <select id="filter">
+        <option value="all">Todos</option>
+        <option value="managed">Controlados</option>
+        <option value="low">Pocas piezas</option>
+        <option value="out">Agotados</option>
+        <option value="unmanaged">Sin controlar</option>
+      </select>
+      <button id="apply" class="btn primary">Filtrar</button>
+    </section>
+    <section class="table-card"><div class="scroll"><table class="table">
+      <thead><tr><th>Producto</th><th>Código Equipesca</th><th>Stock Total</th><th>Alerta mínima</th><th>Controlar stock</th><th>Estado</th><th>Ajuste</th><th></th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table></div></section>
+  </main>
+
+<script>
+const $=s=>document.querySelector(s);
+let password=sessionStorage.getItem('aquacore-admin-password')||'',products=[];
+const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+
+function statusInfo(p){
+  if(!p.managed)return ['off','Por confirmar'];
+  if(p.stock<=0)return ['out','Agotado'];
+  if(p.stock<=p.low_stock_threshold)return ['low','Pocas piezas'];
+  return ['ok','Disponible'];
+}
+
+async function api(method='GET',body){
+  const r=await fetch('/api/admin-inventory',{
+    method,
+    headers:{'content-type':'application/json','x-admin-password':password},
+    body:body?JSON.stringify(body):undefined,
+    cache:'no-store'
+  });
+  const out=await r.json().catch(()=>({}));
+  if(r.status===401)throw new Error('AUTH');
+  if(!r.ok)throw new Error([out.error,out.details].filter(Boolean).join(' — ')||'Error de inventario');
+  return out;
+}
+
+function filtered(){
+  const q=$('#search').value.trim().toLowerCase(),f=$('#filter').value;
+  return products.filter(p=>{
+    const matches=!q||[p.name,p.code,p.cat,p.source_code,p.source_description].some(v=>String(v||'').toLowerCase().includes(q));
+    const low=p.managed&&p.stock>0&&p.stock<=p.low_stock_threshold;
+    const out=p.managed&&p.stock<=0;
+    const state=f==='all'||(f==='managed'&&p.managed)||(f==='unmanaged'&&!p.managed)||(f==='low'&&low)||(f==='out'&&out);
+    return matches&&state;
+  });
+}
+
+function render(){
+  const all=products;
+  $('#total').textContent=all.length;
+  $('#managed').textContent=all.filter(p=>p.managed).length;
+  $('#low').textContent=all.filter(p=>p.managed&&p.stock>0&&p.stock<=p.low_stock_threshold).length;
+  $('#out').textContent=all.filter(p=>p.managed&&p.stock<=0).length;
+
+  $('#tbody').innerHTML=filtered().map(p=>{
+    const [cl,tx]=statusInfo(p);
+    return '<tr data-row="'+p.id+'">'+
+      '<td><div class="name">'+esc(p.name)+'</div><div class="code">'+esc(p.cat)+(p.code?' · '+esc(p.code):'')+'</div></td>'+
+      '<td><input class="sku" data-source="'+p.id+'" value="'+esc(p.source_code||'')+'" placeholder="Ej. 12345"></td>'+
+      '<td><input class="num" data-stock="'+p.id+'" type="number" min="0" step="0.001" value="'+p.stock+'">'+(p.source_updated_at?'<div class="code">Actualizado '+esc(new Date(p.source_updated_at).toLocaleString('es-MX'))+'</div>':'')+'</td>'+
+      '<td><input class="num" data-th="'+p.id+'" type="number" min="0" step="1" value="'+p.low_stock_threshold+'"></td>'+
+      '<td><input class="check" data-managed="'+p.id+'" type="checkbox" '+(p.managed?'checked':'')+'></td>'+
+      '<td><span class="pill '+cl+'">'+tx+'</span></td>'+
+      '<td><button class="rowbtn minus" data-adjust="'+p.id+'" data-delta="-1">−1</button> <button class="rowbtn plus" data-adjust="'+p.id+'" data-delta="1">+1</button></td>'+
+      '<td><button class="rowbtn save" data-save="'+p.id+'">Guardar</button></td>'+
+    '</tr>';
+  }).join('');
+
+  document.querySelectorAll('[data-save]').forEach(b=>b.onclick=()=>save(Number(b.dataset.save)));
+  document.querySelectorAll('[data-adjust]').forEach(b=>b.onclick=()=>adjust(Number(b.dataset.adjust),Number(b.dataset.delta)));
+}
+
+function readRow(id){
+  return {
+    product_id:id,
+    stock:Number(document.querySelector('[data-stock="'+id+'"]').value)||0,
+    low_stock_threshold:Number(document.querySelector('[data-th="'+id+'"]').value)||0,
+    managed:document.querySelector('[data-managed="'+id+'"]').checked,
+    source_code:document.querySelector('[data-source="'+id+'"]').value.trim()
+  };
+}
+
+async function save(id){
+  try{
+    const out=await api('POST',readRow(id));
+    const i=products.findIndex(p=>p.id===id);
+    if(i>=0)products[i]={...products[i],...out.item,stock:Number(out.item.stock),low_stock_threshold:Number(out.item.low_stock_threshold),managed:Boolean(out.item.managed)};
+    render();
+  }catch(e){alert(e.message)}
+}
+
+async function adjust(id,delta){
+  try{
+    const row=readRow(id);
+    const out=await api('POST',{...row,action:'adjust',delta});
+    const i=products.findIndex(p=>p.id===id);
+    if(i>=0)products[i]={...products[i],...out.item,stock:Number(out.item.stock),low_stock_threshold:Number(out.item.low_stock_threshold),managed:Boolean(out.item.managed)};
+    render();
+  }catch(e){alert(e.message)}
+}
+
+async function load(){
+  try{
+    const out=await api();
+    products=out.products||[];
+    $('#login').classList.add('hidden');
+    render();
+  }catch(e){
+    if(e.message==='AUTH'){password='';sessionStorage.removeItem('aquacore-admin-password');$('#login').classList.remove('hidden')}
+    else alert(e.message);
+  }
+}
+
+$('#loginForm').onsubmit=async e=>{e.preventDefault();password=$('#password').value;sessionStorage.setItem('aquacore-admin-password',password);$('#loginError').textContent='';await load()};
+$('#refresh').onclick=load;
+$('#apply').onclick=render;
+$('#search').oninput=render;
+$('#filter').onchange=render;
+$('#logout').onclick=()=>{password='';sessionStorage.removeItem('aquacore-admin-password');$('#password').value='';$('#login').classList.remove('hidden')};
+async function fileToBase64(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>resolve(String(reader.result||'').split(',').pop()||'');
+    reader.onerror=()=>reject(reader.error||new Error('No se pudo leer el archivo'));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function importInventory(){
+  const file=$('#inventoryFile').files?.[0];
+  if(!file){alert('Selecciona el archivo de existencias de Equipesca');return}
+  const btn=$('#importFile'),box=$('#importResult');
+  btn.disabled=true;
+  btn.textContent='Actualizando…';
+  box.className='import-result';
+  box.textContent='Leyendo '+file.name+'…';
+  try{
+    const base64=await fileToBase64(file);
+    const r=await fetch('/api/admin-inventory-import',{
+      method:'POST',
+      headers:{'content-type':'application/json','x-admin-password':password},
+      body:JSON.stringify({filename:file.name,base64})
+    });
+    const out=await r.json().catch(()=>({}));
+    if(r.status===401)throw new Error('AUTH');
+    if(!r.ok)throw new Error([out.error,out.details].filter(Boolean).join(' — ')||'No se pudo importar el archivo');
+    box.className='import-result '+(out.unmatched?'warn':'good');
+    box.innerHTML='<b>'+out.updated+' productos actualizados</b> de '+out.reportRows+' renglones del archivo.'+
+      (out.unmatched?' '+out.unmatched+' producto(s) de AquaCore quedaron sin coincidencia; puedes colocar su Código Equipesca manualmente en la tabla.':' Todos los productos encontraron coincidencia.');
+    await load();
+  }catch(e){
+    if(e.message==='AUTH'){password='';sessionStorage.removeItem('aquacore-admin-password');$('#login').classList.remove('hidden')}
+    else{box.className='import-result warn';box.textContent=e.message}
+  }finally{
+    btn.disabled=false;
+    btn.textContent='Actualizar inventario';
+  }
+}
+
+$('#importFile').onclick=importInventory;
+if(password)load();
+</script>
+</body>
+</html>

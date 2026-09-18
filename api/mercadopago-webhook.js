@@ -1,5 +1,5 @@
 import { WebhookSignatureValidator, InvalidWebhookSignatureError } from 'mercadopago';
-import { dbConfigured, updateOrderByFolio, updateOrderByMpOrderId } from './_db.js';
+import { dbConfigured, updateOrderByFolio, updateOrderByMpOrderId, commitOrderInventory } from './_db.js';
 
 function validateWithSdk({signature,requestId,dataId,secret}){
   if(!signature||!secret) return false;
@@ -171,6 +171,19 @@ export default async function handler(req,res){
       }catch(dbErr){
         console.error('No se pudo actualizar el pedido en Supabase',dbErr);
         return res.status(500).json({error:'No se pudo registrar el estado del pago'});
+      }
+
+      if(mapped==='approved' && order.external_reference){
+        try{
+          const inventoryResult=await commitOrderInventory(String(order.external_reference));
+          if(inventoryResult?.ok===false){
+            console.error('AQUACORE_INVENTORY_COMMIT_FAILED',inventoryResult);
+          }else{
+            console.log('AQUACORE_INVENTORY_COMMITTED',{folio:String(order.external_reference),inventoryResult});
+          }
+        }catch(inventoryErr){
+          console.error('AQUACORE_INVENTORY_COMMIT_ERROR',inventoryErr);
+        }
       }
     }
 

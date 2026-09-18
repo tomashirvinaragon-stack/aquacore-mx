@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { dbConfigured, upsertOrder, updateOrderByFolio } from './_db.js';
+import { dbConfigured, upsertOrder, updateOrderByFolio, getInventoryByIds } from './_db.js';
 
 const FREE_SHIPPING = 5000;
 
@@ -80,6 +80,27 @@ export default async function handler(req,res){
       const p=byId.get(id);
       if(!p)return res.status(400).json({error:`Producto inválido: ${id}`});
       clean.push({p,qty});
+    }
+
+    if(dbConfigured()){
+      try{
+        const inventory=await getInventoryByIds(clean.map(x=>x.p.id));
+        const byInventory=new Map((Array.isArray(inventory)?inventory:[]).map(x=>[Number(x.product_id),x]));
+        for(const {p,qty} of clean){
+          const inv=byInventory.get(Number(p.id));
+          if(inv?.managed && Number(inv.stock||0)<qty){
+            return res.status(409).json({
+              error:`No hay suficiente existencia de ${p.name}.`,
+              code:'OUT_OF_STOCK',
+              productId:Number(p.id),
+              available:Number(inv.stock||0),
+              requested:qty
+            });
+          }
+        }
+      }catch(inventoryErr){
+        console.error('No se pudo validar inventario antes del checkout',inventoryErr);
+      }
     }
 
     const subtotal=Number(clean.reduce((s,x)=>s+Number(x.p.price)*x.qty,0).toFixed(2));

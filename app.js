@@ -17,6 +17,12 @@ function productImage(p,detail=false){
 }
 
 function toast(t){const x=$('#toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1800)}
+function stockInfo(p){
+  if(!p.stockManaged)return{className:'stock-unknown',label:'Disponibilidad por confirmar'};
+  if(Number(p.stock)<=0)return{className:'stock-out',label:'Agotado'};
+  if(Number(p.stock)<=Number(p.lowStockThreshold||0))return{className:'stock-low',label:'Pocas piezas'};
+  return{className:'stock-ok',label:'Disponible'};
+}
 function cats(){return [...new Set(PRODUCTS.map(p=>p.cat))]}
 function renderCategories(){
   $('#categoryGrid').innerHTML=cats().map(c=>`<button class="category-card" data-cat="${esc(c)}"><span class="category-icon">${catIcon[c]||'•'}</span><b>${esc(c)}</b><span>${PRODUCTS.filter(p=>p.cat===c).length} productos</span></button>`).join('');
@@ -36,7 +42,8 @@ function filtered(){
   return a;
 }
 function card(p){
-  return `<article class="product-card"><div class="product-visual" data-cat="${esc(p.cat)}">${p.featured?'<span class="badge">DESTACADO</span>':''}${productImage(p)}</div><div class="product-body"><span class="product-category">${esc(p.cat)}</span><div class="product-title">${esc(p.name)}</div><div class="product-code">${esc(p.code||'')}</div><div class="price">${fmt(p.price)}</div><div class="net-price">Precio neto</div><div class="product-actions"><button class="add-btn" data-add="${p.id}">Agregar al carrito</button><button class="wa-btn" data-wa="${p.id}" aria-label="WhatsApp">WA</button><button class="detail-btn" data-detail="${p.id}">Ver detalles</button></div></div></article>`;
+  const st=stockInfo(p),soldOut=p.stockManaged&&Number(p.stock)<=0;
+  return `<article class="product-card"><div class="product-visual" data-cat="${esc(p.cat)}">${p.featured?'<span class="badge">DESTACADO</span>':''}${productImage(p)}</div><div class="product-body"><span class="product-category">${esc(p.cat)}</span><div class="product-title">${esc(p.name)}</div><div class="product-code">${esc(p.code||'')}</div><div class="price">${fmt(p.price)}</div><div class="net-price">Precio neto</div><div class="stock-pill ${st.className}">${st.label}</div><div class="product-actions"><button class="add-btn" data-add="${p.id}" ${soldOut?'disabled':''}>${soldOut?'Agotado':'Agregar al carrito'}</button><button class="wa-btn" data-wa="${p.id}" aria-label="WhatsApp">WA</button><button class="detail-btn" data-detail="${p.id}">Ver detalles</button></div></div></article>`;
 }
 function renderProducts(){
   const a=filtered();
@@ -61,7 +68,8 @@ function detail(id){
       ${specs.length?`<div class="detail-section"><h3>Ficha técnica</h3><div class="spec-grid">${specs.map(s=>`<div class="spec-item">${esc(s)}</div>`).join('')}</div></div>`:''}
       ${uses.length?`<div class="detail-section"><h3>Aplicaciones</h3><ul class="detail-list compact">${uses.map(s=>`<li>${esc(s)}</li>`).join('')}</ul></div>`:''}
     </div>`:'';
-  $('#productDialogBody').innerHTML=`<div class="product-detail"><div class="product-detail-visual">${productImage(p,true)}</div><div><span class="detail-kicker">${esc(p.cat)}</span><h2>${esc(p.name)}</h2><div class="detail-code">${esc(p.code||'')}</div><div class="detail-price">${fmt(p.price)}</div><ul class="detail-list"><li>Precio neto</li><li>Envíos a todo México</li><li>Envío gratis desde $5,000 MXN</li><li>Disponibilidad sujeta a confirmación</li></ul>${extra}<div class="product-detail-actions"><button class="btn primary" data-modal-add="${p.id}">Agregar al carrito</button><button class="btn secondary" data-modal-wa="${p.id}">Consultar por WhatsApp</button></div></div></div>`;
+  const st=stockInfo(p),soldOut=p.stockManaged&&Number(p.stock)<=0;
+  $('#productDialogBody').innerHTML=`<div class="product-detail"><div class="product-detail-visual">${productImage(p,true)}</div><div><span class="detail-kicker">${esc(p.cat)}</span><h2>${esc(p.name)}</h2><div class="detail-code">${esc(p.code||'')}</div><div class="detail-price">${fmt(p.price)}</div><div class="stock-pill ${st.className}">${st.label}</div><ul class="detail-list"><li>Precio neto</li><li>Envíos a todo México</li><li>Envío gratis desde $5,000 MXN</li></ul>${extra}<div class="product-detail-actions"><button class="btn primary" data-modal-add="${p.id}" ${soldOut?'disabled':''}>${soldOut?'Agotado':'Agregar al carrito'}</button><button class="btn secondary" data-modal-wa="${p.id}">Consultar por WhatsApp</button></div></div></div>`;
   $('#productDialog').showModal();
   $('[data-modal-add]').onclick=()=>{add(id,false);$('#productDialog').close()};
   $('[data-modal-wa]').onclick=()=>ask(id);
@@ -69,12 +77,22 @@ function detail(id){
 function lines(){return Object.entries(cart).map(([id,qty])=>({p:PRODUCTS.find(x=>x.id===+id),qty})).filter(x=>x.p)}
 function subtotal(){return lines().reduce((s,x)=>s+x.p.price*x.qty,0)}
 function save(){localStorage.setItem('aquacore-cart-v2',JSON.stringify(cart));renderCart()}
-function add(id,open=true){cart[id]=(cart[id]||0)+1;save();toast('Producto agregado al carrito');if(open)openCart()}
-function qty(id,d){cart[id]=(cart[id]||0)+d;if(cart[id]<=0)delete cart[id];save()}
+function add(id,open=true){
+  const p=PRODUCTS.find(x=>x.id===id);
+  if(!p)return;
+  const current=Number(cart[id]||0);
+  if(p.stockManaged&&current>=Number(p.stock||0)){toast('No hay más piezas disponibles');return}
+  cart[id]=current+1;save();toast('Producto agregado al carrito');if(open)openCart()
+}
+function qty(id,d){
+  const p=PRODUCTS.find(x=>x.id===id),current=Number(cart[id]||0);
+  if(d>0&&p?.stockManaged&&current>=Number(p.stock||0)){toast('No hay más piezas disponibles');return}
+  cart[id]=current+d;if(cart[id]<=0)delete cart[id];save()
+}
 function renderCart(){
   const l=lines(),sub=subtotal(),count=l.reduce((s,x)=>s+x.qty,0);
   $('#cartCount').textContent=count;
-  $('#cartItems').innerHTML=l.length?l.map(({p,qty:q})=>`<div class="cart-item"><div><b>${esc(p.name)}</b><small>${fmt(p.price)} c/u</small><div class="qty"><button data-dec="${p.id}">−</button><span>${q}</span><button data-inc="${p.id}">+</button><button class="remove" data-rm="${p.id}">Eliminar</button></div></div><strong>${fmt(p.price*q)}</strong></div>`).join(''):'<div style="padding:45px 0;text-align:center;color:#617487">Tu carrito está vacío.</div>';
+  $('#cartItems').innerHTML=l.length?l.map(({p,qty:q})=>`<div class="cart-item"><div><b>${esc(p.name)}</b><small>${fmt(p.price)} c/u</small><div class="qty"><button data-dec="${p.id}">−</button><span>${q}</span><button data-inc="${p.id}" ${p.stockManaged&&q>=Number(p.stock||0)?'disabled':''}>+</button><button class="remove" data-rm="${p.id}">Eliminar</button></div></div><strong>${fmt(p.price*q)}</strong></div>`).join(''):'<div style="padding:45px 0;text-align:center;color:#617487">Tu carrito está vacío.</div>';
   $('#subtotal').textContent=fmt(sub);
   $('#total').textContent=fmt(sub);
   $('#shipping').textContent=sub>=FREE_SHIPPING?'GRATIS':'Por calcular';
@@ -116,7 +134,15 @@ const POLICIES={
 };
 
 async function init(){
-  PRODUCTS=await fetch('data/products.json').then(r=>r.json());
+  const [catalog,inventoryOut]=await Promise.all([
+    fetch('data/products.json').then(r=>r.json()),
+    fetch('/api/inventory',{cache:'no-store'}).then(r=>r.ok?r.json():({inventory:[]})).catch(()=>({inventory:[]}))
+  ]);
+  const byInventory=new Map((Array.isArray(inventoryOut?.inventory)?inventoryOut.inventory:[]).map(x=>[Number(x.product_id),x]));
+  PRODUCTS=catalog.map(p=>{
+    const inv=byInventory.get(Number(p.id));
+    return {...p,stockManaged:Boolean(inv?.managed),stock:Number(inv?.stock||0),lowStockThreshold:Number(inv?.low_stock_threshold||0)};
+  });
   renderCategories();renderFilters();renderProducts();renderCart();toggleShape();
   $('#cartButton').onclick=openCart;
   $('#closeCart').onclick=closeCart;
