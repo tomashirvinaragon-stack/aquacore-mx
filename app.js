@@ -5,10 +5,12 @@ let cart=JSON.parse(localStorage.getItem('aquacore-cart-v2')||'{}');
 const fmt=n=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'}).format(n);
 const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 const catIcon={Blowers:'🌀',Aireadores:'🌊',Difusores:'⚫','Calidad de agua':'🧪','Redes y mallas':'🕸️',Procesamiento:'🔪',Protección:'🦺',Refacciones:'⚙️'};
+const NO_PRODUCT_IMAGE=new Set([78,80,85]);
 const imagePath=p=>p.image||(p.cat==='Blowers'?'/assets/products/blower-pulsar.webp':`/api/equipesca-image?name=${encodeURIComponent(p.name)}&code=${encodeURIComponent(p.code||'')}&v=20260917b`);
 function productImage(p,detail=false){
   const cls=detail?'product-detail-photo':'product-photo';
   const fallback=detail?'product-detail-fallback':'symbol';
+  if(NO_PRODUCT_IMAGE.has(Number(p.id))) return `<span class="${fallback}">${p.icon||catIcon[p.cat]||'•'}</span>`;
   return `<img class="${cls}" src="${esc(imagePath(p))}" alt="${esc(p.name)}" loading="lazy" decoding="async" onerror="this.style.display='none'"><span class="${fallback}">${p.icon||catIcon[p.cat]||'•'}</span>`;
 }
 
