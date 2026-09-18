@@ -19,7 +19,8 @@
       "Sistemas de aireación",
       "Estanques de acuacultura",
       "Líneas de difusión de aire"
-    ]
+    ],
+    "equipesca_code": "33091"
   },
   {
     "id": 2,
@@ -39,7 +40,8 @@
       "Difusión de aire en estanques",
       "Sistemas con blower",
       "Líneas de aireación"
-    ]
+    ],
+    "equipesca_code": "54174"
   },
   {
     "id": 3,
@@ -47,7 +49,8 @@
     "name": "Blower PIONEER 1/2 HP · 1PH · 115V · con filtro",
     "code": "PMF-10 / PRB30-510",
     "price": 8806.52,
-    "icon": "🌀"
+    "icon": "🌀",
+    "equipesca_code": "33088"
   },
   {
     "id": 4,
@@ -69,7 +72,8 @@
       "Aireación de estanques",
       "Sistemas con difusores",
       "Aplicaciones de aire continuo"
-    ]
+    ],
+    "equipesca_code": "33089"
   },
   {
     "id": 5,
@@ -88,7 +92,8 @@
       "Sistemas de aireación",
       "Distribución lineal de aire",
       "Estanques de acuacultura"
-    ]
+    ],
+    "equipesca_code": "05040"
   },
   {
     "id": 6,
@@ -107,7 +112,8 @@
       "Difusión de aire",
       "Sistemas con blower",
       "Estanques y tanques de cultivo"
-    ]
+    ],
+    "equipesca_code": "05433"
   },
   {
     "id": 7,
@@ -126,7 +132,8 @@
       "Tanques pequeños",
       "Líneas de aireación",
       "Difusión localizada de aire"
-    ]
+    ],
+    "equipesca_code": "06038"
   },
   {
     "id": 8,
@@ -145,7 +152,8 @@
       "Difusión de aire en estanques",
       "Sistemas con blower",
       "Aireación de mayor superficie"
-    ]
+    ],
+    "equipesca_code": "54376"
   },
   {
     "id": 9,
@@ -164,7 +172,8 @@
       "Difusión de aire",
       "Estanques y tanques",
       "Sistemas con blower"
-    ]
+    ],
+    "equipesca_code": "05056"
   },
   {
     "id": 10,
@@ -172,7 +181,8 @@
     "name": "Blower PIONEER 1 HP · 3PH · 220/440V · con filtro",
     "code": "PMF-12 / PRB40-420",
     "price": 8176.83,
-    "icon": "🌀"
+    "icon": "🌀",
+    "equipesca_code": "33090"
   },
   {
     "id": 11,
@@ -191,7 +201,8 @@
       "Mantenimiento de aireadores",
       "Reemplazo de componente",
       "Sistemas de aireación"
-    ]
+    ],
+    "equipesca_code": "05335"
   },
   {
     "id": 12,
@@ -199,7 +210,8 @@
     "name": "Blower PIONEER 2 HP · 3PH · 220/440V · con filtro",
     "code": "PMF-16 / PRB50-520",
     "price": 14383.08,
-    "icon": "🌀"
+    "icon": "🌀",
+    "equipesca_code": "38079"
   },
   {
     "id": 13,
@@ -207,7 +219,8 @@
     "name": "Blower PIONEER 10 HP · 3PH · 220/440V · con filtro",
     "code": "PMF-20 / PRB80-660",
     "price": 46502.4,
-    "icon": "🌀"
+    "icon": "🌀",
+    "equipesca_code": "36248"
   },
   {
     "id": 14,
@@ -229,7 +242,8 @@
       "Estanques de camarón",
       "Tilapia y otras especies acuícolas",
       "Oxigenación y circulación superficial"
-    ]
+    ],
+    "equipesca_code": "32549"
   },
   {
     "id": 15,
@@ -250,7 +264,8 @@
       "Estanques de acuacultura",
       "Oxigenación superficial",
       "Circulación de agua"
-    ]
+    ],
+    "equipesca_code": "05250"
   },
   {
     "id": 16,
@@ -271,7 +286,8 @@
       "Estanques de acuacultura",
       "Oxigenación superficial",
       "Circulación de agua"
-    ]
+    ],
+    "equipesca_code": "33007"
   },
   {
     "id": 17,
@@ -292,7 +308,8 @@
       "Estanques de acuacultura",
       "Oxigenación",
       "Mezcla y circulación de agua"
-    ]
+    ],
+    "equipesca_code": "39405"
   },
   {
     "id": 18,
@@ -311,7 +328,8 @@
       "Mantenimiento de aireadores",
       "Reemplazo de componente",
       "Sistemas de aireación"
-    ]
+    ],
+    "equipesca_code": "05338"
   },
   {
     "id": 19,
@@ -332,7 +350,8 @@
       "Estanques de acuacultura",
       "Oxigenación superficial",
       "Circulación de agua"
-    ]
+    ],
+    "equipesca_code": "50441"
   },
   {
     "id": 20,
@@ -353,7 +372,8 @@
       "Estanques de acuacultura",
       "Oxigenación superficial",
       "Circulación de agua"
-    ]
+    ],
+    "equipesca_code": "49750"
   },
   {
     "id": 21,
@@ -374,7 +394,8 @@
       "Repuesto para sistema de aireación",
       "Mantenimiento de equipo",
       "Aplicaciones compatibles según modelo"
-    ]
+    ],
+    "equipesca_code": "05742"
   },
   {
     "id": 22,
@@ -394,7 +415,8 @@
       "Repuesto para sistema de aireación",
       "Mantenimiento de equipo",
       "Aplicaciones compatibles según modelo"
-    ]
+    ],
+    "equipesca_code": "05087"
   },
   {
     "id": 23,
@@ -524,7 +546,8 @@
       "Monitoreo de estanques",
       "Control de calidad de agua",
       "Verificación de sistemas de aireación"
-    ]
+    ],
+    "equipesca_code": "32501"
   },
   {
     "id": 29,
@@ -545,7 +568,8 @@
       "Acuacultura",
       "Monitoreo de calidad de agua",
       "Verificación de oxígeno disuelto"
-    ]
+    ],
+    "equipesca_code": "44358"
   },
   {
     "id": 30,
@@ -565,7 +589,8 @@
       "Fileteado de pescado",
       "Deshuese",
       "Procesamiento de producto"
-    ]
+    ],
+    "equipesca_code": "43200"
   },
   {
     "id": 31,
@@ -585,7 +610,8 @@
       "Fileteado",
       "Deshuese",
       "Procesamiento de pescado"
-    ]
+    ],
+    "equipesca_code": "03116"
   },
   {
     "id": 32,
@@ -606,7 +632,8 @@
       "Deslonjado",
       "Preparación de pescado",
       "Procesamiento de producto"
-    ]
+    ],
+    "equipesca_code": "03117"
   },
   {
     "id": 33,
@@ -626,7 +653,8 @@
       "Preparación general",
       "Corte de alimentos",
       "Área de procesamiento"
-    ]
+    ],
+    "equipesca_code": "27219"
   },
   {
     "id": 34,
@@ -646,7 +674,8 @@
       "Despellejado",
       "Cortes de porción",
       "Procesamiento de pescado"
-    ]
+    ],
+    "equipesca_code": "03133"
   },
   {
     "id": 35,
@@ -666,7 +695,8 @@
       "Cortes largos",
       "Porcionado",
       "Procesamiento de pescado"
-    ]
+    ],
+    "equipesca_code": "38306"
   },
   {
     "id": 36,
@@ -686,7 +716,8 @@
       "Fileteado",
       "Deshuese",
       "Procesamiento de pescado"
-    ]
+    ],
+    "equipesca_code": "27456"
   },
   {
     "id": 37,
@@ -706,7 +737,8 @@
       "Cortes de precisión",
       "Preparación general",
       "Área de procesamiento"
-    ]
+    ],
+    "equipesca_code": "03107"
   },
   {
     "id": 38,
@@ -959,7 +991,8 @@
       "Confección de redes",
       "Aplicaciones pesqueras",
       "Proyectos según medida requerida"
-    ]
+    ],
+    "equipesca_code": "53216"
   },
   {
     "id": 50,
@@ -979,7 +1012,8 @@
       "Confección de redes",
       "Reparación de artes de pesca",
       "Aplicaciones según medida"
-    ]
+    ],
+    "equipesca_code": "51994"
   },
   {
     "id": 51,
@@ -1041,7 +1075,8 @@
       "Confección de redes",
       "Reparación de artes de pesca",
       "Aplicaciones según medida"
-    ]
+    ],
+    "equipesca_code": "52451"
   },
   {
     "id": 54,
@@ -1313,7 +1348,8 @@
       "Pesca y acuacultura",
       "Trabajo en ambientes húmedos",
       "Protección contra salpicaduras"
-    ]
+    ],
+    "equipesca_code": "31882"
   },
   {
     "id": 67,
@@ -1333,7 +1369,8 @@
       "Pesca y acuacultura",
       "Trabajo en ambientes húmedos",
       "Protección contra salpicaduras"
-    ]
+    ],
+    "equipesca_code": "30648"
   },
   {
     "id": 68,
@@ -1352,7 +1389,8 @@
       "Trabajo general",
       "Manipulación ligera",
       "Apoyo en tareas de almacén o procesamiento"
-    ]
+    ],
+    "equipesca_code": "05245"
   },
   {
     "id": 69,
@@ -1372,7 +1410,8 @@
       "Pesca y acuacultura",
       "Trabajo en ambientes húmedos",
       "Protección contra salpicaduras"
-    ]
+    ],
+    "equipesca_code": "30649"
   },
   {
     "id": 70,
@@ -1391,7 +1430,8 @@
       "Trabajo general",
       "Manipulación ligera",
       "Apoyo en tareas de almacén o procesamiento"
-    ]
+    ],
+    "equipesca_code": "07002"
   },
   {
     "id": 71,
@@ -1412,7 +1452,8 @@
       "Pesca y acuacultura",
       "Trabajo en ambientes húmedos",
       "Protección contra salpicaduras"
-    ]
+    ],
+    "equipesca_code": "27688"
   },
   {
     "id": 72,
@@ -1432,7 +1473,8 @@
       "Pesca y acuacultura",
       "Trabajo en ambientes húmedos",
       "Protección contra salpicaduras"
-    ]
+    ],
+    "equipesca_code": "31881"
   },
   {
     "id": 73,
@@ -1453,7 +1495,8 @@
       "Pesca y acuacultura",
       "Trabajo en ambientes húmedos",
       "Protección contra salpicaduras"
-    ]
+    ],
+    "equipesca_code": "20195"
   },
   {
     "id": 74,
@@ -1473,7 +1516,8 @@
       "Pesca y acuacultura",
       "Procesamiento",
       "Trabajo en zonas húmedas"
-    ]
+    ],
+    "equipesca_code": "49773"
   },
   {
     "id": 75,
@@ -1493,7 +1537,8 @@
       "Pesca y acuacultura",
       "Procesamiento",
       "Trabajo en zonas húmedas"
-    ]
+    ],
+    "equipesca_code": "49772"
   },
   {
     "id": 76,
@@ -1513,7 +1558,8 @@
       "Pesca y acuacultura",
       "Procesamiento",
       "Trabajo en zonas húmedas"
-    ]
+    ],
+    "equipesca_code": "42498"
   },
   {
     "id": 77,
@@ -1533,7 +1579,8 @@
       "Pesca y acuacultura",
       "Procesamiento",
       "Trabajo en zonas húmedas"
-    ]
+    ],
+    "equipesca_code": "42497"
   },
   {
     "id": 78,
@@ -1554,7 +1601,8 @@
       "Pesca y acuacultura",
       "Trabajo en ambientes húmedos",
       "Protección contra salpicaduras"
-    ]
+    ],
+    "equipesca_code": "20200"
   },
   {
     "id": 79,
@@ -1596,7 +1644,8 @@
       "Pesca y acuacultura",
       "Trabajo en ambientes húmedos",
       "Protección contra salpicaduras"
-    ]
+    ],
+    "equipesca_code": "27459"
   },
   {
     "id": 81,
@@ -1616,7 +1665,8 @@
       "Pesca y acuacultura",
       "Procesamiento",
       "Trabajo en zonas húmedas"
-    ]
+    ],
+    "equipesca_code": "49774"
   },
   {
     "id": 82,
@@ -1637,7 +1687,8 @@
       "Pesca",
       "Trabajo en ambientes húmedos",
       "Protección contra salpicaduras"
-    ]
+    ],
+    "equipesca_code": "48971"
   },
   {
     "id": 83,
@@ -1657,7 +1708,8 @@
       "Pesca y acuacultura",
       "Procesamiento",
       "Trabajo en zonas húmedas"
-    ]
+    ],
+    "equipesca_code": "49775"
   },
   {
     "id": 84,
@@ -1678,7 +1730,8 @@
       "Pesca y acuacultura",
       "Trabajo en ambientes húmedos",
       "Protección contra salpicaduras"
-    ]
+    ],
+    "equipesca_code": "27689"
   },
   {
     "id": 85,
@@ -1699,7 +1752,8 @@
       "Pesca y acuacultura",
       "Trabajo en ambientes húmedos",
       "Protección contra salpicaduras"
-    ]
+    ],
+    "equipesca_code": "27460"
   },
   {
     "id": 86,
@@ -1719,7 +1773,8 @@
       "Pesca y acuacultura",
       "Trabajo en ambientes húmedos",
       "Protección contra salpicaduras"
-    ]
+    ],
+    "equipesca_code": "27616"
   },
   {
     "id": 87,
@@ -1739,7 +1794,8 @@
       "Pesca y acuacultura",
       "Trabajo en ambientes húmedos",
       "Protección contra salpicaduras"
-    ]
+    ],
+    "equipesca_code": "27246"
   },
   {
     "id": 88,
@@ -1759,7 +1815,8 @@
       "Pesca y acuacultura",
       "Trabajo en ambientes húmedos",
       "Protección contra salpicaduras"
-    ]
+    ],
+    "equipesca_code": "27195"
   },
   {
     "id": 89,
@@ -1779,7 +1836,8 @@
       "Pesca y acuacultura",
       "Trabajo en ambientes húmedos",
       "Protección contra salpicaduras"
-    ]
+    ],
+    "equipesca_code": "20198"
   },
   {
     "id": 90,
@@ -1800,7 +1858,8 @@
       "Pesca",
       "Trabajo en ambientes húmedos",
       "Protección contra salpicaduras"
-    ]
+    ],
+    "equipesca_code": "48612"
   },
   {
     "id": 91,
@@ -1821,7 +1880,8 @@
       "Pesca y acuacultura",
       "Trabajo en ambientes húmedos",
       "Protección contra salpicaduras"
-    ]
+    ],
+    "equipesca_code": "31816"
   },
   {
     "id": 92,
