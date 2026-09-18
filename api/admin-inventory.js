@@ -44,6 +44,10 @@ function merge(products,rows){
       stock:x?Number(x.stock||0):0,
       low_stock_threshold:x?Number(x.low_stock_threshold||0):2,
       managed:x?Boolean(x.managed):false,
+      source_code:x?.source_code||'',
+      source_description:x?.source_description||'',
+      source_file:x?.source_file||'',
+      source_updated_at:x?.source_updated_at||null,
       updated_at:x?.updated_at||null
     };
   });
@@ -69,14 +73,14 @@ export default async function handler(req,res){
       const p=products.find(x=>Number(x.id)===id);
       if(!p) return res.status(404).json({error:'Producto no encontrado'});
 
-      let stock=Math.max(0,Math.floor(Number(req.body?.stock)||0));
+      let stock=Math.max(0,Number(req.body?.stock)||0);
       const threshold=Math.max(0,Math.floor(Number(req.body?.low_stock_threshold)||0));
       const managed=Boolean(req.body?.managed);
 
       if(req.body?.action==='adjust'){
         const rows=await listInventory();
         const current=(Array.isArray(rows)?rows:[]).find(x=>Number(x.product_id)===id);
-        stock=Math.max(0,Number(current?.stock||0)+Math.trunc(Number(req.body?.delta)||0));
+        stock=Math.max(0,Number(current?.stock||0)+Number(req.body?.delta||0));
       }
 
       const rows=await upsertInventoryItem({
@@ -84,6 +88,7 @@ export default async function handler(req,res){
         stock,
         low_stock_threshold:threshold,
         managed,
+        source_code:String(req.body?.source_code||'').trim()||null,
         updated_at:new Date().toISOString()
       });
       return res.status(200).json({ok:true,item:Array.isArray(rows)?rows[0]:rows});
