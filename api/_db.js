@@ -55,3 +55,30 @@ export async function listOrders(limit=500){
   const n=Math.max(1,Math.min(1000,Number(limit)||500));
   return request(`orders?select=*&order=created_at.desc&limit=${n}`);
 }
+
+
+export async function listInventory(){
+  return request('inventory?select=*&order=product_id.asc');
+}
+
+export async function upsertInventoryItem(item){
+  return request('inventory?on_conflict=product_id',{
+    method:'POST',
+    body:item,
+    prefer:'resolution=merge-duplicates,return=representation'
+  });
+}
+
+export async function getInventoryByIds(ids){
+  const clean=[...new Set((Array.isArray(ids)?ids:[]).map(Number).filter(Number.isInteger))];
+  if(!clean.length) return [];
+  return request(`inventory?select=*&product_id=in.(${clean.join(',')})`);
+}
+
+export async function commitOrderInventory(folio){
+  if(!folio) return null;
+  return request('rpc/commit_order_inventory',{
+    method:'POST',
+    body:{p_folio:String(folio)}
+  });
+}
