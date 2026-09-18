@@ -14,3 +14,13 @@ dialog{border:0;border-radius:25px;padding:0;box-shadow:0 35px 110px rgba(0,0,0,
 .invoice-request{margin:18px 0 14px;border:1px solid var(--line);border-radius:16px;background:#f8fbfc;overflow:hidden}.invoice-toggle{margin:0!important;padding:15px 16px}.invoice-toggle span{display:flex;flex-direction:column;gap:3px}.invoice-toggle small{font-weight:500;color:var(--muted);line-height:1.4}.invoice-fields{border-top:1px solid var(--line);padding:16px}.invoice-fields[hidden]{display:none}.invoice-fields .form-grid{margin:0}
 
 .trust-section{background:#fff}.trust-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.trust-cards article{border:1px solid var(--line);border-radius:22px;padding:22px;background:linear-gradient(180deg,#fff,#f8fbfc);box-shadow:0 8px 28px rgba(6,43,77,.05)}.trust-cards article>span{display:grid;place-items:center;width:46px;height:46px;border-radius:14px;background:#eef8fb;font-size:22px}.trust-cards h3{color:var(--navy);margin:16px 0 8px;font-size:17px}.trust-cards p{color:var(--muted);line-height:1.65;font-size:13px;margin:0}.policy-dialog #policyBody p{color:var(--muted);line-height:1.75}.policy-dialog #policyBody p strong{color:var(--ink)}@media(max-width:950px){.trust-cards{grid-template-columns:1fr 1fr}}@media(max-width:580px){.trust-cards{grid-template-columns:1fr}}
+
+
+/* Inventario */
+.stock-pill{display:inline-flex;align-items:center;width:max-content;margin-top:9px;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:850}
+.stock-ok{background:#e7f7ef;color:#08784a}
+.stock-low{background:#fff4d8;color:#915f00}
+.stock-out{background:#fdebed;color:#a62c3a}
+.stock-unknown{background:#eef4f8;color:#557086}
+.add-btn:disabled,.btn:disabled{opacity:.55;cursor:not-allowed;filter:grayscale(.2)}
+.qty button:disabled{opacity:.35;cursor:not-allowed}
