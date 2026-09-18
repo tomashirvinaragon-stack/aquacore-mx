@@ -8,6 +8,9 @@ function norm(s=''){
     .trim();
 }
 
+const INVENTORY_SNAPSHOT_AT='2026-09-18T11:31:11-07:00';
+const ZERO_STOCK_EQUIPESCA_CODES=new Set(['54405','44734','55618','27417']);
+
 function loadMercury(){
   const file=path.join(process.cwd(),'data','products.json');
   const products=JSON.parse(fs.readFileSync(file,'utf8'));
@@ -39,10 +42,23 @@ export default async function handler(req,res){
     const availability=catalog.map(p=>{
       const code=norm(p.code);
       const match=source.find(x=>code && norm(x?.title||'').includes(code));
-      const available=sourceAvailable(match);
+      const shopAvailable=sourceAvailable(match);
+      const equipescaCode=String(p?.equipesca_code||'').trim();
+
+      // Snapshot real de existencias compartido por Equipesca el 18-sep-2026 11:31.
+      // El inventario SQL administrado tiene prioridad en el frontend cuando existe.
+      // Este endpoint funciona únicamente como respaldo.
+      const snapshotAvailable=equipescaCode
+        ? !ZERO_STOCK_EQUIPESCA_CODES.has(equipescaCode)
+        : null;
+
       return {
         product_id:Number(p.id),
-        available:typeof available==='boolean'?available:null,
+        available:typeof snapshotAvailable==='boolean'
+          ? snapshotAvailable
+          : (typeof shopAvailable==='boolean'?shopAvailable:null),
+        snapshot_at:INVENTORY_SNAPSHOT_AT,
+        equipesca_code:equipescaCode||null,
         matched:Boolean(match),
         matched_title:match?.title||null
       };
@@ -50,7 +66,8 @@ export default async function handler(req,res){
 
     return res.status(200).json({
       ok:true,
-      source:'Equipesca Shopify · motores-marinos',
+      source:'Existencias Equipesca 2026-09-18 11:31 · respaldo Shopify',
+      snapshot_at:INVENTORY_SNAPSHOT_AT,
       availability
     });
   }catch(err){
