@@ -51,7 +51,15 @@ function ask(id){
 }
 function detail(id){
   const p=PRODUCTS.find(x=>x.id===id);
-  $('#productDialogBody').innerHTML=`<div class="product-detail"><div class="product-detail-visual">${productImage(p,true)}</div><div><span class="detail-kicker">${esc(p.cat)}</span><h2>${esc(p.name)}</h2><div class="detail-code">${esc(p.code||'')}</div><div class="detail-price">${fmt(p.price)}</div><ul class="detail-list"><li>Precio neto</li><li>Envíos a todo México</li><li>Envío gratis desde $5,000 MXN</li><li>Disponibilidad sujeta a confirmación</li></ul><div class="product-detail-actions"><button class="btn primary" data-modal-add="${p.id}">Agregar al carrito</button><button class="btn secondary" data-modal-wa="${p.id}">Consultar por WhatsApp</button></div></div></div>`;
+  const specs=Array.isArray(p.specs)?p.specs:[];
+  const uses=Array.isArray(p.uses)?p.uses:[];
+  const extra=(p.description||specs.length||uses.length)?`
+    <div class="detail-extra">
+      ${p.description?`<div class="detail-description">${esc(p.description)}</div>`:''}
+      ${specs.length?`<div class="detail-section"><h3>Ficha técnica</h3><div class="spec-grid">${specs.map(s=>`<div class="spec-item">${esc(s)}</div>`).join('')}</div></div>`:''}
+      ${uses.length?`<div class="detail-section"><h3>Aplicaciones</h3><ul class="detail-list compact">${uses.map(s=>`<li>${esc(s)}</li>`).join('')}</ul></div>`:''}
+    </div>`:'';
+  $('#productDialogBody').innerHTML=`<div class="product-detail"><div class="product-detail-visual">${productImage(p,true)}</div><div><span class="detail-kicker">${esc(p.cat)}</span><h2>${esc(p.name)}</h2><div class="detail-code">${esc(p.code||'')}</div><div class="detail-price">${fmt(p.price)}</div><ul class="detail-list"><li>Precio neto</li><li>Envíos a todo México</li><li>Envío gratis desde $5,000 MXN</li><li>Disponibilidad sujeta a confirmación</li></ul>${extra}<div class="product-detail-actions"><button class="btn primary" data-modal-add="${p.id}">Agregar al carrito</button><button class="btn secondary" data-modal-wa="${p.id}">Consultar por WhatsApp</button></div></div></div>`;
   $('#productDialog').showModal();
   $('[data-modal-add]').onclick=()=>{add(id,false);$('#productDialog').close()};
   $('[data-modal-wa]').onclick=()=>ask(id);
