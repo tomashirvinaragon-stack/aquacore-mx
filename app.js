@@ -137,7 +137,7 @@ const POLICIES={
 
 async function init(){
   const [catalog,inventoryOut]=await Promise.all([
-    fetch('data/products.json').then(r=>r.json()),
+    fetch('data/products.json',{cache:'no-store'}).then(r=>r.json()),
     fetch('/api/inventory',{cache:'no-store'}).then(r=>r.ok?r.json():({inventory:[]})).catch(()=>({inventory:[]}))
   ]);
   const byInventory=new Map((Array.isArray(inventoryOut?.inventory)?inventoryOut.inventory:[]).map(x=>[Number(x.product_id),x]));
