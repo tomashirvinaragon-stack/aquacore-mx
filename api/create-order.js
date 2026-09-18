@@ -100,6 +100,10 @@ export default async function handler(req,res){
         }
       }catch(inventoryErr){
         console.error('No se pudo validar inventario antes del checkout',inventoryErr);
+        return res.status(503).json({
+          error:'No se pudo confirmar la existencia en este momento. Intenta nuevamente.',
+          code:'STOCK_VALIDATION_UNAVAILABLE'
+        });
       }
     }
 

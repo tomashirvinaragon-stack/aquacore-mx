@@ -195,16 +195,37 @@ async function init(){
       });
       const out=await r.json().catch(()=>({}));
       if(!r.ok||!out.checkoutUrl){
+        if(out.code==='OUT_OF_STOCK'){
+          const available=Number.isFinite(Number(out.available))?` Disponibles: ${Number(out.available)}.`:'';
+          const stockErr=new Error(`${out.error||'La existencia cambió antes del pago.'}${available}`);
+          stockErr.code='OUT_OF_STOCK';
+          throw stockErr;
+        }
+        if(out.code==='STOCK_VALIDATION_UNAVAILABLE'){
+          const stockErr=new Error(out.error||'No se pudo confirmar la existencia en este momento.');
+          stockErr.code='STOCK_VALIDATION_UNAVAILABLE';
+          throw stockErr;
+        }
         const detail=[out.providerStatus?`HTTP ${out.providerStatus}`:'',out.providerCode||'',out.details||out.error||'Pago no disponible'].filter(Boolean).join(' · ');
         throw new Error(detail);
       }
       location.href=out.checkoutUrl;
     }catch(err){
-      console.error('Checkout Mercado Pago:',err);
+      console.error('Checkout:',err);
       $('#checkoutDialog').close();
-      $('#successTitle').textContent='Error de Mercado Pago';
-      $('#successCopy').textContent=`No se pudo abrir el checkout. Detalle: ${err.message}`;
-      $('#successWa').textContent='Continuar por WhatsApp';
+      if(err.code==='OUT_OF_STOCK'){
+        $('#successTitle').textContent='Inventario actualizado';
+        $('#successCopy').textContent=`${err.message} Ajusta tu carrito antes de continuar.`;
+        $('#successWa').textContent='Consultar disponibilidad por WhatsApp';
+      }else if(err.code==='STOCK_VALIDATION_UNAVAILABLE'){
+        $('#successTitle').textContent='No pudimos confirmar existencia';
+        $('#successCopy').textContent=`${err.message} No se realizó ningún cobro.`;
+        $('#successWa').textContent='Consultar por WhatsApp';
+      }else{
+        $('#successTitle').textContent='Error de Mercado Pago';
+        $('#successCopy').textContent=`No se pudo abrir el checkout. Detalle: ${err.message}`;
+        $('#successWa').textContent='Continuar por WhatsApp';
+      }
       $('#successDialog').showModal();
     }finally{
       btn.disabled=false;
