@@ -18,11 +18,6 @@ function scoreProduct(p,name,code){
   return score;
 }
 
-function isBrandPlaceholder(url=''){
-  const s=decodeURIComponent(String(url||'')).toLowerCase();
-  return /(logo|placeholder|sin[-_ ]?imagen|no[-_ ]?image)/i.test(s);
-}
-
 function imageFromProduct(p){
   const f=p?.featured_image;
   let url=
@@ -30,7 +25,6 @@ function imageFromProduct(p){
     f?.url || f?.src ||
     p?.image || p?.image_url || '';
   if(url?.startsWith('//')) url='https:'+url;
-  if(isBrandPlaceholder(url)) return '';
   return url||'';
 }
 
@@ -98,10 +92,7 @@ export default async function handler(req,res){
     const best=unique[0];
 
     let image=imageFromProduct(best);
-    if(!image){
-      const og=await ogImage(best?.url);
-      image=isBrandPlaceholder(og)?'':og;
-    }
+    if(!image) image=await ogImage(best?.url);
 
     if(debug){
       return res.status(image?200:404).json({
