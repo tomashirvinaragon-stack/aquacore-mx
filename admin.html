@@ -91,7 +91,7 @@
       const r=await fetch('/api/admin-orders?'+q,{headers:{'x-admin-password':password},cache:'no-store'});
       const out=await r.json().catch(()=>({}));
       if(r.status===401) throw new Error('AUTH');
-      if(!r.ok) throw new Error(out.error||'No se pudieron cargar los pedidos');
+      if(!r.ok) throw new Error([out.error,out.details].filter(Boolean).join(' — ')||'No se pudieron cargar los pedidos');
       return out;
     }
     function render(out){
