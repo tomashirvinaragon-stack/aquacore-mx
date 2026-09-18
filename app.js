@@ -82,7 +82,9 @@ function add(id,open=true){
   if(!p)return;
   const current=Number(cart[id]||0);
   if(p.stockManaged&&current>=Number(p.stock||0)){toast('No hay más piezas disponibles');return}
-  cart[id]=current+1;save();toast('Producto agregado al carrito');if(open)openCart()
+  cart[id]=current+1;save();
+  window.aquaMeta?.('AddToCart',{content_ids:[String(p.id)],content_name:p.name,content_type:'product',value:Number(p.price),currency:'MXN'});
+  toast('Producto agregado al carrito');if(open)openCart()
 }
 function qty(id,d){
   const p=PRODUCTS.find(x=>x.id===id),current=Number(cart[id]||0);
@@ -129,7 +131,7 @@ const POLICIES={
   shipping:'<span class="eyebrow">POLÍTICA</span><h2>Envíos</h2><p><strong>Envío gratis:</strong> aplica en compras de $5,000 MXN o más dentro de la política comercial vigente. En pedidos menores, el costo se calcula antes de cobrar según destino, peso y volumen.</p><p>El punto de surtido se determina con base en existencia, destino y logística. Cuando el pedido sea enviado, puede registrarse la paquetería y el número de guía o referencia de entrega.</p><p>Los tiempos de tránsito dependen del destino y del transportista. La disponibilidad del producto se confirma al procesar el pedido.</p>',
   warranty:'<span class="eyebrow">POLÍTICA</span><h2>Garantías</h2><p>La cobertura y el plazo de garantía pueden variar según marca, fabricante, tipo de producto y condiciones de uso. Conserva tu folio, comprobante de compra y, cuando aplique, número de serie.</p><p>Si detectas una falla, contacta a AquaCore MX antes de intervenir, desmontar o enviar el producto. Te ayudaremos a revisar la información necesaria y a canalizar el caso conforme al procedimiento aplicable del fabricante o proveedor.</p><p>Esta información no limita los derechos que correspondan al consumidor conforme a la legislación aplicable.</p>',
   returns:'<span class="eyebrow">POLÍTICA</span><h2>Devoluciones</h2><p>Antes de devolver un producto, solicita autorización y revisión del caso por WhatsApp al 644 212 7571. El procedimiento depende del tipo de artículo, su estado y el motivo de la devolución.</p><p>Se recomienda conservar empaque, accesorios, manuales y comprobante de compra. Productos cortados, configurados, fabricados sobre medida o solicitados especialmente pueden tener condiciones distintas, por lo que conviene confirmarlas antes de comprar.</p><p>Si el producto llegó con daño visible o existe un error en el surtido, repórtalo tan pronto como sea posible con fotografías del empaque y del artículo para facilitar la revisión.</p>',
-  privacy:'<span class="eyebrow">POLÍTICA</span><h2>Privacidad</h2><p>Los datos proporcionados se utilizan para preparar, cobrar, facturar, enviar y dar seguimiento al pedido, así como para atender consultas relacionadas con la compra.</p><p>AquaCore MX no almacena en este sitio los datos bancarios o de tarjeta ingresados en Mercado Pago. Los datos fiscales se utilizan únicamente para gestionar la facturación solicitada.</p>',
+  privacy:'<span class="eyebrow">POLÍTICA</span><h2>Privacidad</h2><p>Los datos proporcionados se utilizan para preparar, cobrar, facturar, enviar y dar seguimiento al pedido, así como para atender consultas relacionadas con la compra.</p><p>AquaCore MX no almacena en este sitio los datos bancarios o de tarjeta ingresados en Mercado Pago. Los datos fiscales se utilizan únicamente para gestionar la facturación solicitada.</p><p>El sitio utiliza herramientas de medición y publicidad, incluido Meta Pixel, para conocer de forma agregada visitas, productos consultados, carritos y conversiones, y para medir el rendimiento de campañas publicitarias.</p>',
   terms:'<span class="eyebrow">POLÍTICA</span><h2>Términos de compra</h2><p>Los precios publicados se muestran en MXN como precios netos. La disponibilidad está sujeta a confirmación y puede depender del punto de distribución.</p><p>En pedidos de $5,000 MXN o más, el checkout puede continuar a Mercado Pago con envío gratis conforme a la política comercial vigente. En pedidos menores se calcula el flete antes de cobrar.</p><p>Las especificaciones mostradas buscan facilitar la selección del producto; para aplicaciones críticas, compatibilidad de equipos o dimensionamiento de aireación, se recomienda confirmar con un asesor antes de comprar.</p>'
 };
 
@@ -158,7 +160,16 @@ async function init(){
   if(invoiceRequired){invoiceRequired.onchange=toggleInvoice;toggleInvoice();}
   $('#checkoutBtn').onclick=()=>{
     closeCart();
-    $('#orderMini').innerHTML=`<strong>${lines().reduce((s,x)=>s+x.qty,0)} artículo(s) · ${fmt(subtotal())}</strong><br>${subtotal()>=FREE_SHIPPING?'Envío gratis':'Envío por calcular'}`;
+    const checkoutLines=lines(),checkoutValue=Number(subtotal().toFixed(2));
+    $('#orderMini').innerHTML=`<strong>${checkoutLines.reduce((s,x)=>s+x.qty,0)} artículo(s) · ${fmt(checkoutValue)}</strong><br>${checkoutValue>=FREE_SHIPPING?'Envío gratis':'Envío por calcular'}`;
+    window.aquaMeta?.('InitiateCheckout',{
+      content_ids:checkoutLines.map(x=>String(x.p.id)),
+      contents:checkoutLines.map(x=>({id:String(x.p.id),quantity:Number(x.qty),item_price:Number(x.p.price)})),
+      content_type:'product',
+      num_items:checkoutLines.reduce((s,x)=>s+Number(x.qty),0),
+      value:checkoutValue,
+      currency:'MXN'
+    });
     $('#checkoutDialog').showModal();
   };
 
