@@ -9,7 +9,7 @@ const imagePath=p=>p.image||`/api/equipesca-image?name=${encodeURIComponent(p.na
 function productImage(p,detail=false){
   const cls=detail?'product-detail-photo':'product-photo';
   const fallback=detail?'product-detail-fallback':'symbol';
-  return `<img class="${cls}" src="${esc(imagePath(p))}" alt="${esc(p.name)}" loading="lazy" decoding="async" onload="if(/equipesca|logo|placeholder|sin[-_ ]?imagen|no[-_ ]?image/i.test(decodeURIComponent(this.currentSrc||this.src)))this.style.display='none'" onerror="this.style.display='none'"><span class="${fallback}">${p.icon||catIcon[p.cat]||'•'}</span>`;
+  return `<img class="${cls}" src="${esc(imagePath(p))}" alt="${esc(p.name)}" loading="lazy" decoding="async" onload="if(/logo|placeholder|sin[-_ ]?imagen|no[-_ ]?image/i.test(decodeURIComponent(this.currentSrc||this.src)))this.style.display='none'" onerror="this.style.display='none'"><span class="${fallback}">${p.icon||catIcon[p.cat]||'•'}</span>`;
 }
 
 function toast(t){const x=$('#toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1800)}
