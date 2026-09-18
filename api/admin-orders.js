@@ -1,6 +1,17 @@
 import crypto from 'node:crypto';
 import { dbConfigured, listOrders } from './_db.js';
 
+function getAdminPassword(){
+  return (
+    process.env.AQUACORE_ADMIN_PASSWORD ||
+    process.env['CONTRASEÑA_DE_ADMINISTRADOR_DE_AQUACORE'] ||
+    process.env['CONTRASENA_DE_ADMINISTRADOR_DE_AQUACORE'] ||
+    process.env['CONTRASEÑA_DE_ADMINISTRADOR_DE_AQUACORE_MX'] ||
+    process.env['CONTRASENA_DE_ADMINISTRADOR_DE_AQUACORE_MX'] ||
+    ''
+  );
+}
+
 function same(a,b){
   const ha=crypto.createHash('sha256').update(String(a||'')).digest();
   const hb=crypto.createHash('sha256').update(String(b||'')).digest();
@@ -8,7 +19,7 @@ function same(a,b){
 }
 
 function authorized(req){
-  const expected=process.env.AQUACORE_ADMIN_PASSWORD;
+  const expected=getAdminPassword();
   const supplied=req.headers['x-admin-password'];
   return Boolean(expected&&supplied&&same(expected,supplied));
 }
@@ -25,7 +36,7 @@ function normalizeStatus(s){
 export default async function handler(req,res){
   res.setHeader('cache-control','no-store');
   if(req.method!=='GET') return res.status(405).json({error:'Método no permitido'});
-  if(!process.env.AQUACORE_ADMIN_PASSWORD) return res.status(503).json({error:'Panel administrativo no configurado'});
+  if(!getAdminPassword()) return res.status(503).json({error:'Panel administrativo no configurado'});
   if(!authorized(req)) return res.status(401).json({error:'Contraseña incorrecta'});
   if(!dbConfigured()) return res.status(503).json({error:'Base de datos de pedidos no configurada'});
 
