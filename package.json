@@ -4,8 +4,11 @@
   "private": true,
   "type": "module",
   "description": "Tienda AquaCore MX con checkout Mercado Pago y carrito de productos.",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
-    "mercadopago": "^3.6.1"
+    "mercadopago": "^3.6.1",
+    "xlsx": "^0.18.5"
   }
 }
