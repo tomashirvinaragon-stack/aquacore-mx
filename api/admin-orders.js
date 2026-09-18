@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import { dbConfigured, listOrders } from './_db.js';
+import { dbConfigured, listOrders, updateOrderByFolio } from './_db.js';
 
 function getAdminPassword(){
   return (
@@ -33,40 +33,90 @@ function normalizeStatus(s){
   return x||'pending';
 }
 
+function adminState(o){
+  return String(o?.admin_status||'active').toLowerCase();
+}
+
 export default async function handler(req,res){
   res.setHeader('cache-control','no-store');
-  if(req.method!=='GET') return res.status(405).json({error:'Método no permitido'});
   if(!getAdminPassword()) return res.status(503).json({error:'Panel administrativo no configurado'});
   if(!authorized(req)) return res.status(401).json({error:'Contraseña incorrecta'});
   if(!dbConfigured()) return res.status(503).json({error:'Base de datos de pedidos no configurada'});
+
+  if(req.method==='POST'){
+    try{
+      const {folio,action}=req.body||{};
+      if(!folio||!action) return res.status(400).json({error:'Acción incompleta'});
+      const now=new Date().toISOString();
+      let patch;
+
+      if(action==='cancel'){
+        patch={admin_status:'canceled',canceled_at:now};
+      }else if(action==='archive'){
+        patch={admin_status:'archived',archived_at:now};
+      }else if(action==='restore'){
+        patch={admin_status:'active',archived_at:null,canceled_at:null};
+      }else{
+        return res.status(400).json({error:'Acción no válida'});
+      }
+
+      const rows=await updateOrderByFolio(String(folio),patch);
+      if(!rows||!rows.length) return res.status(404).json({error:'Pedido no encontrado'});
+      return res.status(200).json({ok:true,order:rows[0]});
+    }catch(err){
+      console.error('Admin order action error',err);
+      return res.status(500).json({
+        error:'No se pudo actualizar el pedido',
+        details:String(err?.message||'Error de base de datos desconocido').slice(0,500)
+      });
+    }
+  }
+
+  if(req.method!=='GET') return res.status(405).json({error:'Método no permitido'});
 
   try{
     const all=await listOrders(500);
     const status=String(req.query?.status||'all').toLowerCase();
     const q=String(req.query?.q||'').trim().toLowerCase();
-    let orders=Array.isArray(all)?all:[];
+    const rows=Array.isArray(all)?all:[];
+    const active=rows.filter(o=>adminState(o)!=='archived');
+    const activeNotCanceled=active.filter(o=>adminState(o)!=='canceled');
+    let orders;
 
-    if(status!=='all') orders=orders.filter(o=>normalizeStatus(o.payment_status)===status);
+    if(status==='archived'){
+      orders=rows.filter(o=>adminState(o)==='archived');
+    }else if(status==='canceled'){
+      orders=rows.filter(o=>adminState(o)==='canceled');
+    }else if(status==='all'){
+      orders=active;
+    }else{
+      orders=activeNotCanceled.filter(o=>normalizeStatus(o.payment_status)===status);
+    }
+
     if(q){
       orders=orders.filter(o=>[
         o.folio,o.customer_name,o.customer_email,o.customer_phone,o.city,o.state,o.mp_order_id,o.payment_id
       ].some(v=>String(v||'').toLowerCase().includes(q)));
     }
 
-    const approved=all.filter(o=>normalizeStatus(o.payment_status)==='approved');
-    const pending=all.filter(o=>normalizeStatus(o.payment_status)==='pending');
-    const failed=all.filter(o=>normalizeStatus(o.payment_status)==='failed');
-    const refunded=all.filter(o=>normalizeStatus(o.payment_status)==='refunded');
+    const approved=activeNotCanceled.filter(o=>normalizeStatus(o.payment_status)==='approved');
+    const pending=activeNotCanceled.filter(o=>normalizeStatus(o.payment_status)==='pending');
+    const failed=activeNotCanceled.filter(o=>normalizeStatus(o.payment_status)==='failed');
+    const refunded=activeNotCanceled.filter(o=>normalizeStatus(o.payment_status)==='refunded');
+    const canceled=active.filter(o=>adminState(o)==='canceled');
+    const archived=rows.filter(o=>adminState(o)==='archived');
     const approvedSales=approved.reduce((s,o)=>s+Number(o.subtotal||0)+Number(o.shipping_amount||0),0);
 
     return res.status(200).json({
       ok:true,
       stats:{
-        totalOrders:all.length,
+        totalOrders:active.length,
         approvedOrders:approved.length,
         pendingOrders:pending.length,
         failedOrders:failed.length,
         refundedOrders:refunded.length,
+        canceledOrders:canceled.length,
+        archivedOrders:archived.length,
         approvedSales:Number(approvedSales.toFixed(2))
       },
       orders
