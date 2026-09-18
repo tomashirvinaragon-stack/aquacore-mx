@@ -84,11 +84,11 @@
     const date=s=>s?new Intl.DateTimeFormat('es-MX',{dateStyle:'medium',timeStyle:'short'}).format(new Date(s)):'—';
     const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
     function statusInfo(s,admin){
-      admin=String(admin||'active').toLowerCase();
-      if(admin==='canceled')return['failed','Cancelado'];
-      if(admin==='archived')return['refunded','Archivado'];
       s=String(s||'').toLowerCase();
+      admin=String(admin||'active').toLowerCase();
+      if(admin==='archived')return['refunded','Archivado'];
       if(['approved','paid','processed'].includes(s))return['approved','Pagado'];
+      if(admin==='canceled')return['failed','Cancelado'];
       if(['failed','canceled','cancelled','rejected'].includes(s))return['failed','Fallido'];
       if(s==='refunded')return['refunded','Reembolsado'];
       return['pending','Pendiente'];
