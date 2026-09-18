@@ -59,6 +59,18 @@ export default async function handler(req,res){
       return res.status(400).json({error:'Pedido incompleto'});
     }
 
+    const invoiceRequired=customer?.invoice_required==='yes'||customer?.invoice_required===true;
+    const invoice=invoiceRequired?{
+      rfc:String(customer.invoice_rfc||'').trim().toUpperCase(),
+      name:String(customer.invoice_name||'').trim(),
+      tax_regime:String(customer.invoice_tax_regime||'').trim(),
+      cfdi_use:String(customer.invoice_cfdi_use||'').trim(),
+      zip:String(customer.invoice_zip||'').trim()
+    }:null;
+    if(invoiceRequired&&(!invoice.rfc||!invoice.name||!invoice.tax_regime||!invoice.cfdi_use||!invoice.zip)){
+      return res.status(400).json({error:'Faltan datos de facturación'});
+    }
+
     const byId=new Map(loadProducts().map(p=>[Number(p.id),p]));
     const clean=[];
 
@@ -144,14 +156,17 @@ export default async function handler(req,res){
         state:String(customer.state||'').trim()||null,
         zip:String(customer.zip||'').trim()||null,
         reference:String(customer.reference||'').trim()||null,
-        items:clean.map(({p,qty})=>({
-          id:Number(p.id),
-          name:p.name,
-          code:p.code||null,
-          qty,
-          unit_price:Number(p.price),
-          total:Number((Number(p.price)*qty).toFixed(2))
-        })),
+        items:[
+          ...clean.map(({p,qty})=>({
+            id:Number(p.id),
+            name:p.name,
+            code:p.code||null,
+            qty,
+            unit_price:Number(p.price),
+            total:Number((Number(p.price)*qty).toFixed(2))
+          })),
+          ...(invoice?[{_type:'invoice',required:true,...invoice}]:[])
+        ],
         subtotal,
         shipping_amount:0,
         shipping_status:'free',

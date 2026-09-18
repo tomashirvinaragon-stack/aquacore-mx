@@ -91,6 +91,9 @@ function folio(){const d=new Date(),ymd=`${d.getFullYear()}${String(d.getMonth()
 function orderMsg(d,id){
   let m=`PEDIDO AQUACORE MX\nFolio: ${id}\n\nCLIENTE\nNombre: ${d.name}\nTel: ${d.phone}\nCorreo: ${d.email}\nEntrega: ${d.address}, ${d.city}, ${d.state}, C.P. ${d.zip}\nReferencia: ${d.reference||'-'}\n\nPRODUCTOS\n`;
   lines().forEach(({p,qty})=>m+=`• ${qty} x ${p.name} — ${fmt(p.price*qty)}\n`);
+  if(d.invoice_required==='yes'){
+    m+=`\nFACTURACIÓN\nRFC: ${d.invoice_rfc||'-'}\nRazón social: ${d.invoice_name||'-'}\nRégimen fiscal: ${d.invoice_tax_regime||'-'}\nUso CFDI: ${d.invoice_cfdi_use||'-'}\nC.P. fiscal: ${d.invoice_zip||'-'}\n`;
+  }
   m+=`\nSubtotal: ${fmt(subtotal())}\nEnvío: ${subtotal()>=FREE_SHIPPING?'GRATIS':'Por calcular'}\n\nDeseo confirmar disponibilidad y recibir instrucciones de pago.`;
   return m;
 }
@@ -118,6 +121,13 @@ async function init(){
   $('#drawerBackdrop').onclick=closeCart;
   $('#searchInput').oninput=e=>{search=e.target.value;renderProducts()};
   $('#sortSelect').onchange=e=>{sort=e.target.value;renderProducts()};
+  const invoiceRequired=$('#invoiceRequired'),invoiceFields=$('#invoiceFields');
+  const toggleInvoice=()=>{
+    const on=!!invoiceRequired?.checked;
+    if(invoiceFields) invoiceFields.hidden=!on;
+    if(invoiceFields) invoiceFields.querySelectorAll('input').forEach(input=>{input.disabled=!on;input.required=on});
+  };
+  if(invoiceRequired){invoiceRequired.onchange=toggleInvoice;toggleInvoice();}
   $('#checkoutBtn').onclick=()=>{
     closeCart();
     $('#orderMini').innerHTML=`<strong>${lines().reduce((s,x)=>s+x.qty,0)} artículo(s) · ${fmt(subtotal())}</strong><br>${subtotal()>=FREE_SHIPPING?'Envío gratis':'Envío por calcular'}`;
@@ -127,6 +137,14 @@ async function init(){
   $('#checkoutForm').onsubmit=async e=>{
     e.preventDefault();
     const form=e.currentTarget,btn=$('#submitOrderBtn'),d=Object.fromEntries(new FormData(form)),id=folio(),sub=subtotal();
+    d.invoice_required=d.invoice_required==='yes'?'yes':'no';
+    if(d.invoice_required==='yes'){
+      d.invoice_rfc=String(d.invoice_rfc||'').trim().toUpperCase();
+      d.invoice_name=String(d.invoice_name||'').trim();
+      d.invoice_tax_regime=String(d.invoice_tax_regime||'').trim();
+      d.invoice_cfdi_use=String(d.invoice_cfdi_use||'').trim();
+      d.invoice_zip=String(d.invoice_zip||'').trim();
+    }
     pendingWhatsApp=`https://wa.me/${PHONE}?text=${encodeURIComponent(orderMsg(d,id))}`;
     localStorage.setItem('aquacore-last-order',JSON.stringify({id,d,lines:lines().map(x=>({id:x.p.id,qty:x.qty})),sub}));
 

@@ -67,7 +67,7 @@
     <section class="table-card">
       <div class="scroll">
         <table class="table">
-          <thead><tr><th>Folio</th><th>Fecha</th><th>Cliente</th><th>Total</th><th>Pago</th><th>Método</th><th>Entrega</th><th></th></tr></thead>
+          <thead><tr><th>Folio</th><th>Fecha</th><th>Cliente</th><th>Total</th><th>Pago</th><th>Método</th><th>Entrega</th><th>Factura</th><th></th></tr></thead>
           <tbody id="tbody"></tbody>
         </table>
       </div>
@@ -141,6 +141,7 @@
           '<td><span class="status '+cl+'">'+tx+'</span><div class="muted">'+esc(o.payment_status_detail||'')+'</div></td>'+
           '<td>'+esc(o.payment_method||'—')+'<div class="muted">'+esc(o.payment_id||'')+'</div></td>'+
           '<td>'+esc([o.city,o.state].filter(Boolean).join(', ')||'—')+'<div class="muted">'+esc(o.zip||'')+'</div></td>'+
+          '<td>'+((Array.isArray(o.items)&&o.items.some(x=>x&&x._type==='invoice'))?'<span class="status pending">Solicitada</span>':'<span class="muted">No</span>')+'</td>'+
           '<td><div class="rowactions">'+
             (whatsappUrl(o)?'<a class="linkbtn wa" target="_blank" rel="noopener" href="'+whatsappUrl(o)+'">WhatsApp</a>':'')+
             '<button class="linkbtn" data-i="'+i+'">Ver</button></div></td>'+
@@ -153,7 +154,9 @@
       const o=orders[i]; if(!o)return;
       $('#dFolio').textContent=o.folio;
       const [cl,tx]=statusInfo(o.payment_status,o.admin_status);
-      const items=Array.isArray(o.items)?o.items:[];
+      const rawItems=Array.isArray(o.items)?o.items:[];
+      const invoice=rawItems.find(x=>x&&x._type==='invoice')||null;
+      const items=rawItems.filter(x=>!x||x._type!=='invoice');
       const admin=String(o.admin_status||'active').toLowerCase();
       const wa=whatsappUrl(o);
       const paid=['approved','paid','processed'].includes(String(o.payment_status||'').toLowerCase());
@@ -163,6 +166,7 @@
           '<div class="box"><small>Estado del pago</small><span class="status '+cl+'">'+tx+'</span><br><span class="muted">'+esc(o.payment_status_detail||'')+'</span></div>'+
           '<div class="box"><small>Entrega</small>'+esc(o.address||'—')+'<br>'+esc([o.city,o.state,o.zip].filter(Boolean).join(', '))+'<br><span class="muted">'+esc(o.reference||'')+'</span></div>'+
           '<div class="box"><small>Mercado Pago</small>Order: '+esc(o.mp_order_id||'—')+'<br>Pago: '+esc(o.payment_id||'—')+'<br>Método: '+esc(o.payment_method||'—')+'</div>'+
+          (invoice?'<div class="box" style="grid-column:1/-1"><small>Datos de facturación</small><b>RFC: '+esc(invoice.rfc||'—')+'</b><br>'+esc(invoice.name||'')+'<br>Régimen: '+esc(invoice.tax_regime||'—')+'<br>Uso CFDI: '+esc(invoice.cfdi_use||'—')+'<br>C.P. fiscal: '+esc(invoice.zip||'—')+'</div>':'')+
         '</div>'+
         '<div class="items">'+items.map(x=>'<div class="item"><div><b>'+esc(x.name||'Producto')+'</b><div class="muted">'+esc(x.code||'')+' · '+esc(x.qty)+' x '+money(x.unit_price)+'</div></div><b>'+money(x.total)+'</b></div>').join('')+'</div>'+
         '<div style="display:flex;justify-content:space-between;margin-top:16px;font-size:20px"><b>Total</b><b>'+money(Number(o.subtotal||0)+Number(o.shipping_amount||0))+'</b></div>'+
@@ -190,9 +194,14 @@
     $('#refresh').onclick=load; $('#filter').onclick=load; $('#search').onkeydown=e=>{if(e.key==='Enter')load()}; $('#status').onchange=load;
     $('#logout').onclick=()=>{password='';sessionStorage.removeItem('aquacore-admin-password');$('#password').value='';$('#login').classList.remove('hidden')};
     $('#csv').onclick=()=>{
-      const cols=['folio','created_at','customer_name','customer_email','customer_phone','subtotal','shipping_amount','payment_status','payment_method','payment_id','city','state','zip'];
+      const cols=['folio','created_at','customer_name','customer_email','customer_phone','subtotal','shipping_amount','payment_status','payment_method','payment_id','city','state','zip','factura','invoice_rfc','invoice_name','invoice_tax_regime','invoice_cfdi_use','invoice_zip'];
       const q=v=>'"'+String(v??'').replaceAll('"','""')+'"';
-      const csv=[cols.join(','),...orders.map(o=>cols.map(c=>q(o[c])).join(','))].join('\n');
+      const rows=orders.map(o=>{
+        const inv=(Array.isArray(o.items)?o.items:[]).find(x=>x&&x._type==='invoice')||{};
+        const row={...o,factura:inv.required?'SI':'NO',invoice_rfc:inv.rfc||'',invoice_name:inv.name||'',invoice_tax_regime:inv.tax_regime||'',invoice_cfdi_use:inv.cfdi_use||'',invoice_zip:inv.zip||''};
+        return cols.map(c=>q(row[c])).join(',');
+      });
+      const csv=[cols.join(','),...rows].join('\n');
       const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));a.download='pedidos-aquacore.csv';a.click();URL.revokeObjectURL(a.href);
     };
     if(password)load();

@@ -160,6 +160,18 @@
         <label class="wide">Correo<input required name="email" type="email" autocomplete="email"></label><label class="wide">Dirección<input required name="address" autocomplete="street-address"></label>
         <label>Ciudad<input required name="city"></label><label>Estado<input required name="state"></label><label>C.P.<input required name="zip" inputmode="numeric" autocomplete="postal-code"></label><label>Referencia<input name="reference"></label>
       </div>
+      <div class="invoice-request">
+        <label class="checkbox invoice-toggle"><input id="invoiceRequired" name="invoice_required" value="yes" type="checkbox"> <span><strong>Requiero factura</strong><small>Captura los datos tal como aparecen en tu constancia de situación fiscal.</small></span></label>
+        <div id="invoiceFields" class="invoice-fields" hidden>
+          <div class="form-grid">
+            <label>RFC<input name="invoice_rfc" maxlength="13" autocomplete="off" disabled></label>
+            <label>C.P. fiscal<input name="invoice_zip" maxlength="5" inputmode="numeric" disabled></label>
+            <label class="wide">Razón social / Nombre fiscal<input name="invoice_name" autocomplete="organization" disabled></label>
+            <label class="wide">Régimen fiscal<input name="invoice_tax_regime" placeholder="Ej. 601 - General de Ley Personas Morales" disabled></label>
+            <label class="wide">Uso de CFDI<input name="invoice_cfdi_use" placeholder="Ej. G03 - Gastos en general" disabled></label>
+          </div>
+        </div>
+      </div>
       <label class="checkbox"><input required type="checkbox"> <span>Confirmo que mis datos son correctos y deseo generar el pedido.</span></label>
       <div class="payment-notice" id="paymentNotice">En compras de $5,000 MXN o más podrás continuar directamente a Mercado Pago. En compras menores, te ayudamos a calcular el envío antes de cobrar.</div><button class="btn primary full" id="submitOrderBtn" type="submit">Continuar al pago</button>
     </form>
@@ -171,6 +183,6 @@
 
   <a class="whatsapp-float" href="https://wa.me/526442127571?text=Hola%20AquaCore%20MX" target="_blank" rel="noopener" aria-label="WhatsApp">WA</a>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="app.js?v=20260917d"></script>
+  <script src="app.js?v=20260917e"></script>
 </body>
 </html>
