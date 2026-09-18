@@ -12,14 +12,20 @@ const imagePath=p=>{
 };
 const productUrl=p=>`${location.origin}/productos/${slugify(p.name)}-${p.id}`;
 const toast=t=>{const x=document.querySelector('#productToast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1800)};
+function requiresConfirmation(p){
+  if(p.cat!=='Motores Mercury') return false;
+  if(p.stockManaged) return Number(p.stock)===1;
+  return Boolean(p.availabilityKnown&&p.shopAvailable);
+}
 function stockInfo(p){
   if(p.stockManaged){
     if(Number(p.stock)<=0)return{className:'stock-out',label:'Agotado'};
+    if(requiresConfirmation(p))return{className:'stock-unknown',label:'Disponibilidad por confirmar'};
     if(Number(p.stock)<=Number(p.lowStockThreshold||0))return{className:'stock-low',label:'Pocas piezas'};
     return{className:'stock-ok',label:'Disponible'};
   }
   if(p.availabilityKnown)return p.shopAvailable
-    ?{className:'stock-ok',label:'Disponible'}
+    ?{className:'stock-unknown',label:'Disponibilidad por confirmar'}
     :{className:'stock-out',label:'Agotado'};
   return{className:'stock-unknown',label:'Disponibilidad por confirmar'};
 }
@@ -27,6 +33,12 @@ function isSoldOut(p){
   return p.stockManaged
     ? Number(p.stock)<=0
     : Boolean(p.availabilityKnown&&!p.shopAvailable);
+}
+function stockUpdatedLabel(p){
+  if(!p.stockUpdatedAt)return'';
+  const d=new Date(p.stockUpdatedAt);
+  if(!Number.isFinite(d.getTime()))return'';
+  return `Inventario actualizado: ${new Intl.DateTimeFormat('es-MX',{dateStyle:'short',timeStyle:'short'}).format(d)}`;
 }
 
 function getRequestedId(){
@@ -45,6 +57,7 @@ function addToCart(p){
   const cart=JSON.parse(localStorage.getItem('aquacore-cart-v2')||'{}');
   const current=Number(cart[p.id]||0);
   if(isSoldOut(p)){toast('Producto agotado');return}
+  if(requiresConfirmation(p)){toast('Confirma existencia antes de comprar');whatsapp(p);return}
   if(p.stockManaged&&current>=Number(p.stock||0)){toast('No hay más piezas disponibles');return}
   cart[p.id]=current+1;
   localStorage.setItem('aquacore-cart-v2',JSON.stringify(cart));
@@ -75,7 +88,8 @@ async function init(){
       stock:Number(inv?.stock||0),
       lowStockThreshold:Number(inv?.low_stock_threshold||0),
       availabilityKnown,
-      shopAvailable:availabilityKnown?Boolean(mercury.available):null
+      shopAvailable:availabilityKnown?Boolean(mercury.available):null,
+      stockUpdatedAt:inv?.updated_at||mercury?.snapshot_at||mercuryOut?.snapshot_at||null
     }:null;
     if(!p){
       document.title='Producto no encontrado | AquaCore MX';
@@ -91,7 +105,7 @@ async function init(){
 
     const specs=Array.isArray(p.specs)?p.specs:[];
     const uses=Array.isArray(p.uses)?p.uses:[];
-    const st=stockInfo(p),soldOut=isSoldOut(p);
+    const st=stockInfo(p),soldOut=isSoldOut(p),confirm=requiresConfirmation(p),updated=stockUpdatedLabel(p);
     root.innerHTML=`
       <div class="single-product-visual">${productImage(p)}</div>
       <div class="single-product-info">
@@ -101,12 +115,13 @@ async function init(){
         <div class="single-product-price">${fmt(p.price)}</div>
         <div class="net-price">Precio neto</div>
         <div class="stock-pill ${st.className}">${st.label}</div>
+        ${updated?`<div class="net-price">${esc(updated)}</div>`:''}
         <div class="single-product-benefits"><span>✓ Envíos a todo México</span><span>✓ Envío gratis desde ${fmt(FREE_SHIPPING)}</span></div>
         ${p.description?`<p class="single-product-description">${esc(p.description)}</p>`:''}
         ${specs.length?`<section class="detail-section"><h2>Ficha técnica</h2><div class="spec-grid">${specs.map(s=>`<div class="spec-item">${esc(s)}</div>`).join('')}</div></section>`:''}
         ${uses.length?`<section class="detail-section"><h2>Aplicaciones</h2><ul class="detail-list compact">${uses.map(s=>`<li>${esc(s)}</li>`).join('')}</ul></section>`:''}
         <div class="single-product-actions">
-          <button class="btn primary" id="addProduct" ${soldOut?'disabled':''}>${soldOut?'Agotado':'Agregar al carrito'}</button>
+          <button class="btn primary" id="addProduct" ${soldOut?'disabled':''}>${soldOut?'Agotado':confirm?'Confirmar disponibilidad':'Agregar al carrito'}</button>
           <button class="btn secondary" id="waProduct">Consultar por WhatsApp</button>
           <button class="btn ghost" id="shareProduct">Compartir enlace</button>
         </div>
