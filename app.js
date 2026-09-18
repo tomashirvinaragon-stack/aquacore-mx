@@ -18,10 +18,20 @@ function productImage(p,detail=false){
 
 function toast(t){const x=$('#toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1800)}
 function stockInfo(p){
-  if(!p.stockManaged)return{className:'stock-unknown',label:'Disponibilidad por confirmar'};
-  if(Number(p.stock)<=0)return{className:'stock-out',label:'Agotado'};
-  if(Number(p.stock)<=Number(p.lowStockThreshold||0))return{className:'stock-low',label:'Pocas piezas'};
-  return{className:'stock-ok',label:'Disponible'};
+  if(p.stockManaged){
+    if(Number(p.stock)<=0)return{className:'stock-out',label:'Agotado'};
+    if(Number(p.stock)<=Number(p.lowStockThreshold||0))return{className:'stock-low',label:'Pocas piezas'};
+    return{className:'stock-ok',label:'Disponible'};
+  }
+  if(p.availabilityKnown)return p.shopAvailable
+    ?{className:'stock-ok',label:'Disponible'}
+    :{className:'stock-out',label:'Agotado'};
+  return{className:'stock-unknown',label:'Disponibilidad por confirmar'};
+}
+function isSoldOut(p){
+  return p.stockManaged
+    ? Number(p.stock)<=0
+    : Boolean(p.availabilityKnown&&!p.shopAvailable);
 }
 function cats(){return [...new Set(PRODUCTS.map(p=>p.cat))]}
 function renderCategories(){
@@ -42,7 +52,7 @@ function filtered(){
   return a;
 }
 function card(p){
-  const st=stockInfo(p),soldOut=p.stockManaged&&Number(p.stock)<=0;
+  const st=stockInfo(p),soldOut=isSoldOut(p);
   return `<article class="product-card"><div class="product-visual" data-cat="${esc(p.cat)}">${p.featured?'<span class="badge">DESTACADO</span>':''}${productImage(p)}</div><div class="product-body"><span class="product-category">${esc(p.cat)}</span><div class="product-title">${esc(p.name)}</div><div class="product-code">${esc(p.code||'')}</div><div class="price">${fmt(p.price)}</div><div class="net-price">Precio neto</div><div class="stock-pill ${st.className}">${st.label}</div><div class="product-actions"><button class="add-btn" data-add="${p.id}" ${soldOut?'disabled':''}>${soldOut?'Agotado':'Agregar al carrito'}</button><button class="wa-btn" data-wa="${p.id}" aria-label="WhatsApp">WA</button><button class="detail-btn" data-detail="${p.id}">Ver detalles</button></div></div></article>`;
 }
 function renderProducts(){
@@ -68,7 +78,7 @@ function detail(id){
       ${specs.length?`<div class="detail-section"><h3>Ficha técnica</h3><div class="spec-grid">${specs.map(s=>`<div class="spec-item">${esc(s)}</div>`).join('')}</div></div>`:''}
       ${uses.length?`<div class="detail-section"><h3>Aplicaciones</h3><ul class="detail-list compact">${uses.map(s=>`<li>${esc(s)}</li>`).join('')}</ul></div>`:''}
     </div>`:'';
-  const st=stockInfo(p),soldOut=p.stockManaged&&Number(p.stock)<=0;
+  const st=stockInfo(p),soldOut=isSoldOut(p);
   $('#productDialogBody').innerHTML=`<div class="product-detail"><div class="product-detail-visual">${productImage(p,true)}</div><div><span class="detail-kicker">${esc(p.cat)}</span><h2>${esc(p.name)}</h2><div class="detail-code">${esc(p.code||'')}</div><div class="detail-price">${fmt(p.price)}</div><div class="stock-pill ${st.className}">${st.label}</div><ul class="detail-list"><li>Precio neto</li><li>Envíos a todo México</li><li>Envío gratis desde $5,000 MXN</li></ul>${extra}<div class="product-detail-actions"><button class="btn primary" data-modal-add="${p.id}" ${soldOut?'disabled':''}>${soldOut?'Agotado':'Agregar al carrito'}</button><button class="btn secondary" data-modal-wa="${p.id}">Consultar por WhatsApp</button></div></div></div>`;
   $('#productDialog').showModal();
   $('[data-modal-add]').onclick=()=>{add(id,false);$('#productDialog').close()};
@@ -81,6 +91,7 @@ function add(id,open=true){
   const p=PRODUCTS.find(x=>x.id===id);
   if(!p)return;
   const current=Number(cart[id]||0);
+  if(isSoldOut(p)){toast('Producto agotado');return}
   if(p.stockManaged&&current>=Number(p.stock||0)){toast('No hay más piezas disponibles');return}
   cart[id]=current+1;save();
   window.aquaMeta?.('AddToCart',{content_ids:[String(p.id)],content_name:p.name,content_type:'product',value:Number(p.price),currency:'MXN'});
@@ -136,14 +147,26 @@ const POLICIES={
 };
 
 async function init(){
-  const [catalog,inventoryOut]=await Promise.all([
+  const [catalog,inventoryOut,mercuryOut]=await Promise.all([
     fetch('data/products.json',{cache:'no-store'}).then(r=>r.json()),
-    fetch('/api/inventory',{cache:'no-store'}).then(r=>r.ok?r.json():({inventory:[]})).catch(()=>({inventory:[]}))
+    fetch('/api/inventory',{cache:'no-store'}).then(r=>r.ok?r.json():({inventory:[]})).catch(()=>({inventory:[]})),
+    fetch('/api/equipesca-mercury',{cache:'no-store'}).then(r=>r.ok?r.json():({availability:[]})).catch(()=>({availability:[]}))
   ]);
   const byInventory=new Map((Array.isArray(inventoryOut?.inventory)?inventoryOut.inventory:[]).map(x=>[Number(x.product_id),x]));
+  const byMercury=new Map((Array.isArray(mercuryOut?.availability)?mercuryOut.availability:[]).map(x=>[Number(x.product_id),x]));
   PRODUCTS=catalog.map(p=>{
     const inv=byInventory.get(Number(p.id));
-    return {...p,stockManaged:Boolean(inv?.managed),stock:Number(inv?.stock||0),lowStockThreshold:Number(inv?.low_stock_threshold||0)};
+    const mercury=byMercury.get(Number(p.id));
+    const stockManaged=Boolean(inv?.managed);
+    const availabilityKnown=!stockManaged&&typeof mercury?.available==='boolean';
+    return {
+      ...p,
+      stockManaged,
+      stock:Number(inv?.stock||0),
+      lowStockThreshold:Number(inv?.low_stock_threshold||0),
+      availabilityKnown,
+      shopAvailable:availabilityKnown?Boolean(mercury.available):null
+    };
   });
   renderCategories();renderFilters();renderProducts();renderCart();toggleShape();
   $('#cartButton').onclick=openCart;
