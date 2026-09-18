@@ -88,13 +88,22 @@ export default async function handler(req,res){
         const byInventory=new Map((Array.isArray(inventory)?inventory:[]).map(x=>[Number(x.product_id),x]));
         for(const {p,qty} of clean){
           const inv=byInventory.get(Number(p.id));
-          if(inv?.managed && Number(inv.stock||0)<qty){
+          const available=Number(inv?.stock||0);
+          if(inv?.managed && available<qty){
             return res.status(409).json({
               error:`No hay suficiente existencia de ${p.name}.`,
               code:'OUT_OF_STOCK',
               productId:Number(p.id),
-              available:Number(inv.stock||0),
+              available,
               requested:qty
+            });
+          }
+          if(p.cat==='Motores Mercury' && (!inv?.managed || available===1)){
+            return res.status(409).json({
+              error:`La existencia de ${p.name} debe confirmarse antes del pago.`,
+              code:'CONFIRM_AVAILABILITY',
+              productId:Number(p.id),
+              available:inv?.managed?available:null
             });
           }
         }
@@ -105,6 +114,13 @@ export default async function handler(req,res){
           code:'STOCK_VALIDATION_UNAVAILABLE'
         });
       }
+    }else if(clean.some(x=>x.p.cat==='Motores Mercury')){
+      const motor=clean.find(x=>x.p.cat==='Motores Mercury')?.p;
+      return res.status(409).json({
+        error:`La existencia de ${motor?.name||'este motor Mercury'} debe confirmarse antes del pago.`,
+        code:'CONFIRM_AVAILABILITY',
+        productId:Number(motor?.id||0)||null
+      });
     }
 
     const subtotal=Number(clean.reduce((s,x)=>s+Number(x.p.price)*x.qty,0).toFixed(2));
