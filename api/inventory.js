@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { dbConfigured, listInventory } from './_db.js';
 import {
   equipescaSqlConfigured,
@@ -14,12 +16,39 @@ function syncIntervalMs(){
   return minutes*60*1000;
 }
 
+function catalogNeedsSync(rows){
+  try{
+    const file=path.join(process.cwd(),'data','products.json');
+    const products=JSON.parse(fs.readFileSync(file,'utf8'));
+    const managedIds=new Set(
+      (Array.isArray(rows)?rows:[])
+        .filter(row=>Boolean(row?.managed))
+        .map(row=>Number(row.product_id))
+    );
+
+    return products.some(product=>
+      String(product?.equipesca_code||'').trim() &&
+      !managedIds.has(Number(product.id))
+    );
+  }catch(err){
+    console.error('Catalog inventory coverage check failed',err);
+    return false;
+  }
+}
+
 async function refreshIfNeeded(rows){
   if(!equipescaSqlConfigured()) return {rows,sync:'not_configured'};
 
+  const missingMappedProducts=catalogNeedsSync(rows);
   const last=lastAutomaticSync(rows);
   const lastMs=last?Date.parse(last):0;
-  if(lastMs&&Date.now()-lastMs<syncIntervalMs()) return {rows,sync:'fresh'};
+
+  // A product newly added to the catalog must not wait for the normal
+  // refresh interval. Force a sync when its Equipesca mapping exists but
+  // there is still no managed inventory row for it.
+  if(!missingMappedProducts && lastMs && Date.now()-lastMs<syncIntervalMs()){
+    return {rows,sync:'fresh'};
+  }
 
   if(Date.now()-lastAttemptAt<60_000) return {rows,sync:'cooldown'};
   lastAttemptAt=Date.now();
@@ -29,7 +58,7 @@ async function refreshIfNeeded(rows){
       activeSync=syncEquipescaInventory().finally(()=>{activeSync=null});
     }
     await activeSync;
-    return {rows:await listInventory(),sync:'updated'};
+    return {rows:await listInventory(),sync:missingMappedProducts?'catalog_updated':'updated'};
   }catch(err){
     console.error('Automatic inventory refresh skipped',err);
     return {rows,sync:'cached'};
