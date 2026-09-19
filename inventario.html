@@ -12,7 +12,7 @@
     .btn{border:0;border-radius:11px;padding:10px 14px;font-weight:800;cursor:pointer}.primary{background:linear-gradient(90deg,var(--blue),#0fa7b0);color:white}.ghost{background:#eef4f8;color:var(--navy)}
     .wrap{max-width:1450px;margin:auto;padding:26px 20px 60px}.head{display:flex;justify-content:space-between;gap:16px;align-items:end;margin-bottom:18px}.head h1{margin:0;color:var(--navy)}.muted{color:var(--muted)}
     .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px}.stat small{display:block;color:var(--muted);font-weight:700}.stat strong{display:block;margin-top:6px;font-size:25px;color:var(--navy)}
-    .importer{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px}.importer h2{margin:0 0 6px;color:var(--navy);font-size:20px}.import-grid{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin-top:12px}.import-grid input{width:100%;border:1px dashed #aebfcb;border-radius:12px;padding:11px;background:#f8fbfd}.import-result{margin-top:10px;padding:11px 12px;border-radius:11px;background:#f7fafc;color:var(--muted);font-size:13px}.import-result.good{background:#e7f7ef;color:#08784a}.import-result.warn{background:#fff4d8;color:#915f00}
+    .sync-banner{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:16px}.sync-banner.good{background:#e7f7ef;border-color:#b9e8cf;color:#08784a}.sync-banner.warn{background:#fff4d8;border-color:#f0d48d;color:#915f00}.sync-banner.checking{background:#eef4f8;color:#557086}.sync-dot{width:12px;height:12px;border-radius:50%;background:currentColor;box-shadow:0 0 0 4px #ffffff88;flex:0 0 auto}.sync-banner b{display:block;font-size:15px}.sync-banner span:last-child{display:block;margin-top:2px;font-size:13px}.importer{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px}.importer h2{margin:0 0 6px;color:var(--navy);font-size:20px}.import-grid{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin-top:12px}.import-grid input{width:100%;border:1px dashed #aebfcb;border-radius:12px;padding:11px;background:#f8fbfd}.import-result{margin-top:10px;padding:11px 12px;border-radius:11px;background:#f7fafc;color:var(--muted);font-size:13px}.import-result.good{background:#e7f7ef;color:#08784a}.import-result.warn{background:#fff4d8;color:#915f00}
     .toolbar{display:grid;grid-template-columns:1fr 220px auto;gap:10px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:13px;margin-bottom:14px}.toolbar input,.toolbar select{width:100%;border:1px solid #ccdbe5;border-radius:10px;padding:11px;font:inherit}
     .table-card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}.scroll{overflow:auto}.table{width:100%;border-collapse:collapse;min-width:980px}.table th{background:#f8fbfd;text-align:left;padding:12px;font-size:12px;text-transform:uppercase;color:#688093;border-bottom:1px solid var(--line)}.table td{padding:12px;border-bottom:1px solid #edf2f5;vertical-align:middle}.table tr:hover td{background:#fbfdfe}
     .name{font-weight:850;color:var(--navy)}.code{font-size:12px;color:var(--muted)}.num{width:90px;border:1px solid #cfdde7;border-radius:9px;padding:9px}.sku{width:105px;border:1px solid #cfdde7;border-radius:9px;padding:9px}.check{width:20px;height:20px}.rowbtn{border:0;border-radius:9px;padding:8px 10px;font-weight:850;cursor:pointer}.minus{background:#fdebed;color:#a62c3a}.plus{background:#e7f7ef;color:#08784a}.save{background:#e8f2ff;color:#1762a5}.pill{display:inline-flex;padding:5px 8px;border-radius:999px;font-size:12px;font-weight:900}.ok{background:#e7f7ef;color:#08784a}.low{background:#fff4d8;color:#915f00}.out{background:#fdebed;color:#a62c3a}.off{background:#eef4f8;color:#557086}
@@ -43,6 +43,7 @@
 
   <main class="wrap">
     <div class="head"><div><h1>Control de stock</h1><p class="muted">El stock exacto solo se publica cuando activas “Controlar stock”.</p></div></div>
+    <div id="syncBanner" class="sync-banner checking"><span class="sync-dot"></span><div><b id="syncBannerTitle">Comprobando inventario…</b><span id="syncBannerText">Consultando la última sincronización de Equipesca.</span></div></div>
     <section class="stats">
       <div class="stat"><small>Productos</small><strong id="total">0</strong></div>
       <div class="stat"><small>Con stock controlado</small><strong id="managed">0</strong></div>
@@ -197,6 +198,25 @@ $('#apply').onclick=render;
 $('#search').oninput=render;
 $('#filter').onchange=render;
 $('#logout').onclick=()=>{password='';sessionStorage.removeItem('aquacore-admin-password');$('#password').value='';$('#login').classList.remove('hidden')};
+function setSyncBanner(kind,title,detail){
+  const banner=$('#syncBanner'),titleEl=$('#syncBannerTitle'),textEl=$('#syncBannerText');
+  if(!banner||!titleEl||!textEl)return;
+  banner.className='sync-banner '+kind;
+  titleEl.textContent=title;
+  textEl.textContent=detail;
+}
+function syncLabel(value){
+  const d=new Date(value);
+  if(!Number.isFinite(d.getTime()))return null;
+  const now=new Date();
+  const sameDay=d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth()&&d.getDate()===now.getDate();
+  return {
+    sameDay,
+    text:new Intl.DateTimeFormat('es-MX',{dateStyle:'short',timeStyle:'short'}).format(d),
+    time:new Intl.DateTimeFormat('es-MX',{timeStyle:'short'}).format(d)
+  };
+}
+
 async function syncStatus(){
   const box=$('#syncResult');
   if(!box)return;
@@ -211,18 +231,24 @@ async function syncStatus(){
     const localRows=products.filter(p=>String(p.source_file||'').startsWith('AquaCore_AutoSync_')&&p.source_updated_at);
     const localLast=localRows.length?Math.max(...localRows.map(p=>Date.parse(p.source_updated_at)||0)):0;
     if(localLast){
+      const info=syncLabel(localLast);
       box.className='import-result good';
       box.innerHTML='<b>Inventario automático activo desde esta PC.</b> Última sincronización: '+esc(new Date(localLast).toLocaleString('es-MX'))+'. Los precios permanecen manuales.';
+      setSyncBanner(info?.sameDay?'good':'warn',info?.sameDay?'Inventario actualizado hoy · '+info.time:'Inventario pendiente de actualizar hoy','Última sincronización: '+(info?.text||new Date(localLast).toLocaleString('es-MX'))+'.');
     }else if(out.configured){
+      const info=out.lastSync?syncLabel(out.lastSync):null;
       box.className='import-result good';
       box.innerHTML='<b>Conexión automática directa lista.</b> '+(out.lastSync?'Última sincronización: '+esc(new Date(out.lastSync).toLocaleString('es-MX'))+'.':'La primera actualización se hará al abrir la tienda o al pulsar “Sincronizar ahora”.');
+      if(info)setSyncBanner(info.sameDay?'good':'warn',info.sameDay?'Inventario actualizado hoy · '+info.time:'Inventario pendiente de actualizar hoy','Última sincronización: '+info.text+'.');
+      else setSyncBanner('warn','Aún no hay una sincronización registrada','Abre la tienda o pulsa “Sincronizar ahora” para actualizar existencias.');
     }else{
       box.className='import-result warn';
       box.innerHTML='<b>Automatización lista para instalar.</b> Pulsa “Instalar inventario automático en esta PC”. Solo se hace una vez; después Windows enviará las existencias cada 15 minutos.';
+      setSyncBanner('warn','Sincronización automática pendiente','Instala o configura la conexión con Equipesca para registrar la actualización diaria.');
     }
   }catch(e){
     if(e.message==='AUTH'){password='';sessionStorage.removeItem('aquacore-admin-password');$('#login').classList.remove('hidden')}
-    else{box.className='import-result warn';box.textContent=e.message}
+    else{box.className='import-result warn';box.textContent=e.message;setSyncBanner('warn','No se pudo comprobar la actualización',e.message)}
   }
 }
 
