@@ -27,6 +27,27 @@ if (-not $IsWindows -and $PSVersionTable.PSVersion.Major -ge 6) {
 
 New-Item -ItemType Directory -Path $Root -Force | Out-Null
 
+# Limpia una instalación anterior que pudiera haberse quedado ejecutándose.
+try {
+    Import-Module ScheduledTasks -ErrorAction SilentlyContinue
+    $existingTask = Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
+    if ($existingTask) {
+        Stop-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
+        Start-Sleep -Seconds 1
+        Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false -ErrorAction SilentlyContinue
+    }
+} catch {}
+
+# Detiene únicamente workers anteriores de AquaCore que hayan quedado colgados.
+try {
+    Get-CimInstance Win32_Process -Filter "Name='powershell.exe'" -ErrorAction SilentlyContinue |
+        Where-Object { $_.CommandLine -like '*aquacore-inventory-sync.ps1*' } |
+        ForEach-Object {
+            try { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue } catch {}
+        }
+} catch {}
+
+
 Write-Host ""
 Write-Host "AquaCore MX - Inventario automatico" -ForegroundColor Green
 Write-Host "Este proceso NO modifica precios. Solo actualiza existencias." -ForegroundColor Yellow
