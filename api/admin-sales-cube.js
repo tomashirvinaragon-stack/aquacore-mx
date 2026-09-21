@@ -133,7 +133,10 @@ export default async function handler(req,res){
 
     for(const {order:o,lines} of filtered){
       const orderTotal=Number(o.subtotal||0)+Number(o.shipping_amount||0);
-      sales+=orderTotal;
+      const filteredTotal=(category||product)
+        ? lines.reduce((s,x)=>s+Number(x.line_total||0),0)
+        : orderTotal;
+      sales+=filteredTotal;
       units+=lines.reduce((s,x)=>s+x.qty,0);
 
       const key=customerKey(o);
@@ -156,7 +159,7 @@ export default async function handler(req,res){
       const c=customers.get(key);
       c.orders_count+=1;
       c.items_bought+=lines.reduce((s,x)=>s+x.qty,0);
-      c.total_spent+=orderTotal;
+      c.total_spent+=filteredTotal;
       if(o.created_at && (!c.first_purchase || Date.parse(o.created_at)<Date.parse(c.first_purchase))) c.first_purchase=o.created_at;
       if(o.created_at && (!c.last_purchase || Date.parse(o.created_at)>Date.parse(c.last_purchase))) c.last_purchase=o.created_at;
       for(const x of lines) c.products.add(x.product);
