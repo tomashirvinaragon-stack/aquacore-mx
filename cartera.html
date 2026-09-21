@@ -15,8 +15,9 @@
     .filters{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:16px}.filter-grid{display:grid;grid-template-columns:160px 155px 155px 180px 180px 1fr 180px 1fr;gap:10px}.filters input,.filters select{width:100%;border:1px solid #ccdbe5;border-radius:10px;padding:11px;font:inherit;background:#fff}.filter-actions{display:flex;gap:10px;margin-top:11px;flex-wrap:wrap}
     .section{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-top:16px}.section-head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}.section-head h2{margin:0;color:var(--navy);font-size:21px}.section-head p{margin:3px 0 0;color:var(--muted);font-size:13px}
     .scroll{overflow:auto}.table{width:100%;border-collapse:collapse}.table.customers{min-width:1150px}.table.details{min-width:1400px}.table th{background:#f8fbfd;text-align:left;padding:12px;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#688093;border-bottom:1px solid var(--line);white-space:nowrap}.table td{padding:12px;border-bottom:1px solid #edf2f5;vertical-align:top}.table tr:hover td{background:#fbfdfe}.name{font-weight:850;color:var(--navy)}.muted{color:var(--muted);font-size:12px}.money{font-weight:900;color:var(--navy)}.pill{display:inline-flex;background:#eef4f8;color:#42647d;padding:5px 8px;border-radius:999px;font-size:11px;font-weight:800;margin:2px 4px 2px 0}.empty{padding:38px;text-align:center;color:var(--muted)}
+    dialog{border:0;border-radius:20px;box-shadow:0 25px 80px #16334d30;max-width:980px;width:calc(100% - 26px);padding:0}dialog::backdrop{background:#0d2436a6}.dlg{padding:24px}.dlghead{display:flex;justify-content:space-between;gap:12px;align-items:start}.dlg h2{margin:0;color:var(--navy)}.x{border:0;background:#edf3f7;border-radius:50%;width:38px;height:38px;font-size:20px;cursor:pointer}.form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}.form-grid label{font-size:12px;font-weight:800;color:var(--muted)}.form-grid input,.form-grid select,.form-grid textarea{width:100%;margin-top:5px;border:1px solid #ccdbe5;border-radius:10px;padding:10px;font:inherit;background:#fff}.manual-lines{margin-top:16px;border:1px solid var(--line);border-radius:14px;overflow:hidden}.manual-row{display:grid;grid-template-columns:1.7fr 1fr 1fr 100px 130px 42px;gap:8px;padding:10px;border-bottom:1px solid var(--line);align-items:end}.manual-row:last-child{border-bottom:0}.manual-row input{width:100%;border:1px solid #ccdbe5;border-radius:9px;padding:9px;font:inherit}.manual-row button{height:39px;border:0;border-radius:9px;background:#fdebed;color:#a62c3a;font-weight:900;cursor:pointer}.dlg-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:16px;flex-wrap:wrap}
     .login{position:fixed;inset:0;background:linear-gradient(135deg,#062b4d,#0a809c);display:grid;place-items:center;z-index:100}.login-card{background:#fff;border-radius:22px;padding:30px;width:min(430px,calc(100% - 30px));box-shadow:0 30px 90px #001d2e55;text-align:center}.login-card img{height:55px}.login-card input{width:100%;border:1px solid #ccdbe5;border-radius:12px;padding:13px;margin:9px 0 11px;font:inherit}.hidden{display:none!important}.err{color:var(--bad);min-height:20px;font-size:13px}
-    @media(max-width:1250px){.filter-grid{grid-template-columns:repeat(4,1fr)}.stats{grid-template-columns:repeat(3,1fr)}}@media(max-width:800px){.filter-grid{grid-template-columns:1fr 1fr}.stats{grid-template-columns:1fr 1fr}.head{align-items:start;flex-direction:column}.wrap{padding:18px 12px 45px}.topin{padding:11px 12px}}@media(max-width:520px){.filter-grid,.stats{grid-template-columns:1fr}}
+    @media(max-width:1250px){.filter-grid{grid-template-columns:repeat(4,1fr)}.stats{grid-template-columns:repeat(3,1fr)}}@media(max-width:800px){.filter-grid{grid-template-columns:1fr 1fr}.stats{grid-template-columns:1fr 1fr}.head{align-items:start;flex-direction:column}.wrap{padding:18px 12px 45px}.topin{padding:11px 12px}}@media(max-width:800px){.form-grid{grid-template-columns:1fr 1fr}.manual-row{grid-template-columns:1fr 1fr}.manual-row button{width:100%}}@media(max-width:520px){.filter-grid,.stats,.form-grid{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -44,7 +45,7 @@
   <main class="wrap">
     <div class="head">
       <div><h1>Cartera / Cubo de ventas</h1><p>Historial acumulado de clientes, zonas, productos, cantidades y ventas de AquaCore MX.</p></div>
-      <button id="csv" class="btn primary">Exportar cubo CSV</button>
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><button id="manualSaleBtn" class="btn ghost">Registrar venta manual</button><button id="csv" class="btn primary">Exportar cubo CSV</button></div>
     </div>
 
     <section class="stats">
@@ -96,6 +97,25 @@
     </section>
   </main>
 
+  <dialog id="manualSale"><form id="manualSaleForm" class="dlg">
+    <div class="dlghead"><div><div class="muted">Venta fuera del checkout</div><h2>Registrar venta manual</h2></div><button class="x" type="button" id="closeManual">×</button></div>
+    <div class="form-grid">
+      <label>Fecha de venta<input id="saleDate" name="sale_date" type="date" required></label>
+      <label>Nombre del cliente<input name="customer_name" required placeholder="Nombre o razón social"></label>
+      <label>Teléfono<input name="customer_phone" placeholder="WhatsApp / teléfono"></label>
+      <label>Correo<input name="customer_email" type="email" placeholder="correo@cliente.com"></label>
+      <label>Estado<input name="state" placeholder="Ej. Sonora"></label>
+      <label>Ciudad / municipio<input name="city" placeholder="Ej. Cajeme"></label>
+      <label>C.P.<input name="zip" placeholder="Código postal"></label>
+      <label>Método de pago<select name="payment_method"><option>Transferencia</option><option>Depósito</option><option>Efectivo</option><option>Tarjeta</option><option>Crédito</option><option>Otro</option></select></label>
+      <label>Origen del cliente<select name="source"><option>WhatsApp</option><option>Facebook</option><option>Marketplace</option><option>Instagram</option><option>Google</option><option>Recomendación</option><option>Llamada</option><option>Otro</option></select></label>
+      <label style="grid-column:1/-1">Notas<textarea name="notes" rows="2" placeholder="Observaciones, referencia, condición comercial..."></textarea></label>
+    </div>
+    <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:18px"><div><b>Productos</b><div class="muted">Puedes registrar uno o varios artículos.</div></div><button id="addManualLine" type="button" class="btn ghost">+ Agregar producto</button></div>
+    <div id="manualLines" class="manual-lines"></div>
+    <div class="dlg-actions"><button type="button" class="btn ghost" id="cancelManual">Cancelar</button><button type="submit" class="btn primary" id="saveManual">Guardar venta</button></div>
+  </form></dialog>
+
 <script>
 const $=s=>document.querySelector(s);
 let password=sessionStorage.getItem('aquacore-admin-password')||'',data={customers:[],details:[],stats:{}};
@@ -126,6 +146,64 @@ function fillSelect(el,items,label){
   const current=el.value;
   el.innerHTML='<option value="">'+label+'</option>'+items.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('');
   if([...el.options].some(o=>o.value===current))el.value=current;
+}
+
+function localDateValue(d=new Date()){
+  const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+day;
+}
+function addManualLine(values={}){
+  const row=document.createElement('div');
+  row.className='manual-row';
+  row.innerHTML=
+    '<label><span class="muted">Producto</span><input data-m-name required value="'+esc(values.name||'')+'" placeholder="Ej. Blower Pioneer 1 HP"></label>'+
+    '<label><span class="muted">Categoría</span><input data-m-cat value="'+esc(values.category||'')+'" placeholder="Blowers"></label>'+
+    '<label><span class="muted">Código</span><input data-m-code value="'+esc(values.code||'')+'" placeholder="Código / modelo"></label>'+
+    '<label><span class="muted">Cantidad</span><input data-m-qty type="number" min="0.001" step="0.001" required value="'+esc(values.qty||1)+'"></label>'+
+    '<label><span class="muted">Precio unitario</span><input data-m-price type="number" min="0" step="0.01" required value="'+esc(values.unit_price||'')+'" placeholder="0.00"></label>'+
+    '<button type="button" title="Quitar">×</button>';
+  row.querySelector('button').onclick=()=>{if($('#manualLines').children.length>1)row.remove()};
+  $('#manualLines').appendChild(row);
+}
+function openManualSale(){
+  $('#manualSaleForm').reset();
+  $('#saleDate').value=localDateValue();
+  $('#manualLines').innerHTML='';
+  addManualLine();
+  manualSale.showModal();
+}
+async function saveManualSale(e){
+  e.preventDefault();
+  const form=e.currentTarget,fd=Object.fromEntries(new FormData(form));
+  const lines=[...document.querySelectorAll('#manualLines .manual-row')].map(row=>({
+    name:row.querySelector('[data-m-name]').value.trim(),
+    category:row.querySelector('[data-m-cat]').value.trim(),
+    code:row.querySelector('[data-m-code]').value.trim(),
+    qty:Number(row.querySelector('[data-m-qty]').value)||0,
+    unit_price:Number(row.querySelector('[data-m-price]').value)||0
+  })).filter(x=>x.name&&x.qty>0);
+  if(!lines.length){alert('Agrega al menos un producto.');return}
+  const btn=$('#saveManual');btn.disabled=true;btn.textContent='Guardando…';
+  try{
+    const r=await fetch('/api/admin-manual-sale',{
+      method:'POST',
+      headers:{'content-type':'application/json','x-admin-password':password},
+      body:JSON.stringify({
+        sale_date:fd.sale_date,
+        payment_method:fd.payment_method,
+        source:fd.source,
+        notes:fd.notes,
+        customer:{name:fd.customer_name,phone:fd.customer_phone,email:fd.customer_email,state:fd.state,city:fd.city,zip:fd.zip},
+        lines
+      })
+    });
+    const out=await r.json().catch(()=>({}));
+    if(!r.ok)throw new Error([out.error,out.details].filter(Boolean).join(' — ')||'No se pudo registrar la venta');
+    manualSale.close();
+    await load();
+    alert('Venta registrada correctamente. Folio '+out.folio+' · Total '+money(out.total));
+  }catch(err){alert(err.message)}
+  finally{btn.disabled=false;btn.textContent='Guardar venta'}
 }
 async function api(){
   const q=new URLSearchParams({payment:'approved'});
@@ -193,6 +271,10 @@ function clearFilters(){
   $('#state').value='';$('#city').value='';$('#customer').value='';$('#category').value='';$('#product').value='';
   load();
 }
+$('#manualSaleBtn').onclick=openManualSale;
+$('#closeManual').onclick=$('#cancelManual').onclick=()=>manualSale.close();
+$('#addManualLine').onclick=()=>addManualLine();
+$('#manualSaleForm').onsubmit=saveManualSale;
 $('#period').onchange=()=>{if($('#period').value!=='custom')setPeriod()};
 $('#from').onchange=$('#to').onchange=()=>{$('#period').value='custom'};
 $('#apply').onclick=load;$('#refresh').onclick=load;$('#clear').onclick=clearFilters;
