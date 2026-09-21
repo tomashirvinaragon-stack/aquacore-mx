@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Cartera y cubo de ventas | AquaCore MX</title>
+  <style>
+    :root{--navy:#062b4d;--blue:#0876b7;--teal:#10b8b0;--bg:#f3f7fa;--card:#fff;--line:#dce6ee;--text:#17354f;--muted:#6b8090;--ok:#159c62;--warn:#b97900;--bad:#c23d4a}
+    *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    .top{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}.topin{max-width:1500px;margin:auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:15px}.logo{height:42px}.top-actions{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+    .btn{border:0;border-radius:11px;padding:10px 14px;font-weight:800;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}.primary{background:linear-gradient(90deg,var(--blue),#0fa7b0);color:white}.ghost{background:#eef4f8;color:var(--navy)}
+    .wrap{max-width:1500px;margin:auto;padding:26px 20px 60px}.head{display:flex;justify-content:space-between;gap:16px;align-items:end;margin-bottom:18px}.head h1{margin:0;color:var(--navy);font-size:34px}.head p{margin:7px 0 0;color:var(--muted)}
+    .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}.stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px}.stat small{display:block;color:var(--muted);font-weight:700}.stat strong{display:block;margin-top:6px;font-size:25px;color:var(--navy)}
+    .filters{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:16px}.filter-grid{display:grid;grid-template-columns:160px 155px 155px 180px 180px 1fr 180px 1fr;gap:10px}.filters input,.filters select{width:100%;border:1px solid #ccdbe5;border-radius:10px;padding:11px;font:inherit;background:#fff}.filter-actions{display:flex;gap:10px;margin-top:11px;flex-wrap:wrap}
+    .section{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-top:16px}.section-head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}.section-head h2{margin:0;color:var(--navy);font-size:21px}.section-head p{margin:3px 0 0;color:var(--muted);font-size:13px}
+    .scroll{overflow:auto}.table{width:100%;border-collapse:collapse}.table.customers{min-width:1150px}.table.details{min-width:1400px}.table th{background:#f8fbfd;text-align:left;padding:12px;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#688093;border-bottom:1px solid var(--line);white-space:nowrap}.table td{padding:12px;border-bottom:1px solid #edf2f5;vertical-align:top}.table tr:hover td{background:#fbfdfe}.name{font-weight:850;color:var(--navy)}.muted{color:var(--muted);font-size:12px}.money{font-weight:900;color:var(--navy)}.pill{display:inline-flex;background:#eef4f8;color:#42647d;padding:5px 8px;border-radius:999px;font-size:11px;font-weight:800;margin:2px 4px 2px 0}.empty{padding:38px;text-align:center;color:var(--muted)}
+    .login{position:fixed;inset:0;background:linear-gradient(135deg,#062b4d,#0a809c);display:grid;place-items:center;z-index:100}.login-card{background:#fff;border-radius:22px;padding:30px;width:min(430px,calc(100% - 30px));box-shadow:0 30px 90px #001d2e55;text-align:center}.login-card img{height:55px}.login-card input{width:100%;border:1px solid #ccdbe5;border-radius:12px;padding:13px;margin:9px 0 11px;font:inherit}.hidden{display:none!important}.err{color:var(--bad);min-height:20px;font-size:13px}
+    @media(max-width:1250px){.filter-grid{grid-template-columns:repeat(4,1fr)}.stats{grid-template-columns:repeat(3,1fr)}}@media(max-width:800px){.filter-grid{grid-template-columns:1fr 1fr}.stats{grid-template-columns:1fr 1fr}.head{align-items:start;flex-direction:column}.wrap{padding:18px 12px 45px}.topin{padding:11px 12px}}@media(max-width:520px){.filter-grid,.stats{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div id="login" class="login">
+    <form id="loginForm" class="login-card">
+      <img src="assets/logo.svg" alt="AquaCore MX">
+      <h2>Cartera AquaCore MX</h2>
+      <p class="muted">Usa la misma contraseña del panel administrativo.</p>
+      <input id="password" type="password" autocomplete="current-password" placeholder="Contraseña" required>
+      <button class="btn primary" style="width:100%">Entrar</button>
+      <div id="loginError" class="err"></div>
+    </form>
+  </div>
+
+  <header class="top"><div class="topin">
+    <img class="logo" src="assets/logo.svg" alt="AquaCore MX">
+    <div class="top-actions">
+      <a class="btn ghost" href="/admin.html">Pedidos</a>
+      <a class="btn ghost" href="/inventario.html">Inventario</a>
+      <button id="refresh" class="btn ghost">Actualizar</button>
+      <button id="logout" class="btn ghost">Cerrar sesión</button>
+    </div>
+  </div></header>
+
+  <main class="wrap">
+    <div class="head">
+      <div><h1>Cartera / Cubo de ventas</h1><p>Historial acumulado de clientes, zonas, productos, cantidades y ventas de AquaCore MX.</p></div>
+      <button id="csv" class="btn primary">Exportar cubo CSV</button>
+    </div>
+
+    <section class="stats">
+      <div class="stat"><small>Venta del periodo</small><strong id="sales">$0.00</strong></div>
+      <div class="stat"><small>Pedidos</small><strong id="orders">0</strong></div>
+      <div class="stat"><small>Clientes</small><strong id="customers">0</strong></div>
+      <div class="stat"><small>Unidades vendidas</small><strong id="units">0</strong></div>
+      <div class="stat"><small>Ticket promedio</small><strong id="ticket">$0.00</strong></div>
+    </section>
+
+    <section class="filters">
+      <div class="filter-grid">
+        <select id="period">
+          <option value="month">Mes actual</option>
+          <option value="year">Año actual</option>
+          <option value="all">Todo el historial</option>
+          <option value="custom">Personalizado</option>
+        </select>
+        <input id="from" type="date" title="Desde">
+        <input id="to" type="date" title="Hasta">
+        <select id="state"><option value="">Todos los estados</option></select>
+        <input id="city" placeholder="Ciudad">
+        <input id="customer" placeholder="Cliente, correo o teléfono">
+        <select id="category"><option value="">Todas las categorías</option></select>
+        <input id="product" placeholder="Producto o código">
+      </div>
+      <div class="filter-actions">
+        <button id="apply" class="btn primary">Aplicar filtros</button>
+        <button id="clear" class="btn ghost">Limpiar</button>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><div><h2>Cartera de clientes</h2><p>Cada cliente acumula compras, unidades, productos y venta histórica dentro del periodo seleccionado.</p></div></div>
+      <div class="scroll"><table class="table customers">
+        <thead><tr><th>Cliente</th><th>Zona</th><th>Primera compra</th><th>Última compra</th><th>Compras</th><th>Unidades</th><th>Venta acumulada</th><th>Productos comprados</th></tr></thead>
+        <tbody id="customerBody"></tbody>
+      </table></div>
+      <div id="customerEmpty" class="empty hidden">Todavía no hay clientes para este filtro.</div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><div><h2>Detalle del cubo</h2><p>Una fila por producto vendido. Esta tabla es la base para analizar meses, años, zonas y líneas de producto.</p></div></div>
+      <div class="scroll"><table class="table details">
+        <thead><tr><th>Fecha</th><th>Folio</th><th>Cliente</th><th>Zona</th><th>Categoría</th><th>Producto</th><th>Código</th><th>Cantidad</th><th>P. unitario</th><th>Total línea</th><th>Total pedido</th></tr></thead>
+        <tbody id="detailBody"></tbody>
+      </table></div>
+      <div id="detailEmpty" class="empty hidden">Todavía no hay ventas para este filtro.</div>
+    </section>
+  </main>
+
+<script>
+const $=s=>document.querySelector(s);
+let password=sessionStorage.getItem('aquacore-admin-password')||'',data={customers:[],details:[],stats:{}};
+const money=n=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'}).format(Number(n||0));
+const num=n=>new Intl.NumberFormat('es-MX',{maximumFractionDigits:3}).format(Number(n||0));
+const date=s=>s?new Intl.DateTimeFormat('es-MX',{dateStyle:'medium'}).format(new Date(s)):'—';
+const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+const isoDay=(v,end=false)=>{
+  if(!v)return '';
+  const d=new Date(v+'T00:00:00');
+  if(end)d.setDate(d.getDate()+1);
+  return d.toISOString();
+};
+function dateInput(d){return d.toISOString().slice(0,10)}
+function setPeriod(){
+  const now=new Date(),p=$('#period').value;
+  if(p==='month'){
+    $('#from').value=dateInput(new Date(now.getFullYear(),now.getMonth(),1));
+    $('#to').value=dateInput(new Date(now.getFullYear(),now.getMonth()+1,0));
+  }else if(p==='year'){
+    $('#from').value=now.getFullYear()+'-01-01';
+    $('#to').value=now.getFullYear()+'-12-31';
+  }else if(p==='all'){
+    $('#from').value='';$('#to').value='';
+  }
+}
+function fillSelect(el,items,label){
+  const current=el.value;
+  el.innerHTML='<option value="">'+label+'</option>'+items.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('');
+  if([...el.options].some(o=>o.value===current))el.value=current;
+}
+async function api(){
+  const q=new URLSearchParams({payment:'approved'});
+  if($('#from').value)q.set('from',isoDay($('#from').value));
+  if($('#to').value)q.set('to',isoDay($('#to').value,true));
+  if($('#state').value)q.set('state',$('#state').value);
+  if($('#city').value.trim())q.set('city',$('#city').value.trim());
+  if($('#customer').value.trim())q.set('customer',$('#customer').value.trim());
+  if($('#category').value)q.set('category',$('#category').value);
+  if($('#product').value.trim())q.set('product',$('#product').value.trim());
+  const r=await fetch('/api/admin-sales-cube?'+q,{headers:{'x-admin-password':password},cache:'no-store'});
+  const out=await r.json().catch(()=>({}));
+  if(r.status===401)throw new Error('AUTH');
+  if(!r.ok)throw new Error([out.error,out.details].filter(Boolean).join(' — ')||'No se pudo cargar el cubo');
+  return out;
+}
+function render(out){
+  data=out;
+  $('#sales').textContent=money(out.stats?.sales);
+  $('#orders').textContent=out.stats?.orders||0;
+  $('#customers').textContent=out.stats?.customers||0;
+  $('#units').textContent=num(out.stats?.units);
+  $('#ticket').textContent=money(out.stats?.average_ticket);
+  fillSelect($('#state'),out.facets?.states||[],'Todos los estados');
+  fillSelect($('#category'),out.facets?.categories||[],'Todas las categorías');
+
+  const customers=out.customers||[];
+  $('#customerBody').innerHTML=customers.map(c=>'<tr>'+
+    '<td><div class="name">'+esc(c.name)+'</div><div class="muted">'+esc(c.email||'')+'</div><div class="muted">'+esc(c.phone||'')+'</div></td>'+
+    '<td>'+esc([c.city,c.state].filter(Boolean).join(', ')||'—')+'</td>'+
+    '<td>'+esc(date(c.first_purchase))+'</td>'+
+    '<td>'+esc(date(c.last_purchase))+'</td>'+
+    '<td><b>'+esc(c.orders_count)+'</b></td>'+
+    '<td>'+esc(num(c.items_bought))+'</td>'+
+    '<td class="money">'+money(c.total_spent)+'</td>'+
+    '<td>'+((c.products||[]).slice(0,6).map(x=>'<span class="pill">'+esc(x)+'</span>').join('')||'—')+((c.products||[]).length>6?'<span class="muted"> +'+((c.products||[]).length-6)+' más</span>':'')+'</td>'+
+  '</tr>').join('');
+  $('#customerEmpty').classList.toggle('hidden',customers.length>0);
+
+  const details=out.details||[];
+  $('#detailBody').innerHTML=details.map(x=>'<tr>'+
+    '<td>'+esc(date(x.date))+'</td>'+
+    '<td><b>'+esc(x.folio||'')+'</b></td>'+
+    '<td><div class="name">'+esc(x.customer_name||'—')+'</div><div class="muted">'+esc(x.customer_phone||'')+'</div></td>'+
+    '<td>'+esc([x.city,x.state].filter(Boolean).join(', ')||'—')+'</td>'+
+    '<td>'+esc(x.category||'—')+'</td>'+
+    '<td>'+esc(x.product||'—')+'</td>'+
+    '<td class="muted">'+esc(x.code||'')+'</td>'+
+    '<td><b>'+esc(num(x.quantity))+'</b></td>'+
+    '<td>'+money(x.unit_price)+'</td>'+
+    '<td class="money">'+money(x.line_total)+'</td>'+
+    '<td class="money">'+money(x.order_total)+'</td>'+
+  '</tr>').join('');
+  $('#detailEmpty').classList.toggle('hidden',details.length>0);
+}
+async function load(){
+  try{render(await api());$('#login').classList.add('hidden')}
+  catch(e){
+    if(e.message==='AUTH'){password='';sessionStorage.removeItem('aquacore-admin-password');$('#login').classList.remove('hidden')}
+    else alert(e.message);
+  }
+}
+function clearFilters(){
+  $('#period').value='month';setPeriod();
+  $('#state').value='';$('#city').value='';$('#customer').value='';$('#category').value='';$('#product').value='';
+  load();
+}
+$('#period').onchange=()=>{if($('#period').value!=='custom')setPeriod()};
+$('#from').onchange=$('#to').onchange=()=>{$('#period').value='custom'};
+$('#apply').onclick=load;$('#refresh').onclick=load;$('#clear').onclick=clearFilters;
+$('#customer').onkeydown=$('#city').onkeydown=$('#product').onkeydown=e=>{if(e.key==='Enter')load()};
+$('#logout').onclick=()=>{password='';sessionStorage.removeItem('aquacore-admin-password');$('#password').value='';$('#login').classList.remove('hidden')};
+$('#loginForm').onsubmit=async e=>{e.preventDefault();password=$('#password').value;sessionStorage.setItem('aquacore-admin-password',password);$('#loginError').textContent='';await load()};
+$('#csv').onclick=()=>{
+  const cols=['folio','date','paid_at','customer_name','customer_email','customer_phone','city','state','zip','category','product','code','quantity','unit_price','line_total','order_total'];
+  const q=v=>'"'+String(v??'').replaceAll('"','""')+'"';
+  const rows=(data.details||[]).map(x=>cols.map(c=>q(x[c])).join(','));
+  const csv=[cols.join(','),...rows].join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));a.download='cubo-ventas-aquacore.csv';a.click();URL.revokeObjectURL(a.href);
+};
+setPeriod();
+if(password)load();
+</script>
+</body>
+</html>
