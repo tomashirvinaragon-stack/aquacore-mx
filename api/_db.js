@@ -56,6 +56,26 @@ export async function listOrders(limit=500){
   return request(`orders?select=*&order=created_at.desc&limit=${n}`);
 }
 
+export async function listOrdersAll({from,to,max=20000}={}){
+  const pageSize=1000;
+  const cap=Math.max(1,Math.min(50000,Number(max)||20000));
+  const all=[];
+  let offset=0;
+
+  while(all.length<cap){
+    let path=`orders?select=*&order=created_at.desc&limit=${pageSize}&offset=${offset}`;
+    if(from) path+=`&created_at=gte.${encodeURIComponent(String(from))}`;
+    if(to) path+=`&created_at=lt.${encodeURIComponent(String(to))}`;
+    const rows=await request(path);
+    if(!Array.isArray(rows)||!rows.length) break;
+    all.push(...rows);
+    if(rows.length<pageSize) break;
+    offset+=rows.length;
+  }
+
+  return all.slice(0,cap);
+}
+
 function inventoryFolio(productId){
   return `INV-${Number(productId)}`;
 }
