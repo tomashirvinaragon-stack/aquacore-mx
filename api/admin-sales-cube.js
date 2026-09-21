@@ -53,17 +53,17 @@ function customerKey(o){
 
 function productLines(o,productMap){
   return (Array.isArray(o.items)?o.items:[])
-    .filter(x=>x&&!x._type&&Number.isFinite(Number(x.id)))
+    .filter(x=>x&&!x._type&&(Number.isFinite(Number(x.id))||String(x.name||'').trim()))
     .map(x=>{
-      const meta=productMap.get(Number(x.id))||{};
+      const meta=Number.isFinite(Number(x.id))?productMap.get(Number(x.id))||{}:{};
       const qty=Math.max(0,Number(x.qty)||0);
       const unit=Number(x.unit_price)||0;
       const total=Number.isFinite(Number(x.total))?Number(x.total):qty*unit;
       return {
-        id:Number(x.id),
+        id:Number.isFinite(Number(x.id))?Number(x.id):null,
         product:String(x.name||meta.name||'Producto'),
         code:String(x.code||meta.code||''),
-        category:String(meta.cat||'Sin categoría'),
+        category:String(x.category||meta.cat||'Sin categoría'),
         qty,
         unit_price:Number(unit.toFixed(2)),
         line_total:Number(total.toFixed(2))
