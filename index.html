@@ -130,7 +130,7 @@
 
     <section class="section process-section">
       <div class="section-heading"><div><span class="eyebrow">COMPRA SIMPLE</span><h2>Así funciona tu pedido</h2></div></div>
-      <div class="process-grid"><article><b>1</b><h3>Elige productos</h3><p>Agrega equipos y accesorios al carrito con precio neto visible.</p></article><article><b>2</b><h3>Completa tus datos</h3><p>Ingresa entrega, contacto y, si la necesitas, información de facturación.</p></article><article><b>3</b><h3>Paga o cotiza el flete</h3><p>Desde $5,000 MXN el pedido puede continuar a Mercado Pago con envío gratis. En compras menores primero se calcula el envío.</p></article><article><b>4</b><h3>Da seguimiento</h3><p>Una vez procesado, el pedido se controla por estado de entrega y puede incluir paquetería y número de guía.</p></article></div>
+      <div class="process-grid"><article><b>1</b><h3>Elige productos</h3><p>Agrega equipos y accesorios al carrito con precio neto visible.</p></article><article><b>2</b><h3>Completa tus datos</h3><p>Ingresa entrega, contacto y, si la necesitas, información de facturación.</p></article><article><b>3</b><h3>Paga o cotiza el flete</h3><p>Desde $5,000 MXN el pedido puede continuar a Mercado Pago con envío gratis. En compras menores se cotiza el envío antes del pago.</p></article><article><b>4</b><h3>Da seguimiento</h3><p>Una vez procesado, el pedido se controla por estado de entrega y puede incluir paquetería y número de guía.</p></article></div>
     </section>
 
     <section class="section faq-section" id="faq">
@@ -160,7 +160,7 @@
     <div class="cart-head"><div><span class="eyebrow">TU PEDIDO</span><h3>Carrito</h3></div><button id="closeCart" aria-label="Cerrar">×</button></div>
     <div class="shipping-progress"><div class="progress-text" id="progressText"></div><div class="progress-track"><div class="progress-bar" id="progressBar"></div></div></div>
     <div class="cart-items" id="cartItems"></div>
-    <div class="cart-summary"><div><span>Subtotal</span><strong id="subtotal">$0.00</strong></div><div><span>Envío</span><strong id="shipping">Por calcular</strong></div><div class="total"><span>Total productos</span><strong id="total">$0.00</strong></div><button class="btn primary full" id="checkoutBtn">Continuar pedido</button><small>Pago seguro con Mercado Pago para pedidos con envío gratis. En compras menores a $5,000, primero se calcula el flete.</small></div>
+    <div class="cart-summary"><div><span>Subtotal</span><strong id="subtotal">$0.00</strong></div><div><span>Envío</span><strong id="shipping">Por calcular</strong></div><div class="total"><span>Total productos</span><strong id="total">$0.00</strong></div><button class="btn primary full" id="checkoutBtn">Continuar pedido</button><small>Pago seguro con Mercado Pago para pedidos con envío gratis. En compras menores a $5,000, se cotiza el flete antes del pago.</small></div>
   </aside>
 
   <dialog id="productDialog" class="product-dialog"><button class="dialog-close" data-close="productDialog" aria-label="Cerrar">×</button><div id="productDialogBody"></div></dialog>
@@ -173,7 +173,7 @@
       <div class="form-grid">
         <label>Nombre completo<input required name="name" autocomplete="name"></label><label>Teléfono<input required name="phone" inputmode="tel" autocomplete="tel"></label>
         <label class="wide">Correo<input required name="email" type="email" autocomplete="email"></label><label class="wide">Dirección<input required name="address" autocomplete="street-address"></label>
-        <label>Ciudad<input required name="city"></label><label>Estado<input required name="state"></label><label>C.P.<input required name="zip" inputmode="numeric" autocomplete="postal-code"></label><label>Referencia<input name="reference"></label>
+        <label>Ciudad / municipio<input required name="city"></label><label>Estado<input required name="state"></label><label>Colonia<input required name="neighborhood"></label><label>C.P.<input required name="zip" inputmode="numeric" maxlength="5" autocomplete="postal-code"></label><label class="wide">Referencia<input name="reference"></label>
       </div>
       <div class="invoice-request">
         <label class="checkbox invoice-toggle"><input id="invoiceRequired" name="invoice_required" value="yes" type="checkbox"> <span><strong>Requiero factura</strong><small>Captura los datos tal como aparecen en tu constancia de situación fiscal.</small></span></label>
@@ -188,7 +188,8 @@
         </div>
       </div>
       <label class="checkbox"><input required type="checkbox"> <span>Confirmo que mis datos son correctos y deseo generar el pedido.</span></label>
-      <div class="payment-notice" id="paymentNotice">En compras de $5,000 MXN o más podrás continuar directamente a Mercado Pago. En compras menores, te ayudamos a calcular el envío antes de cobrar.</div><button class="btn primary full" id="submitOrderBtn" type="submit">Continuar al pago</button>
+      <div class="shipping-quote-box" id="shippingQuoteBox" hidden></div>
+      <div class="payment-notice" id="paymentNotice">En compras de $5,000 MXN o más el envío es gratis. En compras menores, AquaCore cotiza el flete antes de cobrar.</div><button class="btn primary full" id="submitOrderBtn" type="submit">Continuar al pago</button>
     </form>
   </dialog>
 
