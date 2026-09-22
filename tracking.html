@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#062b4d">
+  <title>Seguimiento de pedido | AquaCore MX</title>
+  <style>
+    :root{--navy:#062b4d;--blue:#0876b7;--teal:#10b8b0;--bg:#f3f7fa;--line:#dce6ee;--text:#17354f;--muted:#6b8090;--ok:#159c62;--warn:#b97900;--bad:#c23d4a}
+    *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    .top{background:#fff;border-bottom:1px solid var(--line)}.topin{max-width:1100px;margin:auto;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px}.logo{height:44px}.back{color:var(--navy);text-decoration:none;font-weight:800}
+    .wrap{max-width:900px;margin:34px auto;padding:0 16px 60px}.hero{text-align:center;margin-bottom:22px}.hero h1{font-size:34px;color:var(--navy);margin:8px 0}.hero p{color:var(--muted);margin:0}
+    .card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 18px 50px rgba(6,43,77,.06)}.lookup{display:grid;grid-template-columns:1fr 1fr auto;gap:10px}.lookup input{width:100%;border:1px solid #cbd9e4;border-radius:12px;padding:13px;font:inherit}.btn{border:0;border-radius:12px;padding:13px 16px;font-weight:850;cursor:pointer;background:linear-gradient(90deg,var(--blue),#0fa7b0);color:#fff}.error{margin-top:12px;color:var(--bad);font-size:14px;min-height:20px}
+    .result{margin-top:18px}.summary{display:grid;grid-template-columns:1.2fr .8fr .8fr;gap:12px}.box{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fbfdfe}.box small{display:block;color:var(--muted);font-weight:700;margin-bottom:4px}.box strong{color:var(--navy)}
+    .timeline{margin-top:18px;border-top:1px solid var(--line);padding-top:18px}.steps{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}.step{text-align:center;position:relative}.dot{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;margin:0 auto 7px;background:#edf3f7;color:#7890a1;font-weight:900}.step.done .dot{background:#e5f8ef;color:#0a8c55}.step.current .dot{background:#e8f2ff;color:#1762a5;box-shadow:0 0 0 4px #e8f2ff88}.step span{display:block;font-size:12px;font-weight:800;color:#6c8291}.step.done span,.step.current span{color:var(--navy)}
+    .alert{margin-top:15px;border-radius:13px;padding:12px 14px;font-weight:750}.alert.warn{background:#fff4d8;color:#915f00}.alert.bad{background:#fdebed;color:#a62c3a}.alert.ok{background:#e7f7ef;color:#08784a}
+    .ship{margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:12px}.tracklink{display:inline-flex;margin-top:10px;text-decoration:none;background:#eef4f8;color:#0b5f91;padding:10px 13px;border-radius:10px;font-weight:850}.items{margin-top:18px;border:1px solid var(--line);border-radius:14px;overflow:hidden}.item{display:flex;justify-content:space-between;gap:12px;padding:12px 14px;border-bottom:1px solid #edf2f5}.item:last-child{border-bottom:0}.muted{color:var(--muted);font-size:13px}.hidden{display:none!important}
+    @media(max-width:760px){.lookup{grid-template-columns:1fr}.summary,.ship{grid-template-columns:1fr}.steps{grid-template-columns:repeat(3,1fr);row-gap:18px}.hero h1{font-size:29px}}
+  </style>
+</head>
+<body>
+<header class="top"><div class="topin"><img class="logo" src="/assets/logo.svg" alt="AquaCore MX"><a class="back" href="/">← Volver a la tienda</a></div></header>
+<main class="wrap">
+  <section class="hero"><div>📦</div><h1>Seguimiento de pedido</h1><p>Consulta el estado de tu compra AquaCore MX.</p></section>
+
+  <section class="card">
+    <form id="lookupForm" class="lookup">
+      <input id="folio" required placeholder="Folio del pedido" autocomplete="off">
+      <input id="email" required type="email" placeholder="Correo usado en la compra" autocomplete="email">
+      <button class="btn" type="submit">Consultar</button>
+    </form>
+    <div id="error" class="error"></div>
+
+    <div id="result" class="result hidden">
+      <div class="summary">
+        <div class="box"><small>Pedido</small><strong id="rFolio"></strong><div class="muted" id="rCustomer"></div></div>
+        <div class="box"><small>Destino</small><strong id="rDestination"></strong></div>
+        <div class="box"><small>Total</small><strong id="rTotal"></strong></div>
+      </div>
+
+      <div class="timeline">
+        <div class="steps" id="steps"></div>
+        <div id="alert"></div>
+      </div>
+
+      <div class="ship">
+        <div class="box"><small>Paquetería</small><strong id="rCarrier">Por asignar</strong><div class="muted" id="rService"></div></div>
+        <div class="box"><small>Número de guía</small><strong id="rTracking">Aún no disponible</strong><div><a id="trackingLink" class="tracklink hidden" target="_blank" rel="noopener">Ver rastreo de paquetería</a></div></div>
+      </div>
+
+      <div class="items" id="items"></div>
+    </div>
+  </section>
+</main>
+<script>
+const $=s=>document.querySelector(s);
+const money=n=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'}).format(Number(n||0));
+const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+
+const baseSteps=[
+  ['payment','Pago confirmado'],
+  ['preparing','Preparando'],
+  ['shipped','Enviado'],
+  ['in_transit','En tránsito'],
+  ['last_mile','En ruta'],
+  ['delivered','Entregado']
+];
+
+function statusRank(status){
+  const map={payment_pending:-1,payment_issue:-1,canceled:-1,to_fulfill:0,preparing:1,shipped:2,in_transit:3,last_mile:4,delivery_attempt:4,exception:3,delivered:5,returned:3};
+  return Object.prototype.hasOwnProperty.call(map,status)?map[status]:0;
+}
+
+function renderSteps(status){
+  const rank=statusRank(status);
+  $('#steps').innerHTML=baseSteps.map((x,i)=>{
+    const done=rank>i||(status==='delivered'&&i<=5);
+    const current=rank===i&&status!=='delivered';
+    return '<div class="step '+(done?'done ': '')+(current?'current':'')+'"><div class="dot">'+(done?'✓':(i+1))+'</div><span>'+esc(x[1])+'</span></div>';
+  }).join('');
+
+  let html='';
+  if(status==='payment_pending') html='<div class="alert warn">Tu pago todavía está pendiente de confirmación.</div>';
+  else if(status==='payment_issue') html='<div class="alert bad">El pago presenta una incidencia. No se programará envío hasta confirmarlo.</div>';
+  else if(status==='canceled') html='<div class="alert bad">Este pedido aparece como cancelado.</div>';
+  else if(status==='delivery_attempt') html='<div class="alert warn">La paquetería reportó un intento de entrega. Revisa tu guía para más detalle.</div>';
+  else if(status==='exception') html='<div class="alert bad">La paquetería reportó una incidencia durante el traslado.</div>';
+  else if(status==='returned') html='<div class="alert bad">El envío aparece en proceso de devolución.</div>';
+  else if(status==='delivered') html='<div class="alert ok">Tu pedido aparece como entregado. Gracias por comprar en AquaCore MX.</div>';
+  $('#alert').innerHTML=html;
+}
+
+function render(o){
+  $('#result').classList.remove('hidden');
+  $('#rFolio').textContent=o.folio||'—';
+  $('#rCustomer').textContent=o.customer_name?'Cliente: '+o.customer_name:'';
+  $('#rDestination').textContent=[o.city,o.state].filter(Boolean).join(', ')||'—';
+  $('#rTotal').textContent=money(o.total);
+  $('#rCarrier').textContent=o.carrier||'Por asignar';
+  $('#rService').textContent=o.service||'';
+  $('#rTracking').textContent=o.tracking_number||'Aún no disponible';
+  const a=$('#trackingLink');
+  if(o.tracking_url){a.href=o.tracking_url;a.classList.remove('hidden')}else{a.classList.add('hidden');a.removeAttribute('href')}
+  renderSteps(o.status);
+  $('#items').innerHTML=(o.items||[]).map(x=>'<div class="item"><div><b>'+esc(x.name)+'</b><div class="muted">'+esc(x.code||'')+'</div></div><b>x '+esc(x.qty)+'</b></div>').join('')||'<div class="item">Sin detalle de productos</div>';
+}
+
+async function lookup(){
+  $('#error').textContent='';
+  $('#result').classList.add('hidden');
+  const folio=$('#folio').value.trim(),email=$('#email').value.trim();
+  if(!folio||!email)return;
+  const r=await fetch('/api/create-order',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:'track_order',folio,email})});
+  const out=await r.json().catch(()=>({}));
+  if(!r.ok){$('#error').textContent=out.error||'No fue posible consultar el pedido';return}
+  render(out.order);
+}
+
+$('#lookupForm').onsubmit=e=>{e.preventDefault();lookup()};
+const q=new URLSearchParams(location.search),folio=q.get('folio')||'';
+if(folio)$('#folio').value=folio;
+try{
+  const last=JSON.parse(localStorage.getItem('aquacore-last-order')||'null');
+  if(last&&folio&&String(last.id)===String(folio)&&last.d?.email){
+    $('#email').value=last.d.email;
+    lookup();
+  }
+}catch{}
+</script>
+</body>
+</html>
