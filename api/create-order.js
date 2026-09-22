@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { dbConfigured, upsertOrder, updateOrderByFolio, getInventoryByIds, getShippingProfilesByIds } from './_db.js';
+import { dbConfigured, upsertOrder, updateOrderByFolio, getInventoryByIds, getShippingProfilesByIds, getOrderByFolio } from './_db.js';
 import { skydropxConfigured, createQuotation, getCompletedQuotation, normalizeRates, validateRate } from '../lib/skydropx.js';
 
 const FREE_SHIPPING = 5000;
@@ -182,6 +182,62 @@ export default async function handler(req,res){
           products:err.products||[]
         });
       }
+    }
+
+    if(action==='track_order'){
+      if(!dbConfigured()) return res.status(503).json({error:'Seguimiento temporalmente no disponible'});
+      const folio=String(req.body?.folio||'').trim();
+      const email=String(req.body?.email||'').trim().toLowerCase();
+      if(!folio||!email) return res.status(400).json({error:'Captura folio y correo de compra'});
+
+      const order=await getOrderByFolio(folio);
+      const hiddenStatuses=new Set(['inventory','shipping_profile']);
+      if(!order||hiddenStatuses.has(String(order.payment_status||'').toLowerCase())){
+        return res.status(404).json({error:'No encontramos un pedido con esos datos'});
+      }
+      if(String(order.customer_email||'').trim().toLowerCase()!==email){
+        return res.status(404).json({error:'No encontramos un pedido con esos datos'});
+      }
+
+      const rawItems=Array.isArray(order.items)?order.items:[];
+      const fulfillment=rawItems.find(x=>x&&x._type==='fulfillment')||{};
+      const shippingMeta=rawItems.find(x=>x&&x._type==='shipping')||{};
+      const productItems=rawItems.filter(x=>x&&!x._type).map(x=>({
+        name:String(x.name||'Producto'),
+        code:String(x.code||''),
+        qty:Number(x.qty||1)
+      }));
+
+      const payment=String(order.payment_status||'pending').toLowerCase();
+      const admin=String(order.admin_status||'active').toLowerCase();
+      let status=String(fulfillment.status||'').toLowerCase();
+      if(admin==='canceled') status='canceled';
+      else if(['failed','canceled','cancelled','rejected'].includes(payment)) status='payment_issue';
+      else if(['approved','paid','processed'].includes(payment) && !status) status='to_fulfill';
+      else if(!status) status='payment_pending';
+
+      return res.status(200).json({
+        ok:true,
+        order:{
+          folio:String(order.folio||''),
+          customer_name:String(order.customer_name||''),
+          city:String(order.city||''),
+          state:String(order.state||''),
+          created_at:order.created_at||null,
+          paid_at:order.paid_at||null,
+          updated_at:order.updated_at||null,
+          payment_status:payment,
+          status,
+          carrier:String(fulfillment.carrier||shippingMeta.carrier||''),
+          service:String(shippingMeta.service||''),
+          tracking_number:String(fulfillment.tracking_number||''),
+          tracking_url:String(fulfillment.tracking_url||''),
+          shipping_amount:Number(order.shipping_amount||0),
+          shipping_status:String(order.shipping_status||''),
+          total:Number((Number(order.subtotal||0)+Number(order.shipping_amount||0)).toFixed(2)),
+          items:productItems
+        }
+      });
     }
 
     if(!accessToken)return res.status(503).json({error:'Pago en línea aún no activado',code:'PAYMENTS_NOT_CONFIGURED'});
