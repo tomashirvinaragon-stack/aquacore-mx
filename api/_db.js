@@ -56,6 +56,12 @@ export async function listOrders(limit=500){
   return request(`orders?select=*&order=created_at.desc&limit=${n}`);
 }
 
+export async function getOrderByFolio(folio){
+  if(!folio) return null;
+  const rows=await request(`orders?select=*&folio=eq.${encodeURIComponent(String(folio))}&limit=1`);
+  return Array.isArray(rows)?rows[0]||null:null;
+}
+
 export async function listOrdersAll({from,to,max=20000}={}){
   const pageSize=1000;
   const cap=Math.max(1,Math.min(50000,Number(max)||20000));
