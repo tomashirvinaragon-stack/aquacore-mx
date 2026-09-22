@@ -2,8 +2,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { skydropxConfigured, createQuotation, getCompletedQuotation, normalizeRates } from './_skydropx.js';
 
-function loadJson(file){
-  return JSON.parse(fs.readFileSync(path.join(process.cwd(),file),'utf8'));
+function loadProducts(){
+  return JSON.parse(fs.readFileSync(path.join(process.cwd(),'data','products.json'),'utf8'));
+}
+
+function loadShippingProfiles(){
+  return JSON.parse(fs.readFileSync(path.join(process.cwd(),'data','shipping-profiles.json'),'utf8'));
 }
 
 function cleanZip(value){
@@ -86,8 +90,8 @@ export default async function handler(req,res){
       });
     }
 
-    const products=loadJson('data/products.json');
-    const profiles=loadJson('data/shipping-profiles.json');
+    const products=loadProducts();
+    const profiles=loadShippingProfiles();
     const {parcels,missing}=buildParcels(lines,products,profiles);
 
     if(missing.length){
