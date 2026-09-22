@@ -1,6 +1,7 @@
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const PHONE='526442127571', FREE_SHIPPING=5000;
 let PRODUCTS=[],activeCat='Todos',search='',sort='featured',pendingWhatsApp='';
+let selectedShippingRate=null,shippingQuoteId=null;
 let cart=JSON.parse(localStorage.getItem('aquacore-cart-v2')||'{}');
 const fmt=n=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'}).format(n);
 const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
@@ -171,6 +172,56 @@ const POLICIES={
   terms:'<span class="eyebrow">POLÍTICA</span><h2>Términos de compra</h2><p>Los precios publicados se muestran en MXN como precios netos. La disponibilidad está sujeta a confirmación y puede depender del punto de distribución.</p><p>En pedidos de $5,000 MXN o más, el checkout puede continuar a Mercado Pago con envío gratis conforme a la política comercial vigente. En pedidos menores se calcula el flete antes de cobrar.</p><p>Las especificaciones mostradas buscan facilitar la selección del producto; para aplicaciones críticas, compatibilidad de equipos o dimensionamiento de aireación, se recomienda confirmar con un asesor antes de comprar.</p>'
 };
 
+
+function clearShippingQuote(){
+  selectedShippingRate=null;
+  shippingQuoteId=null;
+  const box=$('#shippingQuoteBox');
+  if(box){box.hidden=true;box.innerHTML='';}
+}
+
+function renderShippingRates(out){
+  const box=$('#shippingQuoteBox');
+  const rates=Array.isArray(out?.rates)?out.rates:[];
+  shippingQuoteId=String(out?.quotationId||'');
+  selectedShippingRate=null;
+  box.hidden=false;
+  box.innerHTML=`<h3>Elige tu envío</h3><p>Selecciona la opción que prefieras. La tarifa se vuelve a validar antes de cobrar.</p><div class="shipping-rate-list">${rates.map((r,i)=>`
+    <label class="shipping-rate">
+      <input type="radio" name="shipping_rate" value="${i}">
+      <span class="shipping-rate-copy"><strong>${esc(r.carrier)} · ${esc(r.service)}</strong><small>${r.days?esc(r.days+' día(s) estimados'):'Tiempo por confirmar'}</small></span>
+      <span class="shipping-rate-price">${fmt(Number(r.amount||0))}</span>
+    </label>`).join('')}</div>`;
+
+  box.querySelectorAll('input[name="shipping_rate"]').forEach(input=>{
+    input.onchange=()=>{
+      const rate=rates[Number(input.value)];
+      if(!rate)return;
+      selectedShippingRate={...rate,quotationId:shippingQuoteId};
+      const sub=subtotal();
+      $('#orderMini').innerHTML=`<strong>${lines().reduce((s,x)=>s+x.qty,0)} artículo(s) · ${fmt(sub+Number(rate.amount||0))}</strong><br>Productos ${fmt(sub)} + envío ${fmt(Number(rate.amount||0))}`;
+      $('#paymentNotice').textContent='Tarifa seleccionada. Al continuar, AquaCore vuelve a validar el importe antes de abrir Mercado Pago.';
+      $('#submitOrderBtn').textContent='Continuar al pago';
+    };
+  });
+}
+
+async function requestShippingRates(customer){
+  const r=await fetch('/api/shipping-rates',{
+    method:'POST',
+    headers:{'content-type':'application/json'},
+    body:JSON.stringify({customer,lines:lines().map(x=>({id:x.p.id,qty:x.qty}))})
+  });
+  const out=await r.json().catch(()=>({}));
+  if(!r.ok){
+    const err=new Error(out.error||'No fue posible cotizar el envío');
+    err.code=out.code||'SHIPPING_QUOTE_ERROR';
+    err.products=out.products||[];
+    throw err;
+  }
+  return out;
+}
+
 async function init(){
   const [catalog,inventoryOut,mercuryOut]=await Promise.all([
     fetch('data/products.json',{cache:'no-store'}).then(r=>r.json()),
@@ -216,8 +267,11 @@ async function init(){
       return;
     }
     closeCart();
+    clearShippingQuote();
     const checkoutLines=lines(),checkoutValue=Number(subtotal().toFixed(2));
-    $('#orderMini').innerHTML=`<strong>${checkoutLines.reduce((s,x)=>s+x.qty,0)} artículo(s) · ${fmt(checkoutValue)}</strong><br>${checkoutValue>=FREE_SHIPPING?'Envío gratis':'Envío por calcular'}`;
+    $('#orderMini').innerHTML=`<strong>${checkoutLines.reduce((s,x)=>s+x.qty,0)} artículo(s) · ${fmt(checkoutValue)}</strong><br>${checkoutValue>=FREE_SHIPPING?'Envío gratis':'Envío por cotizar'}`;
+    $('#paymentNotice').textContent=checkoutValue>=FREE_SHIPPING?'Tu compra tiene envío gratis. Puedes continuar a Mercado Pago.':'Captura tu dirección y AquaCore cotizará las paqueterías disponibles antes de cobrar.';
+    $('#submitOrderBtn').textContent=checkoutValue>=FREE_SHIPPING?'Continuar al pago':'Cotizar envío';
     window.aquaMeta?.('InitiateCheckout',{
       content_ids:checkoutLines.map(x=>String(x.p.id)),
       contents:checkoutLines.map(x=>({id:String(x.p.id),quantity:Number(x.qty),item_price:Number(x.p.price)})),
@@ -243,12 +297,27 @@ async function init(){
     pendingWhatsApp=`https://wa.me/${PHONE}?text=${encodeURIComponent(orderMsg(d,id))}`;
     localStorage.setItem('aquacore-last-order',JSON.stringify({id,d,lines:lines().map(x=>({id:x.p.id,qty:x.qty})),sub}));
 
-    if(sub<FREE_SHIPPING){
-      $('#checkoutDialog').close();
-      $('#successTitle').textContent='Falta calcular el envío';
-      $('#successCopy').textContent=`Tu folio es ${id}. Tu compra es de ${fmt(sub)}. Te ayudamos a calcular el flete antes de cobrar.`;
-      $('#successWa').textContent='Cotizar envío por WhatsApp';
-      $('#successDialog').showModal();
+    if(sub<FREE_SHIPPING&&!selectedShippingRate){
+      btn.disabled=true;
+      btn.textContent='Cotizando envío…';
+      try{
+        const out=await requestShippingRates(d);
+        renderShippingRates(out);
+        $('#paymentNotice').textContent='Selecciona una paquetería y después continúa al pago.';
+        toast('Ya encontramos opciones de envío');
+      }catch(err){
+        console.error('Shipping quote:',err);
+        const missing=Array.isArray(err.products)&&err.products.length
+          ? ' Falta configurar empaque: '+err.products.slice(0,3).map(x=>x.name).join(', ')+(err.products.length>3?'…':'')
+          : '';
+        const box=$('#shippingQuoteBox');
+        box.hidden=false;
+        box.innerHTML=`<h3>No pudimos cotizar automáticamente</h3><p class="shipping-error">${esc(err.message+missing)}</p><p>Tu carrito sigue intacto. Puedes consultar el flete por WhatsApp mientras terminamos de configurar este producto.</p>`;
+        $('#paymentNotice').textContent='No se realizará ningún cobro sin una tarifa de envío confirmada.';
+        btn.textContent='Reintentar cotización';
+      }finally{
+        btn.disabled=false;
+      }
       return;
     }
 
@@ -258,10 +327,20 @@ async function init(){
       const r=await fetch('/api/create-order',{
         method:'POST',
         headers:{'content-type':'application/json'},
-        body:JSON.stringify({orderId:id,customer:d,lines:lines().map(x=>({id:x.p.id,qty:x.qty}))})
+        body:JSON.stringify({
+          orderId:id,
+          customer:d,
+          lines:lines().map(x=>({id:x.p.id,qty:x.qty})),
+          shipping:sub<FREE_SHIPPING?selectedShippingRate:null
+        })
       });
       const out=await r.json().catch(()=>({}));
       if(!r.ok||!out.checkoutUrl){
+        if(out.code==='SHIPPING_REQUIRED'||out.code==='SHIPPING_RATE_INVALID'||out.code==='SHIPPING_CURRENCY_INVALID'){
+          const shippingErr=new Error(out.error||'La tarifa de envío debe volver a cotizarse.');
+          shippingErr.code=out.code;
+          throw shippingErr;
+        }
         if(out.code==='OUT_OF_STOCK'){
           const available=Number.isFinite(Number(out.available))?` Disponibles: ${Number(out.available)}.`:'';
           const stockErr=new Error(`${out.error||'La existencia cambió antes del pago.'}${available}`);
@@ -286,7 +365,12 @@ async function init(){
     }catch(err){
       console.error('Checkout:',err);
       $('#checkoutDialog').close();
-      if(err.code==='OUT_OF_STOCK'){
+      if(err.code==='SHIPPING_REQUIRED'||err.code==='SHIPPING_RATE_INVALID'||err.code==='SHIPPING_CURRENCY_INVALID'){
+        clearShippingQuote();
+        $('#successTitle').textContent='Actualiza tu envío';
+        $('#successCopy').textContent=`${err.message} No se realizó ningún cobro.`;
+        $('#successWa').textContent='Consultar envío por WhatsApp';
+      }else if(err.code==='OUT_OF_STOCK'){
         $('#successTitle').textContent='Inventario actualizado';
         $('#successCopy').textContent=`${err.message} Ajusta tu carrito antes de continuar.`;
         $('#successWa').textContent='Consultar disponibilidad por WhatsApp';
@@ -311,6 +395,18 @@ async function init(){
       btn.textContent='Continuar al pago';
     }
   };
+
+  ['address','city','state','neighborhood','zip'].forEach(name=>{
+    const input=$('#checkoutForm')?.elements?.[name];
+    if(input) input.addEventListener('input',()=>{
+      if(!selectedShippingRate)return;
+      clearShippingQuote();
+      const sub=subtotal();
+      $('#orderMini').innerHTML=`<strong>${lines().reduce((s,x)=>s+x.qty,0)} artículo(s) · ${fmt(sub)}</strong><br>Envío por cotizar`;
+      $('#paymentNotice').textContent='Cambió la dirección. Cotiza nuevamente el envío antes de pagar.';
+      $('#submitOrderBtn').textContent='Cotizar envío';
+    });
+  });
 
   $('#successWa').onclick=()=>pendingWhatsApp&&window.open(pendingWhatsApp,'_blank');
   $$('[data-close]').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.close).close());
