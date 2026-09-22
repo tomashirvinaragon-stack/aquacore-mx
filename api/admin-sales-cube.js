@@ -96,12 +96,16 @@ export default async function handler(req,res){
     const productMap=new Map(loadProducts().map(p=>[Number(p.id),p]));
     const all=await listOrdersAll({from,to,max:50000});
 
-    const periodOrders=(Array.isArray(all)?all:[]).filter(o=>
-      String(o.payment_status||'').toLowerCase()!=='inventory' &&
-      !String(o.folio||'').startsWith('INV-') &&
-      String(o.admin_status||'active').toLowerCase()!=='canceled' &&
-      (payment==='all' || paymentState(o.payment_status)===payment)
-    );
+    const periodOrders=(Array.isArray(all)?all:[]).filter(o=>{
+      const status=String(o.payment_status||'').toLowerCase();
+      const folio=String(o.folio||'');
+      return status!=='inventory' &&
+        status!=='shipping_profile' &&
+        !folio.startsWith('INV-') &&
+        !folio.startsWith('SHIP-') &&
+        String(o.admin_status||'active').toLowerCase()!=='canceled' &&
+        (payment==='all' || paymentState(o.payment_status)===payment);
+    });
 
     const facets={
       states:[...new Set(periodOrders.map(o=>String(o.state||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es')),
