@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { dbConfigured, listInventory, upsertInventoryItem } from './_db.js';
+import { dbConfigured, listInventory, upsertInventoryItem, listShippingProfiles, upsertShippingProfile } from './_db.js';
 
 function loadProducts(){
   const file=path.join(process.cwd(),'data','products.json');
@@ -31,10 +31,12 @@ function authorized(req){
   return Boolean(expected&&supplied&&same(expected,supplied));
 }
 
-function merge(products,rows){
+function merge(products,rows,shippingProfiles=[]){
   const byId=new Map((Array.isArray(rows)?rows:[]).map(x=>[Number(x.product_id),x]));
+  const byShipping=new Map((Array.isArray(shippingProfiles)?shippingProfiles:[]).map(x=>[Number(x.product_id),x]));
   return products.map(p=>{
     const x=byId.get(Number(p.id));
+    const sp=byShipping.get(Number(p.id));
     return {
       id:Number(p.id),
       cat:p.cat,
@@ -48,7 +50,14 @@ function merge(products,rows){
       source_description:x?.source_description||'',
       source_file:x?.source_file||'',
       source_updated_at:x?.source_updated_at||null,
-      updated_at:x?.updated_at||null
+      updated_at:x?.updated_at||null,
+      shipping_profile_configured:Boolean(sp&&Number(sp.weight_kg)>0&&Number(sp.length_cm)>0&&Number(sp.width_cm)>0&&Number(sp.height_cm)>0),
+      weight_kg:sp?Number(sp.weight_kg||0):0,
+      length_cm:sp?Number(sp.length_cm||0):0,
+      width_cm:sp?Number(sp.width_cm||0):0,
+      height_cm:sp?Number(sp.height_cm||0):0,
+      units_per_parcel:sp?Number(sp.units_per_parcel||1):1,
+      shipping_updated_at:sp?.updated_at||null
     };
   });
 }
@@ -61,8 +70,12 @@ export default async function handler(req,res){
 
   try{
     if(req.method==='GET'){
-      const [products,rows]=await Promise.all([Promise.resolve(loadProducts()),listInventory()]);
-      return res.status(200).json({ok:true,products:merge(products,rows)});
+      const [products,rows,shippingProfiles]=await Promise.all([
+        Promise.resolve(loadProducts()),
+        listInventory(),
+        listShippingProfiles()
+      ]);
+      return res.status(200).json({ok:true,products:merge(products,rows,shippingProfiles)});
     }
 
     if(req.method==='POST'){
@@ -72,6 +85,23 @@ export default async function handler(req,res){
       const products=loadProducts();
       const p=products.find(x=>Number(x.id)===id);
       if(!p) return res.status(404).json({error:'Producto no encontrado'});
+
+      if(req.body?.action==='shipping_profile'){
+        const profile={
+          product_id:id,
+          product_name:p.name,
+          weight_kg:Math.max(0,Number(req.body?.weight_kg)||0),
+          length_cm:Math.max(0,Number(req.body?.length_cm)||0),
+          width_cm:Math.max(0,Number(req.body?.width_cm)||0),
+          height_cm:Math.max(0,Number(req.body?.height_cm)||0),
+          units_per_parcel:Math.max(1,Math.floor(Number(req.body?.units_per_parcel)||1))
+        };
+        if(!(profile.weight_kg>0&&profile.length_cm>0&&profile.width_cm>0&&profile.height_cm>0)){
+          return res.status(400).json({error:'Captura peso, largo, ancho y alto mayores a cero'});
+        }
+        const saved=await upsertShippingProfile(profile);
+        return res.status(200).json({ok:true,item:Array.isArray(saved)?saved[0]:saved});
+      }
 
       let stock=Math.max(0,Number(req.body?.stock)||0);
       const threshold=Math.max(0,Math.floor(Number(req.body?.low_stock_threshold)||0));
