@@ -1,6 +1,6 @@
 # Envíos automáticos — Skydropx
 
-Esta rama agrega el flujo para cotizar envíos nacionales antes del pago.
+La integración cotiza envíos nacionales antes del pago para pedidos menores a $5,000 MXN. En compras desde $5,000 MXN se conserva el envío gratis al cliente.
 
 ## Variables de entorno en Vercel
 
@@ -11,35 +11,30 @@ Esta rama agrega el flujo para cotizar envíos nacionales antes del pago.
 
 Las credenciales se obtienen en Skydropx > Conexiones > API.
 
-## Datos por producto
+## Empaque por producto
 
-`data/shipping-profiles.json` mantiene los datos de empaque separados del precio del catálogo.
+Los datos se administran desde `/envios.html` usando la misma contraseña del panel administrativo.
 
-Ejemplo:
+Por producto se captura:
 
-```json
-{
-  "2": {
-    "weight_kg": 0.55,
-    "length_cm": 25,
-    "width_cm": 25,
-    "height_cm": 5,
-    "units_per_parcel": 6
-  }
-}
-```
+- Peso total del paquete en kg.
+- Largo del paquete en cm.
+- Ancho del paquete en cm.
+- Alto del paquete en cm.
+- Piezas que caben en ese empaque.
 
-- `weight_kg`: peso por unidad.
-- `length_cm`, `width_cm`, `height_cm`: medidas del paquete.
-- `units_per_parcel`: cuántas unidades de ese producto entran en ese empaque.
+Los perfiles se guardan en la misma base de datos de AquaCore como registros internos y no aparecen en Pedidos ni en el Cubo de ventas.
 
-No se debe activar el cobro automático de flete para productos sin perfil real de empaque.
+## Flujo
 
-## Flujo esperado
+1. Cliente agrega productos al carrito.
+2. Si el subtotal es menor a $5,000 MXN, captura dirección, ciudad/municipio, estado, colonia y C.P.
+3. AquaCore obtiene los perfiles de empaque configurados.
+4. AquaCore consulta Skydropx.
+5. Muestra transportista, servicio, días estimados y precio.
+6. Cliente selecciona una tarifa.
+7. Antes de cobrar, el backend vuelve a validar la tarifa.
+8. El flete se agrega al total de Mercado Pago.
+9. La venta guarda paquetería, servicio, tarifa y costo real del flete.
 
-1. Cliente captura destino.
-2. AquaCore consulta Skydropx.
-3. Muestra transportista, servicio, días y precio.
-4. Cliente elige tarifa.
-5. Backend vuelve a validar la tarifa antes de crear la orden de Mercado Pago.
-6. En compras desde $5,000 MXN el envío sigue siendo gratis al cliente.
+Si falta el perfil de empaque de un producto, AquaCore no cobra un flete inventado: muestra que falta configuración y mantiene el carrito intacto.
