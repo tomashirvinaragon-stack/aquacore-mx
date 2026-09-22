@@ -56,6 +56,12 @@ export async function listOrders(limit=500){
   return request(`orders?select=*&order=created_at.desc&limit=${n}`);
 }
 
+export async function getOrderByFolio(folio){
+  if(!folio) return null;
+  const rows=await request(`orders?select=*&folio=eq.${encodeURIComponent(String(folio))}&limit=1`);
+  return Array.isArray(rows)?rows[0]||null:null;
+}
+
 export async function listOrdersAll({from,to,max=20000}={}){
   const pageSize=1000;
   const cap=Math.max(1,Math.min(50000,Number(max)||20000));
@@ -159,6 +165,78 @@ export async function getInventoryByIds(ids){
   const wanted=new Set((Array.isArray(ids)?ids:[]).map(Number).filter(Number.isFinite));
   if(!wanted.size) return [];
   const all=await listInventory();
+  return all.filter(x=>wanted.has(Number(x.product_id)));
+}
+
+function shippingProfileFolio(productId){
+  return `SHIP-${Number(productId)}`;
+}
+
+function shippingProfileRecord(item){
+  const now=new Date().toISOString();
+  const productId=Number(item.product_id);
+  const payload={
+    _type:'shipping_profile',
+    product_id:productId,
+    weight_kg:Math.max(0,Number(item.weight_kg)||0),
+    length_cm:Math.max(0,Number(item.length_cm)||0),
+    width_cm:Math.max(0,Number(item.width_cm)||0),
+    height_cm:Math.max(0,Number(item.height_cm)||0),
+    units_per_parcel:Math.max(1,Math.floor(Number(item.units_per_parcel)||1)),
+    updated_at:now
+  };
+  return {
+    folio:shippingProfileFolio(productId),
+    mp_order_id:null,
+    customer_name:String(item.product_name||'Empaque AquaCore').slice(0,250),
+    customer_email:null,
+    customer_phone:null,
+    address:null,
+    city:null,
+    state:null,
+    zip:null,
+    reference:null,
+    items:[payload],
+    subtotal:0,
+    shipping_amount:0,
+    shipping_status:'internal',
+    payment_status:'shipping_profile',
+    payment_status_detail:'shipping_profile',
+    payment_method:null,
+    currency:'MXN',
+    paid_at:null,
+    updated_at:now
+  };
+}
+
+function shippingProfileFromOrder(row){
+  const item=(Array.isArray(row?.items)?row.items:[]).find(x=>x&&x._type==='shipping_profile');
+  if(!item) return null;
+  return {
+    product_id:Number(item.product_id),
+    weight_kg:Math.max(0,Number(item.weight_kg)||0),
+    length_cm:Math.max(0,Number(item.length_cm)||0),
+    width_cm:Math.max(0,Number(item.width_cm)||0),
+    height_cm:Math.max(0,Number(item.height_cm)||0),
+    units_per_parcel:Math.max(1,Math.floor(Number(item.units_per_parcel)||1)),
+    updated_at:item.updated_at||row.updated_at||null
+  };
+}
+
+export async function listShippingProfiles(){
+  const rows=await request('orders?select=*&payment_status=eq.shipping_profile&order=folio.asc&limit=1000');
+  return (Array.isArray(rows)?rows:[]).map(shippingProfileFromOrder).filter(Boolean);
+}
+
+export async function upsertShippingProfile(item){
+  const rows=await upsertOrder(shippingProfileRecord(item));
+  return (Array.isArray(rows)?rows:[]).map(shippingProfileFromOrder).filter(Boolean);
+}
+
+export async function getShippingProfilesByIds(ids){
+  const wanted=new Set((Array.isArray(ids)?ids:[]).map(Number).filter(Number.isFinite));
+  if(!wanted.size) return [];
+  const all=await listShippingProfiles();
   return all.filter(x=>wanted.has(Number(x.product_id)));
 }
 

@@ -52,7 +52,7 @@ export default async function handler(req,res){
 
       if(action==='fulfillment'){
         const status=String(req.body?.fulfillment_status||'to_fulfill').toLowerCase();
-        const allowed=['to_fulfill','preparing','shipped','delivered'];
+        const allowed=['to_fulfill','preparing','shipped','in_transit','last_mile','delivery_attempt','exception','delivered','returned'];
         if(!allowed.includes(status)) return res.status(400).json({error:'Estado de entrega no válido'});
         const all=await listOrders(500);
         const current=(Array.isArray(all)?all:[]).find(o=>String(o.folio)===String(folio));
@@ -63,6 +63,7 @@ export default async function handler(req,res){
           status,
           carrier:String(req.body?.carrier||'').trim().slice(0,120),
           tracking_number:String(req.body?.tracking_number||'').trim().slice(0,180),
+          tracking_url:String(req.body?.tracking_url||'').trim().slice(0,1000),
           updated_at:now
         };
         patch={items:[...items,fulfillment]};
@@ -94,7 +95,11 @@ export default async function handler(req,res){
     const all=await listOrders(500);
     const status=String(req.query?.status||'all').toLowerCase();
     const q=String(req.query?.q||'').trim().toLowerCase();
-    const rows=(Array.isArray(all)?all:[]).filter(o=>String(o.payment_status||'').toLowerCase()!=='inventory'&&!String(o.folio||'').startsWith('INV-'));
+    const rows=(Array.isArray(all)?all:[]).filter(o=>{
+      const status=String(o.payment_status||'').toLowerCase();
+      const folio=String(o.folio||'');
+      return status!=='inventory'&&status!=='shipping_profile'&&!folio.startsWith('INV-')&&!folio.startsWith('SHIP-');
+    });
     const active=rows.filter(o=>adminState(o)!=='archived');
     const activeNotCanceled=active.filter(o=>adminState(o)!=='canceled');
     let orders;
