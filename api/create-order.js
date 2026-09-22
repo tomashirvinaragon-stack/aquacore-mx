@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { dbConfigured, upsertOrder, updateOrderByFolio, getInventoryByIds } from './_db.js';
+import { dbConfigured, upsertOrder, updateOrderByFolio, getInventoryByIds, getShippingProfilesByIds } from './_db.js';
 import { skydropxConfigured, createQuotation, getCompletedQuotation, normalizeRates, validateRate } from '../lib/skydropx.js';
 
 const FREE_SHIPPING = 5000;
@@ -15,11 +15,6 @@ function getBaseUrl(req){
   const proto=req.headers['x-forwarded-proto']||'https';
   const host=req.headers['x-forwarded-host']||req.headers.host;
   return `${proto}://${host}`;
-}
-
-function loadShippingProfiles(){
-  const file=path.join(process.cwd(),'data','shipping-profiles.json');
-  return JSON.parse(fs.readFileSync(file,'utf8'));
 }
 
 function cleanZip(value){
@@ -92,7 +87,8 @@ async function quoteShipping(customer,lines){
   }
 
   const products=loadProducts();
-  const profiles=loadShippingProfiles();
+  const rows=await getShippingProfilesByIds(lines.map(x=>x.id));
+  const profiles=Object.fromEntries((Array.isArray(rows)?rows:[]).map(x=>[String(x.product_id),x]));
   const {parcels,missing}=buildParcels(lines,products,profiles);
 
   if(missing.length){
