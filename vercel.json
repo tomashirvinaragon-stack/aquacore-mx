@@ -4,7 +4,10 @@
   "cleanUrls": true,
   "functions": {
     "api/*.js": {
-      "includeFiles": "data/products.json"
+      "includeFiles": [
+        "data/products.json",
+        "data/shipping-profiles.json"
+      ]
     }
   },
   "headers": [
