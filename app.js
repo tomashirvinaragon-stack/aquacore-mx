@@ -207,10 +207,10 @@ function renderShippingRates(out){
 }
 
 async function requestShippingRates(customer){
-  const r=await fetch('/api/shipping-rates',{
+  const r=await fetch('/api/create-order',{
     method:'POST',
     headers:{'content-type':'application/json'},
-    body:JSON.stringify({customer,lines:lines().map(x=>({id:x.p.id,qty:x.qty}))})
+    body:JSON.stringify({action:'quote_shipping',customer,lines:lines().map(x=>({id:x.p.id,qty:x.qty}))})
   });
   const out=await r.json().catch(()=>({}));
   if(!r.ok){
