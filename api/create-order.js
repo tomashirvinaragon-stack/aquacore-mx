@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { dbConfigured, upsertOrder, updateOrderByFolio, getInventoryByIds } from './_db.js';
+import { validateRate } from './_skydropx.js';
 
 const FREE_SHIPPING = 5000;
 
@@ -54,7 +55,7 @@ export default async function handler(req,res){
   try{
     if(!accessToken)return res.status(503).json({error:'Pago en línea aún no activado',code:'PAYMENTS_NOT_CONFIGURED'});
 
-    const {orderId,customer,lines}=req.body||{};
+    const {orderId,customer,lines,shipping}=req.body||{};
     if(!orderId||!customer?.email||!Array.isArray(lines)||!lines.length){
       return res.status(400).json({error:'Pedido incompleto'});
     }
@@ -125,26 +126,54 @@ export default async function handler(req,res){
 
     const subtotal=Number(clean.reduce((s,x)=>s+Number(x.p.price)*x.qty,0).toFixed(2));
 
+    let shippingAmount=0;
+    let shippingRate=null;
+
     if(subtotal<FREE_SHIPPING){
-      return res.status(409).json({
-        error:'El pedido requiere cálculo de envío antes de cobrar.',
-        code:'SHIPPING_REQUIRED',
-        subtotal,
-        missingForFreeShipping:Number((FREE_SHIPPING-subtotal).toFixed(2))
-      });
+      if(!shipping?.quotationId||!shipping?.rateId){
+        return res.status(409).json({
+          error:'Selecciona una tarifa de envío antes de pagar.',
+          code:'SHIPPING_REQUIRED',
+          subtotal,
+          missingForFreeShipping:Number((FREE_SHIPPING-subtotal).toFixed(2))
+        });
+      }
+      try{
+        shippingRate=await validateRate(String(shipping.quotationId),String(shipping.rateId));
+      }catch(err){
+        return res.status(409).json({
+          error:err.message||'La tarifa de envío ya no está disponible.',
+          code:err.code||'SHIPPING_RATE_INVALID'
+        });
+      }
+      if(String(shippingRate.currency||'MXN').toUpperCase()!=='MXN'){
+        return res.status(409).json({error:'La tarifa de envío no está en MXN.',code:'SHIPPING_CURRENCY_INVALID'});
+      }
+      shippingAmount=Number(Number(shippingRate.amount||0).toFixed(2));
+      if(!(shippingAmount>0)){
+        return res.status(409).json({error:'La tarifa de envío es inválida.',code:'SHIPPING_RATE_INVALID'});
+      }
     }
 
+    const grandTotal=Number((subtotal+shippingAmount).toFixed(2));
     const baseUrl=getBaseUrl(req);
-    const items=clean.map(({p,qty})=>({
-      title:String(p.name).slice(0,120),
-      quantity:qty,
-      unit_price:Number(p.price).toFixed(2)
-    }));
+    const items=[
+      ...clean.map(({p,qty})=>({
+        title:String(p.name).slice(0,120),
+        quantity:qty,
+        unit_price:Number(p.price).toFixed(2)
+      })),
+      ...(shippingAmount>0?[{
+        title:`Envío - ${String(shippingRate?.carrier||'Paquetería').slice(0,60)}`,
+        quantity:1,
+        unit_price:shippingAmount.toFixed(2)
+      }]:[])
+    ];
 
     const body={
       type:'online',
       processing_mode:'manual',
-      total_amount:subtotal.toFixed(2),
+      total_amount:grandTotal.toFixed(2),
       external_reference:String(orderId).slice(0,64),
       payer:{email:String(customer.email).trim()},
       items,
@@ -206,11 +235,20 @@ export default async function handler(req,res){
             unit_price:Number(p.price),
             total:Number((Number(p.price)*qty).toFixed(2))
           })),
+          ...(shippingRate?[{
+            _type:'shipping',
+            quotation_id:String(shippingRate.quotationId||shipping?.quotationId||''),
+            rate_id:String(shippingRate.rateId||shipping?.rateId||''),
+            carrier:shippingRate.carrier||null,
+            service:shippingRate.service||null,
+            days:shippingRate.days??null,
+            amount:shippingAmount
+          }]:[]),
           ...(invoice?[{_type:'invoice',required:true,...invoice}]:[])
         ],
         subtotal,
-        shipping_amount:0,
-        shipping_status:'free',
+        shipping_amount:shippingAmount,
+        shipping_status:shippingAmount>0?'quoted':'free',
         payment_status:'pending',
         payment_status_detail:'checkout_created',
         currency:'MXN',
@@ -227,7 +265,9 @@ export default async function handler(req,res){
       checkoutUrl:data.checkout_url,
       mercadoPagoOrderId:data.id,
       externalReference:orderId,
-      subtotal
+      subtotal,
+      shippingAmount,
+      total:grandTotal
     });
   }catch(err){
     console.error('Checkout error:',err);
