@@ -1,4 +1,4 @@
-const PHONE='526442127571';
+const PHONE='526442518189';
 const FREE_SHIPPING=5000;
 const NO_PRODUCT_IMAGE=new Set([78,80,85]);
 const catIcon={Blowers:'🌀',Aireadores:'🌊',Difusores:'⚫','Calidad de agua':'🧪','Redes y mallas':'🕸️',Procesamiento:'🔪',Protección:'🦺',Refacciones:'⚙️','Motores Mercury':'🚤'};
