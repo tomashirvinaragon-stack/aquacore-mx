@@ -309,7 +309,8 @@
       "Oxigenación",
       "Mezcla y circulación de agua"
     ],
-    "equipesca_code": "39405"
+    "equipesca_code": "39405",
+    "image": "https://equipesca.com/cdn/shop/files/download_0ad5383b-db62-4f9e-88be-b49931a201a8.png?v=1764014374&width=533"
   },
   {
     "id": 18,
@@ -440,7 +441,7 @@
       "Circulación y mezcla de agua"
     ],
     "equipesca_code": "55919",
-    "image": "/assets/products/splash-redondo.webp"
+    "image": "https://www.flojett.com/uploads/image/20250403/surge-splash-aerator_20250403135629.webp"
   },
   {
     "id": 24,
@@ -463,7 +464,7 @@
       "Circulación y mezcla de agua"
     ],
     "equipesca_code": "55921",
-    "image": "/assets/products/splash-redondo.webp"
+    "image": "https://www.flojett.com/uploads/image/20250403/surge-splash-aerator_20250403135629.webp"
   },
   {
     "id": 25,
@@ -486,7 +487,7 @@
       "Circulación y mezcla de agua"
     ],
     "equipesca_code": "55918",
-    "image": "/assets/products/splash-redondo.webp"
+    "image": "https://www.flojett.com/uploads/image/20250403/surge-splash-aerator_20250403135629.webp"
   },
   {
     "id": 26,
