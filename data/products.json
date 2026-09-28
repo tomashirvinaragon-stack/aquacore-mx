@@ -439,7 +439,8 @@
       "Oxigenación superficial",
       "Circulación y mezcla de agua"
     ],
-    "equipesca_code": "55919"
+    "equipesca_code": "55919",
+    "image": "/assets/products/splash-redondo.webp"
   },
   {
     "id": 24,
@@ -461,7 +462,8 @@
       "Oxigenación superficial",
       "Circulación y mezcla de agua"
     ],
-    "equipesca_code": "55921"
+    "equipesca_code": "55921",
+    "image": "/assets/products/splash-redondo.webp"
   },
   {
     "id": 25,
@@ -483,7 +485,8 @@
       "Oxigenación superficial",
       "Circulación y mezcla de agua"
     ],
-    "equipesca_code": "55918"
+    "equipesca_code": "55918",
+    "image": "/assets/products/splash-redondo.webp"
   },
   {
     "id": 26,
@@ -504,7 +507,8 @@
       "Oxigenación superficial",
       "Circulación y mezcla de agua"
     ],
-    "equipesca_code": "55923"
+    "equipesca_code": "55923",
+    "image": "/assets/products/splash-cuadrado.webp"
   },
   {
     "id": 27,
@@ -525,7 +529,8 @@
       "Oxigenación superficial",
       "Circulación y mezcla de agua"
     ],
-    "equipesca_code": "55924"
+    "equipesca_code": "55924",
+    "image": "/assets/products/splash-cuadrado.webp"
   },
   {
     "id": 28,
