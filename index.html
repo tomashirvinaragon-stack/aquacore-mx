@@ -10,7 +10,7 @@
   <meta property="og:type" content="website">
   <title>AquaCore MX | Equipos para acuacultura y pesca</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="robots" content="noindex,nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -31,7 +31,7 @@
       <a href="#calculadora">Calcula tu sistema</a>
       <a href="#cobertura">Cobertura</a>
       <a href="#faq">Preguntas</a>
-      <a href="#contacto">Contacto</a>
+      <a href="#contacto">Contacto</a><a href="/tracking">Mis pedidos</a>
     </nav>
     <button class="cart-button" id="cartButton" aria-label="Abrir carrito"><span>Carrito</span><b id="cartCount">0</b></button>
   </header>
@@ -194,10 +194,10 @@
 
   <dialog id="policyDialog" class="policy-dialog"><button class="dialog-close" data-close="policyDialog" aria-label="Cerrar">×</button><div id="policyBody"></div></dialog>
 
-  <dialog id="successDialog" class="success-dialog"><button class="dialog-close" data-close="successDialog" aria-label="Cerrar">×</button><div class="success-icon">✓</div><h2 id="successTitle">Pedido generado</h2><p id="successCopy"></p><button class="btn primary full" id="successWa">Continuar por WhatsApp</button></dialog>
+  <dialog id="successDialog" class="success-dialog"><button class="dialog-close" data-close="successDialog" aria-label="Cerrar">×</button><div class="success-icon">✓</div><h2 id="successTitle">Pedido generado</h2><p id="successCopy"></p><button class="btn primary full" id="successWa">Continuar por WhatsApp</button><a id="successTracking" class="btn secondary full" href="/tracking" hidden>Ver mi pedido</a></dialog>
 
   <a class="whatsapp-float" href="https://wa.me/526442518189?text=Hola%20AquaCore%20MX" target="_blank" rel="noopener" aria-label="WhatsApp">WA</a>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="app.js?v=20260918motors1"></script>
+  <script type="module" src="app.js?v=20261001"></script>
 </body>
 </html>

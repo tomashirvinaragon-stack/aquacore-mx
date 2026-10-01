@@ -1,5 +1,6 @@
 // AquaCore MX - Meta Pixel
 (function(w,d){
+  if(w.location.hostname!=='aquacore-mx.vercel.app')return;
   const PIXEL_ID='3016758178709736';
   if(w.__aquacoreMetaPixelLoaded) return;
   w.__aquacoreMetaPixelLoaded=true;

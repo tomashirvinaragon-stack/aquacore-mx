@@ -96,7 +96,7 @@
     function fulfillmentInfo(o){
       const f=(Array.isArray(o.items)?o.items:[]).find(x=>x&&x._type==='fulfillment')||{};
       const status=String(f.status||'to_fulfill').toLowerCase();
-      const labels={to_fulfill:'Por surtir',preparing:'Preparando',shipped:'Enviado',delivered:'Entregado'};
+      const labels={to_fulfill:'Por surtir',preparing:'Preparando',shipped:'Enviado',in_transit:'En tránsito',last_mile:'En ruta',delivery_attempt:'Intento de entrega',exception:'Incidencia',returned:'Devolución',delivered:'Entregado'};
       return {...f,status,label:labels[status]||'Por surtir'};
     }
     function whatsappUrl(o){
@@ -128,7 +128,8 @@
         action:'fulfillment',
         fulfillment_status:$('#fulfillmentStatus')?.value||'to_fulfill',
         carrier:$('#carrier')?.value||'',
-        tracking_number:$('#trackingNumber')?.value||''
+        tracking_number:$('#trackingNumber')?.value||'',
+        tracking_url:$('#trackingUrl')?.value||''
       };
       const r=await fetch('/api/admin-orders',{
         method:'POST',
@@ -185,7 +186,7 @@
       const rawItems=Array.isArray(o.items)?o.items:[];
       const invoice=rawItems.find(x=>x&&x._type==='invoice')||null;
       const fulfillment=fulfillmentInfo(o);
-      const items=rawItems.filter(x=>!x||!['invoice','fulfillment'].includes(x._type));
+      const items=rawItems.filter(x=>x&&!x._type);
       const admin=String(o.admin_status||'active').toLowerCase();
       const wa=whatsappUrl(o);
       const paid=['approved','paid','processed'].includes(String(o.payment_status||'').toLowerCase());
@@ -198,9 +199,11 @@
           (invoice?'<div class="box" style="grid-column:1/-1"><small>Datos de facturación</small><b>RFC: '+esc(invoice.rfc||'—')+'</b><br>'+esc(invoice.name||'')+'<br>Régimen: '+esc(invoice.tax_regime||'—')+'<br>Uso CFDI: '+esc(invoice.cfdi_use||'—')+'<br>C.P. fiscal: '+esc(invoice.zip||'—')+'</div>':'')+
         '</div>'+
         '<div class="fulfill"><h3>Seguimiento de entrega</h3><div class="fulfill-grid">'+
-          '<label>Estado<select id="fulfillmentStatus"><option value="to_fulfill" '+(fulfillment.status==='to_fulfill'?'selected':'')+'>Por surtir</option><option value="preparing" '+(fulfillment.status==='preparing'?'selected':'')+'>Preparando</option><option value="shipped" '+(fulfillment.status==='shipped'?'selected':'')+'>Enviado</option><option value="delivered" '+(fulfillment.status==='delivered'?'selected':'')+'>Entregado</option></select></label>'+
+          '<label>Estado<select id="fulfillmentStatus"><option value="to_fulfill" '+(fulfillment.status==='to_fulfill'?'selected':'')+'>Por surtir</option><option value="preparing" '+(fulfillment.status==='preparing'?'selected':'')+'>Preparando</option><option value="shipped" '+(fulfillment.status==='shipped'?'selected':'')+'>Enviado</option><option value="in_transit" '+(fulfillment.status==='in_transit'?'selected':'')+'>En tránsito</option><option value="last_mile" '+(fulfillment.status==='last_mile'?'selected':'')+'>En ruta</option><option value="exception" '+(fulfillment.status==='exception'?'selected':'')+'>Incidencia</option><option value="delivery_attempt" '+(fulfillment.status==='delivery_attempt'?'selected':'')+'>Intento de entrega</option><option value="returned" '+(fulfillment.status==='returned'?'selected':'')+'>Devolución</option><option value="delivered" '+(fulfillment.status==='delivered'?'selected':'')+'>Entregado</option></select></label>'+
           '<label>Paquetería<input id="carrier" value="'+esc(fulfillment.carrier||'')+'" placeholder="Ej. Estafeta, DHL, ocurre..."></label>'+
           '<label style="grid-column:1/-1">Número de guía<input id="trackingNumber" value="'+esc(fulfillment.tracking_number||'')+'" placeholder="Número de guía o referencia de envío"></label>'+
+          '<label style="grid-column:1/-1">Enlace de rastreo<input id="trackingUrl" type="url" value="'+esc(fulfillment.tracking_url||'')+'" placeholder="https://..."></label>'+
+          '<a href="/tracking?folio='+encodeURIComponent(o.folio)+'" target="_blank" rel="noopener">Ver seguimiento del cliente</a>'+
         '</div><button class="smallbtn primary" id="saveFulfillment" style="margin-top:12px">Guardar seguimiento</button></div>'+
         '<div class="items">'+items.map(x=>'<div class="item"><div><b>'+esc(x.name||'Producto')+'</b><div class="muted">'+esc(x.code||'')+' · '+esc(x.qty)+' x '+money(x.unit_price)+'</div></div><b>'+money(x.total)+'</b></div>').join('')+'</div>'+
         '<div style="display:flex;justify-content:space-between;margin-top:16px;font-size:20px"><b>Total</b><b>'+money(Number(o.subtotal||0)+Number(o.shipping_amount||0))+'</b></div>'+

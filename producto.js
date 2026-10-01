@@ -1,3 +1,4 @@
+import {readCart,imagePath,requiresConfirmation,stockInfo,isSoldOut} from './storefront.js';
 const PHONE='526442518189';
 const FREE_SHIPPING=5000;
 const NO_PRODUCT_IMAGE=new Set([78,80,85]);
@@ -5,35 +6,9 @@ const catIcon={Blowers:'🌀',Aireadores:'🌊',Difusores:'⚫','Calidad de agua
 const fmt=n=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'}).format(n);
 const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 const slugify=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
-const imagePath=p=>{
-  if(p.image) return p.image.startsWith('/')?p.image:'/'+p.image;
-  if(p.cat==='Blowers') return '/assets/products/blower-pulsar.webp';
-  return `/api/equipesca-image?name=${encodeURIComponent(p.name)}&code=${encodeURIComponent(p.code||'')}&v=20260917b`;
-};
-const productUrl=p=>`${location.origin}/productos/${slugify(p.name)}-${p.id}`;
+
+const productUrl=p=>`${location.origin}/producto?id=${p.id}`;
 const toast=t=>{const x=document.querySelector('#productToast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1800)};
-function requiresConfirmation(p){
-  if(p.cat!=='Motores Mercury') return false;
-  if(p.stockManaged) return Number(p.stock)===1;
-  return Boolean(p.availabilityKnown&&p.shopAvailable);
-}
-function stockInfo(p){
-  if(p.stockManaged){
-    if(Number(p.stock)<=0)return{className:'stock-out',label:'Agotado'};
-    if(requiresConfirmation(p))return{className:'stock-unknown',label:'Disponibilidad por confirmar'};
-    if(Number(p.stock)<=Number(p.lowStockThreshold||0))return{className:'stock-low',label:'Pocas piezas'};
-    return{className:'stock-ok',label:'Disponible'};
-  }
-  if(p.availabilityKnown)return p.shopAvailable
-    ?{className:'stock-unknown',label:'Disponibilidad por confirmar'}
-    :{className:'stock-out',label:'Agotado'};
-  return{className:'stock-unknown',label:'Disponibilidad por confirmar'};
-}
-function isSoldOut(p){
-  return p.stockManaged
-    ? Number(p.stock)<=0
-    : Boolean(p.availabilityKnown&&!p.shopAvailable);
-}
 function stockUpdatedLabel(p){
   if(!p.stockUpdatedAt)return'';
   const d=new Date(p.stockUpdatedAt);
@@ -54,7 +29,7 @@ function productImage(p){
   return `<img class="single-product-photo" src="${esc(imagePath(p))}" alt="${esc(p.name)}" decoding="async" onerror="this.style.display='none'">${fallback}`;
 }
 function addToCart(p){
-  const cart=JSON.parse(localStorage.getItem('aquacore-cart-v2')||'{}');
+  const cart=readCart();
   const current=Number(cart[p.id]||0);
   if(isSoldOut(p)){toast('Producto agotado');return}
   if(requiresConfirmation(p)){toast('Confirma existencia antes de comprar');whatsapp(p);return}
@@ -63,6 +38,7 @@ function addToCart(p){
   localStorage.setItem('aquacore-cart-v2',JSON.stringify(cart));
   window.aquaMeta?.('AddToCart',{content_ids:[String(p.id)],content_name:p.name,content_type:'product',value:Number(p.price),currency:'MXN'});
   toast('Producto agregado al carrito');
+  document.querySelector('.product-cart-link').textContent='Ver carrito ('+Object.values(cart).reduce((a,b)=>a+b,0)+')';
 }
 function whatsapp(p){
   const msg=`Hola AquaCore MX. Me interesa: ${p.name} (${p.code||'sin código'}) - ${fmt(p.price)}.\n${productUrl(p)}`;

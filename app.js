@@ -1,14 +1,15 @@
+import {readCart,imagePath,requiresConfirmation,stockInfo,isSoldOut} from './storefront.js';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const PHONE='526442518189', FREE_SHIPPING=5000;
 let PRODUCTS=[],activeCat='Todos',search='',sort='featured',pendingWhatsApp='';
-let cart=JSON.parse(localStorage.getItem('aquacore-cart-v2')||'{}');
+let cart=readCart();
 const fmt=n=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'}).format(n);
 const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 const slugify=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
 const productUrl=p=>`${location.origin}/producto?id=${p.id}`;
 const catIcon={Blowers:'🌀',Aireadores:'🌊',Difusores:'⚫','Calidad de agua':'🧪','Redes y mallas':'🕸️',Procesamiento:'🔪',Protección:'🦺',Refacciones:'⚙️','Motores Mercury':'🚤'};
 const NO_PRODUCT_IMAGE=new Set([78,80,85]);
-const imagePath=p=>p.image||(p.cat==='Blowers'?'/assets/products/blower-pulsar.webp':`/api/equipesca-image?name=${encodeURIComponent(p.name)}&code=${encodeURIComponent(p.code||'')}&v=20260917b`);
+
 function productImage(p,detail=false){
   const cls=detail?'product-detail-photo':'product-photo';
   const fallback=detail?'product-detail-fallback':'symbol';
@@ -17,28 +18,6 @@ function productImage(p,detail=false){
 }
 
 function toast(t){const x=$('#toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1800)}
-function requiresConfirmation(p){
-  if(p.cat!=='Motores Mercury') return false;
-  if(p.stockManaged) return Number(p.stock)===1;
-  return Boolean(p.availabilityKnown&&p.shopAvailable);
-}
-function stockInfo(p){
-  if(p.stockManaged){
-    if(Number(p.stock)<=0)return{className:'stock-out',label:'Agotado'};
-    if(requiresConfirmation(p))return{className:'stock-unknown',label:'Disponibilidad por confirmar'};
-    if(Number(p.stock)<=Number(p.lowStockThreshold||0))return{className:'stock-low',label:'Pocas piezas'};
-    return{className:'stock-ok',label:'Disponible'};
-  }
-  if(p.availabilityKnown)return p.shopAvailable
-    ?{className:'stock-unknown',label:'Disponibilidad por confirmar'}
-    :{className:'stock-out',label:'Agotado'};
-  return{className:'stock-unknown',label:'Disponibilidad por confirmar'};
-}
-function isSoldOut(p){
-  return p.stockManaged
-    ? Number(p.stock)<=0
-    : Boolean(p.availabilityKnown&&!p.shopAvailable);
-}
 function stockUpdatedLabel(p){
   if(!p.stockUpdatedAt)return'';
   const d=new Date(p.stockUpdatedAt);
@@ -105,7 +84,7 @@ function detail(id){
   $('#productDialog').showModal();
   const modalAdd=$('[data-modal-add]');
   if(modalAdd) modalAdd.onclick=()=>{add(id,false);$('#productDialog').close()};
-  $('[data-modal-wa]').forEach(b=>b.onclick=()=>ask(+b.dataset.modalWa));
+  $$('[data-modal-wa]').forEach(b=>b.onclick=()=>ask(+b.dataset.modalWa));
 }
 function lines(){return Object.entries(cart).map(([id,qty])=>({p:PRODUCTS.find(x=>x.id===+id),qty})).filter(x=>x.p)}
 function subtotal(){return lines().reduce((s,x)=>s+x.p.price*x.qty,0)}
@@ -143,7 +122,7 @@ function renderCart(){
 }
 function openCart(){$('#cartDrawer').classList.add('open');$('#drawerBackdrop').classList.add('open');$('#cartDrawer').setAttribute('aria-hidden','false')}
 function closeCart(){$('#cartDrawer').classList.remove('open');$('#drawerBackdrop').classList.remove('open');$('#cartDrawer').setAttribute('aria-hidden','true')}
-function folio(){const d=new Date(),ymd=`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;return `ACMX-${ymd}-${Math.random().toString(36).slice(2,6).toUpperCase()}`}
+function folio(){const d=new Date(),ymd=`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;return `ACMX-${ymd}-${crypto.randomUUID().slice(0,8).toUpperCase()}`}
 function orderMsg(d,id){
   let m=`PEDIDO AQUACORE MX\nFolio: ${id}\n\nCLIENTE\nNombre: ${d.name}\nTel: ${d.phone}\nCorreo: ${d.email}\nEntrega: ${d.address}, ${d.city}, ${d.state}, C.P. ${d.zip}\nReferencia: ${d.reference||'-'}\n\nPRODUCTOS\n`;
   lines().forEach(({p,qty})=>m+=`• ${qty} x ${p.name} — ${fmt(p.price*qty)}\n`);
@@ -195,6 +174,7 @@ async function init(){
     };
   });
   renderCategories();renderFilters();renderProducts();renderCart();toggleShape();
+  if(new URLSearchParams(location.search).get('cart')==='open')openCart();
   $('#cartButton').onclick=openCart;
   $('#closeCart').onclick=closeCart;
   $('#drawerBackdrop').onclick=closeCart;
@@ -211,7 +191,7 @@ async function init(){
     const needsConfirmation=lines().find(x=>requiresConfirmation(x.p));
     if(needsConfirmation){
       closeCart();
-      toast('Confirma la existencia del motor antes de pagar');
+      toast('Confirma la existencia antes de pagar');
       ask(needsConfirmation.p.id);
       return;
     }
@@ -231,7 +211,8 @@ async function init(){
 
   $('#checkoutForm').onsubmit=async e=>{
     e.preventDefault();
-    const form=e.currentTarget,btn=$('#submitOrderBtn'),d=Object.fromEntries(new FormData(form)),id=folio(),sub=subtotal();
+    const form=e.currentTarget,btn=$('#submitOrderBtn'),d=Object.fromEntries(new FormData(form)),sub=subtotal();
+    let id=folio();
     d.invoice_required=d.invoice_required==='yes'?'yes':'no';
     if(d.invoice_required==='yes'){
       d.invoice_rfc=String(d.invoice_rfc||'').trim().toUpperCase();
@@ -240,20 +221,16 @@ async function init(){
       d.invoice_cfdi_use=String(d.invoice_cfdi_use||'').trim();
       d.invoice_zip=String(d.invoice_zip||'').trim();
     }
+    const checkoutLines=lines().map(x=>({id:x.p.id,qty:x.qty}));
+    try{
+      const previous=JSON.parse(localStorage.getItem('aquacore-last-order')||'null');
+      if(previous&&JSON.stringify(previous.d)===JSON.stringify(d)&&JSON.stringify(previous.lines)===JSON.stringify(checkoutLines)&&previous.sub===sub&&!localStorage.getItem('aquacore-confirmed-'+previous.id))id=previous.id;
+    }catch{}
     pendingWhatsApp=`https://wa.me/${PHONE}?text=${encodeURIComponent(orderMsg(d,id))}`;
     localStorage.setItem('aquacore-last-order',JSON.stringify({id,d,lines:lines().map(x=>({id:x.p.id,qty:x.qty})),sub}));
 
-    if(sub<FREE_SHIPPING){
-      $('#checkoutDialog').close();
-      $('#successTitle').textContent='Falta calcular el envío';
-      $('#successCopy').textContent=`Tu folio es ${id}. Tu compra es de ${fmt(sub)}. Te ayudamos a calcular el flete antes de cobrar.`;
-      $('#successWa').textContent='Cotizar envío por WhatsApp';
-      $('#successDialog').showModal();
-      return;
-    }
-
     btn.disabled=true;
-    btn.textContent='Conectando con Mercado Pago…';
+    btn.textContent=sub<FREE_SHIPPING?'Guardando pedido…':'Conectando con Mercado Pago…';
     try{
       const r=await fetch('/api/create-order',{
         method:'POST',
@@ -261,6 +238,16 @@ async function init(){
         body:JSON.stringify({orderId:id,customer:d,lines:lines().map(x=>({id:x.p.id,qty:x.qty}))})
       });
       const out=await r.json().catch(()=>({}));
+      if(r.ok&&out.shippingRequired){
+        $('#checkoutDialog').close();
+        $('#successTitle').textContent='Pedido registrado · envío por cotizar';
+        $('#successCopy').textContent=`Folio: ${out.externalReference}. Total de productos: ${fmt(out.subtotal)}. Confirmaremos el flete antes de cobrar.`;
+        $('#successWa').textContent='Cotizar envío por WhatsApp';
+        $('#successTracking').href='/tracking?folio='+encodeURIComponent(out.externalReference);
+        $('#successTracking').hidden=false;
+        $('#successDialog').showModal();
+        return;
+      }
       if(!r.ok||!out.checkoutUrl){
         if(out.code==='OUT_OF_STOCK'){
           const available=Number.isFinite(Number(out.available))?` Disponibles: ${Number(out.available)}.`:'';
@@ -286,6 +273,7 @@ async function init(){
     }catch(err){
       console.error('Checkout:',err);
       $('#checkoutDialog').close();
+      $('#successTracking').hidden=true;
       if(err.code==='OUT_OF_STOCK'){
         $('#successTitle').textContent='Inventario actualizado';
         $('#successCopy').textContent=`${err.message} Ajusta tu carrito antes de continuar.`;
