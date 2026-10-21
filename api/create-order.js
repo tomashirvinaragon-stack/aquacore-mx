@@ -79,7 +79,7 @@ export default async function handler(req,res){
       const id=Number(line.id);
       const qty=Math.max(1,Math.min(99,Number(line.qty)||1));
       const p=byId.get(id);
-      if(!p)return res.status(400).json({error:`Producto inválido: ${id}`});
+      if(!p||p.hidden)return res.status(400).json({error:`Producto no disponible: ${id}`});
       clean.push({p,qty});
     }
 
