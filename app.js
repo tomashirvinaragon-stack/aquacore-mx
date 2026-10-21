@@ -6,6 +6,20 @@ const fmt=n=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'}).fo
 const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 const slugify=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
 const productUrl=p=>`${location.origin}/producto?id=${p.id}`;
+// Meta Pixel: cookies del navegador para la API de Conversiones
+function metaCookies(){
+  const get=n=>{const m=document.cookie.match(new RegExp('(?:^|; )'+n+'=([^;]*)'));return m?decodeURIComponent(m[1]):null};
+  let fbc=get('_fbc');
+  if(!fbc){const c=new URLSearchParams(location.search).get('fbclid');if(c)fbc=`fb.1.${Date.now()}.${c}`}
+  return {fbp:get('_fbp'),fbc};
+}
+// Meta Pixel: clic a WhatsApp (con o sin producto)
+function metaContact(source,p){
+  const params=p
+    ?{content_name:p.name,content_ids:[String(p.id)],content_type:'product',value:Number(p.price),currency:'MXN',source}
+    :{source};
+  window.aquaMeta?.('Contact',params);
+}
 const catIcon={Blowers:'🌀',Aireadores:'🌊',Difusores:'⚫','Calidad de agua':'🧪','Redes y mallas':'🕸️',Procesamiento:'🔪',Protección:'🦺',Refacciones:'⚙️','Motores Mercury':'🚤'};
 const NO_PRODUCT_IMAGE=new Set([78,80,85]);
 const imagePath=p=>p.image||(p.cat==='Blowers'?'/assets/products/blower-pulsar.webp':`/api/equipesca-image?name=${encodeURIComponent(p.name)}&code=${encodeURIComponent(p.code||'')}&v=20260917b`);
@@ -83,6 +97,8 @@ function renderProducts(){
 }
 function ask(id){
   const p=PRODUCTS.find(x=>x.id===id);
+  if(!p)return;
+  metaContact('producto',p);
   window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(`Hola AquaCore MX. Me interesa: ${p.name} (${p.code||'sin código'}) - ${fmt(p.price)}.\n${productUrl(p)}`)}`,'_blank');
 }
 function detail(id){
@@ -103,9 +119,10 @@ function detail(id){
       : `<button class="btn primary" data-modal-add="${p.id}">Agregar al carrito</button>`;
   $('#productDialogBody').innerHTML=`<div class="product-detail"><div class="product-detail-visual">${productImage(p,true)}</div><div><span class="detail-kicker">${esc(p.cat)}</span><h2>${esc(p.name)}</h2><div class="detail-code">${esc(p.code||'')}</div><div class="detail-price">${fmt(p.price)}</div><div class="stock-pill ${st.className}">${st.label}</div>${updated?`<div class="net-price">${esc(updated)}</div>`:''}<ul class="detail-list"><li>Precio neto</li><li>Envíos a todo México</li><li>Envío gratis desde $5,000 MXN</li></ul>${extra}<div class="product-detail-actions">${primary}<button class="btn secondary" data-modal-wa="${p.id}">Consultar por WhatsApp</button></div></div></div>`;
   $('#productDialog').showModal();
+  window.aquaMeta?.('ViewContent',{content_ids:[String(p.id)],content_name:p.name,content_category:p.cat,content_type:'product',value:Number(p.price),currency:'MXN'});
   const modalAdd=$('[data-modal-add]');
   if(modalAdd) modalAdd.onclick=()=>{add(id,false);$('#productDialog').close()};
-  $('[data-modal-wa]').forEach(b=>b.onclick=()=>ask(+b.dataset.modalWa));
+  $$('[data-modal-wa]').forEach(b=>b.onclick=()=>ask(+b.dataset.modalWa));
 }
 function lines(){return Object.entries(cart).map(([id,qty])=>({p:PRODUCTS.find(x=>x.id===+id),qty})).filter(x=>x.p)}
 function subtotal(){return lines().reduce((s,x)=>s+x.p.price*x.qty,0)}
@@ -172,6 +189,11 @@ const POLICIES={
 };
 
 async function init(){
+  // Clics en enlaces fijos de WhatsApp (encabezado, pie, botón flotante)
+  document.addEventListener('click',e=>{
+    const a=e.target.closest?.('a[href*="wa.me"]');
+    if(a) metaContact('enlace');
+  });
   const [catalog,inventoryOut,mercuryOut]=await Promise.all([
     fetch('data/products.json',{cache:'no-store'}).then(r=>r.json()),
     fetch('/api/inventory',{cache:'no-store'}).then(r=>r.ok?r.json():({inventory:[]})).catch(()=>({inventory:[]})),
@@ -242,6 +264,14 @@ async function init(){
     }
     pendingWhatsApp=`https://wa.me/${PHONE}?text=${encodeURIComponent(orderMsg(d,id))}`;
     localStorage.setItem('aquacore-last-order',JSON.stringify({id,d,lines:lines().map(x=>({id:x.p.id,qty:x.qty})),sub}));
+    // Meta Pixel: pedido generado (antes del pago)
+    window.aquaMeta?.('Lead',{
+      content_ids:lines().map(x=>String(x.p.id)),
+      content_type:'product',
+      value:Number(sub.toFixed(2)),
+      currency:'MXN',
+      order_id:id
+    });
 
     if(sub<FREE_SHIPPING){
       $('#checkoutDialog').close();
@@ -258,7 +288,7 @@ async function init(){
       const r=await fetch('/api/create-order',{
         method:'POST',
         headers:{'content-type':'application/json'},
-        body:JSON.stringify({orderId:id,customer:d,lines:lines().map(x=>({id:x.p.id,qty:x.qty}))})
+        body:JSON.stringify({orderId:id,customer:d,lines:lines().map(x=>({id:x.p.id,qty:x.qty})),meta:metaCookies()})
       });
       const out=await r.json().catch(()=>({}));
       if(!r.ok||!out.checkoutUrl){
@@ -312,7 +342,7 @@ async function init(){
     }
   };
 
-  $('#successWa').onclick=()=>pendingWhatsApp&&window.open(pendingWhatsApp,'_blank');
+  $('#successWa').onclick=()=>{if(!pendingWhatsApp)return;metaContact('pedido');window.open(pendingWhatsApp,'_blank')};
   $$('[data-close]').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.close).close());
   $$('[data-policy]').forEach(b=>b.onclick=()=>{$('#policyBody').innerHTML=POLICIES[b.dataset.policy];$('#policyDialog').showModal()});
   $('#shapeSelect').onchange=toggleShape;
@@ -321,6 +351,7 @@ async function init(){
     e.preventDefault();
     const d=Object.fromEntries(new FormData(e.currentTarget)),v=volume(),dims=d.shape==='round'?`Diámetro: ${d.diameter} m`:`Largo: ${d.length} m · Ancho: ${d.width} m`;
     const m=`Hola AquaCore MX. Quiero dimensionar un sistema de aireación.\n\nEspecie: ${d.species}\nTipo: ${d.shape==='round'?'Circular':'Rectangular'}\n${dims}\nProfundidad: ${d.depth} m\nNo. estanques: ${d.ponds}\nVolumen aprox. por estanque: ${v.one.toFixed(1)} m³\nVolumen total: ${v.total.toFixed(1)} m³\nDensidad/biomasa: ${d.density||'No indicada'}`;
+    metaContact('calculadora');
     window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(m)}`,'_blank');
   };
   $('#mobileMenu').onclick=()=>{const n=$('#mainNav');n.classList.toggle('open')};

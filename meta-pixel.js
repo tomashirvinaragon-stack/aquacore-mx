@@ -16,9 +16,12 @@
   w.fbq('init',PIXEL_ID);
   w.fbq('track','PageView');
 
-  w.aquaMeta=function(eventName,params){
+  w.aquaMeta=function(eventName,params,eventId){
     try{
-      if(typeof w.fbq==='function') w.fbq('track',eventName,params||{});
+      if(typeof w.fbq==='function'){
+        if(eventId) w.fbq('track',eventName,params||{},{eventID:String(eventId)});
+        else w.fbq('track',eventName,params||{});
+      }
     }catch(err){
       console.debug('Meta Pixel event skipped',err);
     }
