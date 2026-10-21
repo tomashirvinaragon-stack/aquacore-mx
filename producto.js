@@ -8,7 +8,7 @@ const slugify=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').t
 const imagePath=p=>{
   if(p.image) return p.image.startsWith('/')?p.image:'/'+p.image;
   if(p.cat==='Blowers') return '/assets/products/blower-pulsar.webp';
-  return `/api/equipesca-image?name=${encodeURIComponent(p.name)}&code=${encodeURIComponent(p.code||'')}&v=20261021img`;
+  return `/api/equipesca-image?name=${encodeURIComponent(p.name)}&code=${encodeURIComponent(p.code||'')}&v=20261021img2`;
 };
 const productUrl=p=>`${location.origin}/productos/${slugify(p.name)}-${p.id}`;
 const toast=t=>{const x=document.querySelector('#productToast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1800)};
