@@ -22,7 +22,7 @@ function metaContact(source,p){
 }
 const catIcon={Blowers:'🌀',Aireadores:'🌊',Difusores:'⚫','Calidad de agua':'🧪','Redes y mallas':'🕸️',Procesamiento:'🔪',Protección:'🦺',Refacciones:'⚙️','Motores Mercury':'🚤'};
 const NO_PRODUCT_IMAGE=new Set([78,80,85]);
-const imagePath=p=>p.image||(p.cat==='Blowers'?'/assets/products/blower-pulsar.webp':`/api/equipesca-image?name=${encodeURIComponent(p.name)}&code=${encodeURIComponent(p.code||'')}&v=20260917b`);
+const imagePath=p=>p.image||(p.cat==='Blowers'?'/assets/products/blower-pulsar.webp':`/api/equipesca-image?name=${encodeURIComponent(p.name)}&code=${encodeURIComponent(p.code||'')}&v=20261021img`);
 function productImage(p,detail=false){
   const cls=detail?'product-detail-photo':'product-photo';
   const fallback=detail?'product-detail-fallback':'symbol';
