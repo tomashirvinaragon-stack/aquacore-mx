@@ -201,7 +201,8 @@ async function init(){
   ]);
   const byInventory=new Map((Array.isArray(inventoryOut?.inventory)?inventoryOut.inventory:[]).map(x=>[Number(x.product_id),x]));
   const byMercury=new Map((Array.isArray(mercuryOut?.availability)?mercuryOut.availability:[]).map(x=>[Number(x.product_id),x]));
-  PRODUCTS=catalog.map(p=>{
+  // Productos con "hidden": true no se muestran ni se venden (siguen en el catálogo para reportes)
+  PRODUCTS=catalog.filter(p=>!p.hidden).map(p=>{
     const inv=byInventory.get(Number(p.id));
     const mercury=byMercury.get(Number(p.id));
     const stockManaged=Boolean(inv?.managed);

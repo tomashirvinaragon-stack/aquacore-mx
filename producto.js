@@ -77,7 +77,7 @@ async function init(){
       fetch('/api/equipesca-mercury',{cache:'no-store'}).then(r=>r.ok?r.json():({availability:[]})).catch(()=>({availability:[]}))
     ]);
     const id=getRequestedId();
-    const base=products.find(x=>Number(x.id)===id);
+    const base=products.find(x=>Number(x.id)===id&&!x.hidden);
     const inv=(Array.isArray(inventoryOut?.inventory)?inventoryOut.inventory:[]).find(x=>Number(x.product_id)===id);
     const mercury=(Array.isArray(mercuryOut?.availability)?mercuryOut.availability:[]).find(x=>Number(x.product_id)===id);
     const stockManaged=Boolean(inv?.managed);
