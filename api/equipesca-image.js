@@ -18,6 +18,40 @@ function scoreProduct(p,name,code){
   return score;
 }
 
+// Códigos de AquaCore que en equipesca.com aparecen con otro nombre
+const CODE_ALIASES={
+  TAS8S:'as8s'
+};
+
+// Medidas que deben coincidir exactamente (hp, pulgadas, mm) para aceptar una foto.
+// Evita mostrar, por ejemplo, la foto de un motor de 15 hp en uno de 150 hp.
+function measures(s=''){
+  const t=String(s).toLowerCase().replace(/,/g,'.');
+  const out=new Set();
+  const re=/(\d+(?:\.\d+)?)\s*(hp|pulg|mm|")/g;
+  let m;
+  while((m=re.exec(t))){
+    const unit=m[2]==='"'?'pulg':m[2];
+    out.add(`${Number(m[1])}${unit}`);
+  }
+  return out;
+}
+
+function compatible(p,name){
+  const need=measures(name);
+  if(!need.size) return true;
+  const have=measures(p?.title||'');
+  for(const x of need){
+    const unit=x.replace(/^[\d.]+/,'');
+    const sameUnit=[...have].filter(h=>h.endsWith(unit));
+    // Si el producto de Equipesca declara esa unidad, debe incluir el mismo valor.
+    if(sameUnit.length && !have.has(x)) return false;
+    // Para hp la medida es obligatoria: sin hp en el título no se acepta.
+    if(unit==='hp' && !have.has(x)) return false;
+  }
+  return true;
+}
+
 function imageFromProduct(p){
   const f=p?.featured_image;
   let url=
@@ -74,6 +108,8 @@ export default async function handler(req,res){
 
   try{
     const queries=[];
+    const alias=CODE_ALIASES[code.toUpperCase()];
+    if(alias) queries.push(alias);
     if(code) queries.push(code.replaceAll('/',' '));
     if(name) queries.push(name);
     if(name&&code) queries.push(`${name} ${code}`);
@@ -89,7 +125,7 @@ export default async function handler(req,res){
 
     const unique=[...new Map(products.map(p=>[String(p?.id||p?.url||p?.title),p])).values()];
     unique.sort((a,b)=>scoreProduct(b,name,code)-scoreProduct(a,name,code));
-    const best=unique[0];
+    const best=unique.find(p=>compatible(p,name));
 
     let image=imageFromProduct(best);
     if(!image) image=await ogImage(best?.url);
@@ -101,7 +137,7 @@ export default async function handler(req,res){
         matchedTitle:best?.title||null,
         productUrl:best?.url||null,
         image:image||null,
-        candidates:unique.slice(0,5).map(p=>({title:p.title,url:p.url,score:scoreProduct(p,name,code)}))
+        candidates:unique.slice(0,5).map(p=>({title:p.title,url:p.url,score:scoreProduct(p,name,code),compatible:compatible(p,name)}))
       });
     }
 
