@@ -20,7 +20,8 @@
       "Estanques de acuacultura",
       "Líneas de difusión de aire"
     ],
-    "equipesca_code": "33091"
+    "equipesca_code": "33091",
+    "hidden": true
   },
   {
     "id": 2,
@@ -50,7 +51,8 @@
     "code": "PMF-10 / PRB30-510",
     "price": 8806.52,
     "icon": "🌀",
-    "equipesca_code": "33088"
+    "equipesca_code": "33088",
+    "hidden": true
   },
   {
     "id": 4,
@@ -73,7 +75,8 @@
       "Sistemas con difusores",
       "Aplicaciones de aire continuo"
     ],
-    "equipesca_code": "33089"
+    "equipesca_code": "33089",
+    "hidden": true
   },
   {
     "id": 5,
@@ -153,7 +156,8 @@
       "Sistemas con blower",
       "Aireación de mayor superficie"
     ],
-    "equipesca_code": "54376"
+    "equipesca_code": "54376",
+    "hidden": true
   },
   {
     "id": 9,
@@ -182,7 +186,8 @@
     "code": "PMF-12 / PRB40-420",
     "price": 8176.83,
     "icon": "🌀",
-    "equipesca_code": "33090"
+    "equipesca_code": "33090",
+    "hidden": true
   },
   {
     "id": 11,
@@ -211,7 +216,8 @@
     "code": "PMF-16 / PRB50-520",
     "price": 14383.08,
     "icon": "🌀",
-    "equipesca_code": "38079"
+    "equipesca_code": "38079",
+    "hidden": true
   },
   {
     "id": 13,
@@ -220,7 +226,8 @@
     "code": "PMF-20 / PRB80-660",
     "price": 46502.4,
     "icon": "🌀",
-    "equipesca_code": "36248"
+    "equipesca_code": "36248",
+    "hidden": true
   },
   {
     "id": 14,
@@ -243,7 +250,8 @@
       "Tilapia y otras especies acuícolas",
       "Oxigenación y circulación superficial"
     ],
-    "equipesca_code": "32549"
+    "equipesca_code": "32549",
+    "hidden": true
   },
   {
     "id": 15,
@@ -265,7 +273,8 @@
       "Oxigenación superficial",
       "Circulación de agua"
     ],
-    "equipesca_code": "05250"
+    "equipesca_code": "05250",
+    "hidden": true
   },
   {
     "id": 16,
@@ -287,7 +296,8 @@
       "Oxigenación superficial",
       "Circulación de agua"
     ],
-    "equipesca_code": "33007"
+    "equipesca_code": "33007",
+    "hidden": true
   },
   {
     "id": 17,
@@ -310,7 +320,8 @@
       "Mezcla y circulación de agua"
     ],
     "equipesca_code": "39405",
-    "image": "https://equipesca.com/cdn/shop/files/download_0ad5383b-db62-4f9e-88be-b49931a201a8.png?v=1764014374&width=533"
+    "image": "https://equipesca.com/cdn/shop/files/download_0ad5383b-db62-4f9e-88be-b49931a201a8.png?v=1764014374&width=533",
+    "hidden": true
   },
   {
     "id": 18,
@@ -330,7 +341,8 @@
       "Reemplazo de componente",
       "Sistemas de aireación"
     ],
-    "equipesca_code": "05338"
+    "equipesca_code": "05338",
+    "hidden": true
   },
   {
     "id": 19,
@@ -352,7 +364,8 @@
       "Oxigenación superficial",
       "Circulación de agua"
     ],
-    "equipesca_code": "50441"
+    "equipesca_code": "50441",
+    "hidden": true
   },
   {
     "id": 20,
@@ -374,7 +387,8 @@
       "Oxigenación superficial",
       "Circulación de agua"
     ],
-    "equipesca_code": "49750"
+    "equipesca_code": "49750",
+    "hidden": true
   },
   {
     "id": 21,
@@ -396,7 +410,8 @@
       "Mantenimiento de equipo",
       "Aplicaciones compatibles según modelo"
     ],
-    "equipesca_code": "05742"
+    "equipesca_code": "05742",
+    "hidden": true
   },
   {
     "id": 22,
@@ -417,7 +432,8 @@
       "Mantenimiento de equipo",
       "Aplicaciones compatibles según modelo"
     ],
-    "equipesca_code": "05087"
+    "equipesca_code": "05087",
+    "hidden": true
   },
   {
     "id": 23,
@@ -441,7 +457,8 @@
       "Circulación y mezcla de agua"
     ],
     "equipesca_code": "55919",
-    "image": "https://www.flojett.com/uploads/image/20250403/surge-splash-aerator_20250403135629.webp"
+    "image": "https://www.flojett.com/uploads/image/20250403/surge-splash-aerator_20250403135629.webp",
+    "hidden": true
   },
   {
     "id": 24,
@@ -464,7 +481,8 @@
       "Circulación y mezcla de agua"
     ],
     "equipesca_code": "55921",
-    "image": "https://www.flojett.com/uploads/image/20250403/surge-splash-aerator_20250403135629.webp"
+    "image": "https://www.flojett.com/uploads/image/20250403/surge-splash-aerator_20250403135629.webp",
+    "hidden": true
   },
   {
     "id": 25,
@@ -487,7 +505,8 @@
       "Circulación y mezcla de agua"
     ],
     "equipesca_code": "55918",
-    "image": "https://www.flojett.com/uploads/image/20250403/surge-splash-aerator_20250403135629.webp"
+    "image": "https://www.flojett.com/uploads/image/20250403/surge-splash-aerator_20250403135629.webp",
+    "hidden": true
   },
   {
     "id": 26,
@@ -509,7 +528,8 @@
       "Circulación y mezcla de agua"
     ],
     "equipesca_code": "55923",
-    "image": "/assets/products/splash-cuadrado.jpg"
+    "image": "/assets/products/splash-cuadrado.jpg",
+    "hidden": true
   },
   {
     "id": 27,
@@ -531,7 +551,8 @@
       "Circulación y mezcla de agua"
     ],
     "equipesca_code": "55924",
-    "image": "/assets/products/splash-cuadrado.jpg"
+    "image": "/assets/products/splash-cuadrado.jpg",
+    "hidden": true
   },
   {
     "id": 28,
@@ -2068,7 +2089,8 @@
       "Pesca y embarcaciones de trabajo",
       "Navegación según la configuración del modelo"
     ],
-    "equipesca_code": "52686"
+    "equipesca_code": "52686",
+    "hidden": true
   },
   {
     "id": 100,
@@ -2434,7 +2456,8 @@
       "Pesca y embarcaciones de trabajo",
       "Navegación según la configuración del modelo"
     ],
-    "equipesca_code": "50511"
+    "equipesca_code": "50511",
+    "hidden": true
   },
   {
     "id": 116,
@@ -2459,7 +2482,8 @@
       "Pesca y embarcaciones de trabajo",
       "Navegación según la configuración del modelo"
     ],
-    "equipesca_code": "53431"
+    "equipesca_code": "53431",
+    "hidden": true
   },
   {
     "id": 117,
@@ -2484,7 +2508,8 @@
       "Pesca y embarcaciones de trabajo",
       "Navegación según la configuración del modelo"
     ],
-    "equipesca_code": "53032"
+    "equipesca_code": "53032",
+    "hidden": true
   },
   {
     "id": 118,
@@ -2508,7 +2533,8 @@
       "Pesca y embarcaciones de trabajo",
       "Navegación según la configuración del modelo"
     ],
-    "equipesca_code": "27417"
+    "equipesca_code": "27417",
+    "hidden": true
   },
   {
     "id": 119,
@@ -2533,7 +2559,8 @@
       "Pesca y embarcaciones de trabajo",
       "Navegación según la configuración del modelo"
     ],
-    "equipesca_code": "53047"
+    "equipesca_code": "53047",
+    "hidden": true
   },
   {
     "id": 120,
@@ -2558,7 +2585,8 @@
       "Pesca y embarcaciones de trabajo",
       "Navegación según la configuración del modelo"
     ],
-    "equipesca_code": "55618"
+    "equipesca_code": "55618",
+    "hidden": true
   },
   {
     "id": 121,
@@ -2628,7 +2656,8 @@
       "Pesca y embarcaciones de trabajo",
       "Navegación según la configuración del modelo"
     ],
-    "equipesca_code": "51779"
+    "equipesca_code": "51779",
+    "hidden": true
   },
   {
     "id": 124,
@@ -2653,7 +2682,8 @@
       "Pesca y embarcaciones de trabajo",
       "Navegación según la configuración del modelo"
     ],
-    "equipesca_code": "54405"
+    "equipesca_code": "54405",
+    "hidden": true
   },
   {
     "id": 125,
@@ -2677,7 +2707,8 @@
       "Pesca y embarcaciones de trabajo",
       "Navegación según la configuración del modelo"
     ],
-    "equipesca_code": "13074"
+    "equipesca_code": "13074",
+    "hidden": true
   },
   {
     "id": 126,
@@ -2701,7 +2732,8 @@
       "Pesca y embarcaciones de trabajo",
       "Navegación según la configuración del modelo"
     ],
-    "equipesca_code": "32521"
+    "equipesca_code": "32521",
+    "hidden": true
   },
   {
     "id": 127,
@@ -2725,7 +2757,8 @@
       "Pesca y embarcaciones de trabajo",
       "Navegación según la configuración del modelo"
     ],
-    "equipesca_code": "47041"
+    "equipesca_code": "47041",
+    "hidden": true
   },
   {
     "id": 128,
@@ -2750,6 +2783,7 @@
       "Pesca y embarcaciones de trabajo",
       "Navegación según la configuración del modelo"
     ],
-    "equipesca_code": "53432"
+    "equipesca_code": "53432",
+    "hidden": true
   }
 ]
