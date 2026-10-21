@@ -3,6 +3,7 @@ import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { dbConfigured, upsertOrder, updateOrderByFolio, getInventoryByIds } from './_db.js';
 
+import { trackingFromRequest } from './_meta-capi.js';
 const FREE_SHIPPING = 5000;
 
 function loadProducts(){
@@ -54,7 +55,7 @@ export default async function handler(req,res){
   try{
     if(!accessToken)return res.status(503).json({error:'Pago en línea aún no activado',code:'PAYMENTS_NOT_CONFIGURED'});
 
-    const {orderId,customer,lines}=req.body||{};
+    const {orderId,customer,lines,meta:clientMeta}=req.body||{};
     if(!orderId||!customer?.email||!Array.isArray(lines)||!lines.length){
       return res.status(400).json({error:'Pedido incompleto'});
     }
@@ -206,7 +207,8 @@ export default async function handler(req,res){
             unit_price:Number(p.price),
             total:Number((Number(p.price)*qty).toFixed(2))
           })),
-          ...(invoice?[{_type:'invoice',required:true,...invoice}]:[])
+          ...(invoice?[{_type:'invoice',required:true,...invoice}]:[]),
+          trackingFromRequest(req,clientMeta)
         ],
         subtotal,
         shipping_amount:0,

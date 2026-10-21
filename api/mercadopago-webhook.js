@@ -1,5 +1,6 @@
 import { WebhookSignatureValidator, InvalidWebhookSignatureError } from 'mercadopago';
 import { dbConfigured, updateOrderByFolio, updateOrderByMpOrderId, commitOrderInventory } from './_db.js';
+import { metaCapiConfigured, sendPurchaseFromOrder } from './_meta-capi.js';
 
 function validateWithSdk({signature,requestId,dataId,secret}){
   if(!signature||!secret) return false;
@@ -62,6 +63,7 @@ export default async function handler(req,res){
       accessTokenConfigured:Boolean(process.env.MERCADOPAGO_ACCESS_TOKEN),
       webhookSecretConfigured:Boolean(process.env.MERCADOPAGO_WEBHOOK_SECRET),
       ordersDatabaseConfigured:dbConfigured(),
+      metaConversionsApiConfigured:metaCapiConfigured(),
       validator:'mercadopago-sdk'
     });
   }
@@ -161,12 +163,15 @@ export default async function handler(req,res){
       };
       if(mapped==='approved') patch.paid_at=new Date().toISOString();
 
+      let savedRow=null;
       try{
         const byFolio=order.external_reference
           ? await updateOrderByFolio(String(order.external_reference),patch)
           : null;
+        if(Array.isArray(byFolio)&&byFolio.length) savedRow=byFolio[0];
         if((!byFolio||!byFolio.length) && order.id){
-          await updateOrderByMpOrderId(String(order.id),patch);
+          const byMp=await updateOrderByMpOrderId(String(order.id),patch);
+          if(Array.isArray(byMp)&&byMp.length) savedRow=byMp[0];
         }
       }catch(dbErr){
         console.error('No se pudo actualizar el pedido en Supabase',dbErr);
@@ -183,6 +188,17 @@ export default async function handler(req,res){
           }
         }catch(inventoryErr){
           console.error('AQUACORE_INVENTORY_COMMIT_ERROR',inventoryErr);
+        }
+      }
+
+      if(mapped==='approved' && savedRow && metaCapiConfigured()){
+        try{
+          const proto=String(req.headers['x-forwarded-proto']||'https').split(',')[0];
+          const host=String(req.headers['x-forwarded-host']||req.headers.host||'');
+          const capi=await sendPurchaseFromOrder(savedRow,{baseUrl:host?`${proto}://${host}`:undefined});
+          console.log('AQUACORE_META_PURCHASE_SENT',{folio:savedRow.folio,...capi});
+        }catch(capiErr){
+          console.error('AQUACORE_META_PURCHASE_ERROR',{folio:savedRow.folio,error:capiErr?.message||String(capiErr)});
         }
       }
     }
