@@ -48,6 +48,12 @@ function compatible(p,name){
     if(sameUnit.length && !have.has(x)) return false;
     // Para hp la medida es obligatoria: sin hp en el título no se acepta.
     if(unit==='hp' && !have.has(x)) return false;
+    // Para pulgadas, el número debe aparecer en el título aunque no diga "pulg".
+    if(unit==='pulg'){
+      const nums=new Set(String(p?.title||'').toLowerCase().replace(/,/g,'.')
+        .split(/[^0-9.]+/).filter(Boolean).map(v=>String(Number(v))));
+      if(!nums.has(String(Number(x.replace(/pulg$/,''))))) return false;
+    }
   }
   return true;
 }
