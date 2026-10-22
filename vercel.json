@@ -2,6 +2,12 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
   "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/p/:id",
+      "destination": "/api/share?id=:id"
+    }
+  ],
   "functions": {
     "api/*.js": {
       "includeFiles": "data/products.json"
