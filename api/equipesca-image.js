@@ -1,3 +1,4 @@
+import shareHandler from './_share.js';
 function norm(s=''){
   return String(s).toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
@@ -104,6 +105,8 @@ async function ogImage(productUrl){
 }
 
 export default async function handler(req,res){
+  // Liga corta de producto para Facebook/WhatsApp: /p/:id → ?share=:id
+  if(req.query?.share) return shareHandler({...req,query:{id:req.query.share}},res);
   res.setHeader('cache-control','public, s-maxage=86400, stale-while-revalidate=604800');
   if(req.method!=='GET') return res.status(405).json({error:'Método no permitido'});
 
