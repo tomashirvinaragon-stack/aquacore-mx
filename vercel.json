@@ -5,7 +5,7 @@
   "rewrites": [
     {
       "source": "/p/:id",
-      "destination": "/api/share?id=:id"
+      "destination": "/api/equipesca-image?share=:id"
     }
   ],
   "functions": {
