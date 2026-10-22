@@ -107,6 +107,21 @@ async function ogImage(productUrl){
 export default async function handler(req,res){
   // Liga corta de producto para Facebook/WhatsApp: /p/:id → ?share=:id
   if(req.query?.share) return shareHandler({...req,query:{id:req.query.share}},res);
+  // Foto externa (Mercury) servida desde nuestro dominio y guardada en caché
+  if(req.query?.src){
+    const src=String(req.query.src);
+    let u;try{u=new URL(src)}catch{return res.status(400).end()}
+    if(!['shop.mercurymarine.com','www.mercruiserparts.com','equipesca.com','cdn.shopify.com'].includes(u.hostname)) return res.status(403).end();
+    try{
+      const r=await fetch(u,{headers:{'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124 Safari/537.36',accept:'image/avif,image/webp,image/*,*/*'}});
+      const type=r.headers.get('content-type')||'';
+      if(!r.ok||!type.startsWith('image/')) return res.redirect(302,src);
+      const buf=Buffer.from(await r.arrayBuffer());
+      res.setHeader('content-type',type);
+      res.setHeader('cache-control','public, max-age=604800, s-maxage=31536000, immutable');
+      return res.status(200).send(buf);
+    }catch{return res.redirect(302,src)}
+  }
   res.setHeader('cache-control','public, s-maxage=86400, stale-while-revalidate=604800');
   if(req.method!=='GET') return res.status(405).json({error:'Método no permitido'});
 
