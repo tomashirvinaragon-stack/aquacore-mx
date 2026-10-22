@@ -33,7 +33,7 @@ export default function handler(req,res){
 
   const target=`/producto?id=${p.id}`;
   const title=`${p.name} | AquaCore MX`;
-  const desc=`${fmt(p.price)} · Precio neto. ${p.description||''} Envíos a todo México. Atención por WhatsApp 644 251 8189.`.trim();
+  const desc=`${fmt(p.price)} · Precio neto. ${p.description||''} Envíos a todo México. Atención por WhatsApp 644 212 7571.`.trim();
   const img=imageUrl(p);
 
   res.setHeader('content-type','text/html; charset=utf-8');
