@@ -6,7 +6,7 @@ const fmt=n=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'}).fo
 const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 const slugify=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
 const imagePath=p=>{
-  if(p.image) return /^https?:\/\//.test(p.image)||p.image.startsWith('/')?p.image:'/'+p.image;
+  if(p.image) return /^https?:\/\//.test(p.image)?'/api/equipesca-image?src='+encodeURIComponent(p.image):p.image.startsWith('/')?p.image:'/'+p.image;
   if(p.cat==='Blowers') return '/assets/products/blower-pulsar.webp';
   return `/api/equipesca-image?name=${encodeURIComponent(p.name)}&code=${encodeURIComponent(p.code||'')}&v=20261021img2`;
 };
