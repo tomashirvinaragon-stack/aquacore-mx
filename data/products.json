@@ -2068,7 +2068,8 @@
       "Pesca y embarcaciones de trabajo",
       "Navegación según la configuración del modelo"
     ],
-    "equipesca_code": "52686"
+    "equipesca_code": "52686",
+    "image": "https://shop.mercurymarine.com/media/catalog/product/6/0/60hp-twostroke-commandthrust_port.png?format=jpeg"
   },
   {
     "id": 100,
@@ -2434,7 +2435,8 @@
       "Pesca y embarcaciones de trabajo",
       "Navegación según la configuración del modelo"
     ],
-    "equipesca_code": "50511"
+    "equipesca_code": "50511",
+    "image": "https://shop.mercurymarine.com/media/catalog/product/7/5/75-90-115hp_fourstroke_seapro_port.png?format=jpeg"
   },
   {
     "id": 116,
@@ -2459,7 +2461,8 @@
       "Pesca y embarcaciones de trabajo",
       "Navegación según la configuración del modelo"
     ],
-    "equipesca_code": "53431"
+    "equipesca_code": "53431",
+    "image": "https://shop.mercurymarine.com/media/catalog/product/m/m/mm_115hp_4s_sp_wtiller_port_1.png?format=jpeg"
   },
   {
     "id": 117,
@@ -2484,7 +2487,8 @@
       "Pesca y embarcaciones de trabajo",
       "Navegación según la configuración del modelo"
     ],
-    "equipesca_code": "53032"
+    "equipesca_code": "53032",
+    "image": "https://shop.mercurymarine.com/media/catalog/product/m/m/mm_115hp_4s_sp_wtiller_port_1.png?format=jpeg"
   },
   {
     "id": 118,
@@ -2508,7 +2512,8 @@
       "Pesca y embarcaciones de trabajo",
       "Navegación según la configuración del modelo"
     ],
-    "equipesca_code": "27417"
+    "equipesca_code": "27417",
+    "image": "https://shop.mercurymarine.com/media/catalog/product/s/e/seapro_40-60hp_portside.png?format=jpeg"
   },
   {
     "id": 119,
@@ -2533,7 +2538,8 @@
       "Pesca y embarcaciones de trabajo",
       "Navegación según la configuración del modelo"
     ],
-    "equipesca_code": "53047"
+    "equipesca_code": "53047",
+    "image": "https://shop.mercurymarine.com/media/catalog/product/s/e/seapro_40-60hp_portside_tiller.png?format=jpeg"
   },
   {
     "id": 120,
@@ -2558,7 +2564,8 @@
       "Pesca y embarcaciones de trabajo",
       "Navegación según la configuración del modelo"
     ],
-    "equipesca_code": "55618"
+    "equipesca_code": "55618",
+    "image": "https://www.mercruiserparts.com/images/thumbs/014/0148330_mercury-300xl-seapro-dts-544-175_550.jpeg"
   },
   {
     "id": 121,
@@ -2628,7 +2635,8 @@
       "Pesca y embarcaciones de trabajo",
       "Navegación según la configuración del modelo"
     ],
-    "equipesca_code": "51779"
+    "equipesca_code": "51779",
+    "image": "https://www.mercruiserparts.com/images/thumbs/014/0148377_mercury-200xl-seapro-544-185_550.jpeg"
   },
   {
     "id": 124,
@@ -2653,7 +2661,8 @@
       "Pesca y embarcaciones de trabajo",
       "Navegación según la configuración del modelo"
     ],
-    "equipesca_code": "54405"
+    "equipesca_code": "54405",
+    "image": "https://www.mercruiserparts.com/images/thumbs/014/0148377_mercury-200xl-seapro-544-185_550.jpeg"
   },
   {
     "id": 125,
@@ -2677,7 +2686,8 @@
       "Pesca y embarcaciones de trabajo",
       "Navegación según la configuración del modelo"
     ],
-    "equipesca_code": "13074"
+    "equipesca_code": "13074",
+    "image": "https://shop.mercurymarine.com/media/catalog/product/1/5/150hp_fourstroke_seapro_port_2.png?format=jpeg"
   },
   {
     "id": 126,
@@ -2701,7 +2711,8 @@
       "Pesca y embarcaciones de trabajo",
       "Navegación según la configuración del modelo"
     ],
-    "equipesca_code": "32521"
+    "equipesca_code": "32521",
+    "image": "https://shop.mercurymarine.com/media/catalog/product/1/5/150hp_fourstroke_seapro_port_2.png?format=jpeg"
   },
   {
     "id": 127,
@@ -2725,7 +2736,8 @@
       "Pesca y embarcaciones de trabajo",
       "Navegación según la configuración del modelo"
     ],
-    "equipesca_code": "47041"
+    "equipesca_code": "47041",
+    "image": "https://shop.mercurymarine.com/media/catalog/product/7/5/75-90-115hp_fourstroke_seapro_port.png?format=jpeg"
   },
   {
     "id": 128,
@@ -2750,6 +2762,7 @@
       "Pesca y embarcaciones de trabajo",
       "Navegación según la configuración del modelo"
     ],
-    "equipesca_code": "53432"
+    "equipesca_code": "53432",
+    "image": "https://shop.mercurymarine.com/media/catalog/product/m/m/mm_115hp_4s_sp_wtiller_port_1.png?format=jpeg"
   }
 ]
